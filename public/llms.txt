@@ -53,6 +53,6 @@
 ---
 
 ## URL & Deployment
-- Production Domain: https://universal-convertor.pages.dev
-- Repository: https://github.com/universal-convertor/universal-convertor
+- Production Domain: https://convertor.apidevelopers.ir/
+- Repository: https://github.com/emadtoranji/universal-convertor
 - License: The Unlicense (Public Domain Dedication, 100% Free for all commercial and personal use)
