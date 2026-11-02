@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   ChevronsLeftRight,
   FileAudio,
-  FileVideo,
   FileText,
 } from 'lucide-react';
 import { QueueItem } from '../types/converter';
@@ -92,7 +91,6 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
       : null;
 
   const isAudio = item.category === 'audio' || item.options.targetFormat === 'wav';
-  const isVideo = item.category === 'video';
   const isDocument = item.category === 'document';
 
   return (

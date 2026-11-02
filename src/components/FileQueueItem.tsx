@@ -12,7 +12,6 @@ import {
   Sliders,
   Lock,
   Unlock,
-  Palette,
   Shield,
   FileImage,
   FileAudio,
@@ -28,7 +27,6 @@ import {
   AudioBitDepth,
   AudioSampleRate,
   AudioChannels,
-  AudioChannelMode,
   PdfPageSize,
   PdfOrientation,
 } from '../types/converter';

@@ -9,12 +9,10 @@ import {
   OutputFormat,
   QueueItem,
   InputFormat,
-  MediaCategory,
   getCompatibleOutputFormats,
-  getMediaCategory,
   isHomogeneousQueue,
 } from './types/converter';
-import { validateMagicBytes, isExtensionSupported, verifyContentMatchesFormat } from './utils/magicBytes';
+import { isExtensionSupported, verifyContentMatchesFormat } from './utils/magicBytes';
 import { sanitizeSvgString } from './utils/svgSanitizer';
 import { ConversionWorkerPool } from './core/workerPool';
 import { createZipArchive } from './core/zipArchiver';
@@ -33,8 +31,6 @@ import {
   Scale,
   FileCode,
   AlertTriangle,
-  FileArchive,
-  Sliders,
   UploadCloud,
 } from 'lucide-react';
 
