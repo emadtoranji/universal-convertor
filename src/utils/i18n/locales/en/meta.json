@@ -1,12 +1,11 @@
 {
-  "title": "Universal Convertor - 100% Free Client-Side Image, Audio, Video & Document Converter",
-  "description": "100% Free, private client-side converter for images, audio, video & documents. Convert files locally in your browser with zero cloud uploads and unlimited batch speed.",
+  "title": "Universal Convertor - 100% Free Client-Side Image & Data Converter",
+  "description": "100% Free, private client-side converter for images and data. Convert PNG, JPG, WebP, AVIF, SVG, ICO, CSV, TSV & JSON locally in your browser with zero cloud uploads.",
   "keywords": [
     "universal convertor",
     "free image converter",
     "client-side converter",
-    "free audio converter",
-    "document converter",
+    "data converter",
     "zero cloud upload",
     "private file converter",
     "batch file converter",
@@ -14,12 +13,9 @@
     "avif converter",
     "png to webp",
     "jpg to png",
-    "wav encoder",
-    "mp3 to wav",
-    "extract audio from video",
-    "video frame snapshot",
-    "markdown to html",
     "json to csv",
+    "csv to json",
+    "tsv to csv",
     "images to pdf",
     "merge pdf",
     "ico generator",
@@ -28,7 +24,7 @@
   "applicationName": "Universal Convertor",
   "openGraph": {
     "title": "Universal Convertor - 100% Free Client-Side Converter",
-    "description": "Transform images, audio tracks, and documents directly in your browser. 100% free, private, and secure with zero cloud uploads.",
+    "description": "Transform images and tabular data directly in your browser. 100% free, private, and secure with zero cloud uploads.",
     "type": "website",
     "siteName": "Universal Convertor",
     "locale": "en_US"
@@ -36,16 +32,16 @@
   "twitter": {
     "card": "summary_large_image",
     "title": "Universal Convertor - 100% Free Converter",
-    "description": "100% Free, private, client-side batch converter for images, audio, video, and documents with zero uploads."
+    "description": "100% Free, private, client-side batch converter for images and structured data with zero uploads."
   },
   "schema": {
     "context": "https://schema.org",
     "type": "WebApplication",
     "name": "Universal Convertor",
-    "description": "100% Free, client-side universal file converter for images, audio, video, and documents running entirely within browser memory with zero server uploads.",
+    "description": "100% Free, client-side universal file converter for images and tabular data running entirely within browser memory with zero server uploads.",
     "applicationCategory": "MultimediaApplication",
     "operatingSystem": "Any",
-    "browserRequirements": "Requires a modern web browser supporting Web Workers, OffscreenCanvas, and Web Audio API",
+    "browserRequirements": "Requires a modern web browser supporting Web Workers and OffscreenCanvas",
     "offers": {
       "type": "Offer",
       "price": "0",
@@ -55,9 +51,9 @@
       "100% Client-Side In-Memory Processing",
       "Zero Cloud Uploads & Absolute Privacy",
       "Multi-Threaded Web Worker Concurrency Pool",
-      "Universal Image, Audio, Video & Document Support",
+      "High-Accuracy Image & Data Conversion",
       "Lossless & High-Efficiency WebP/AVIF Encoding",
-      "Pure Web Audio API PCM WAV Resampler",
+      "RFC-4180 CSV/TSV/JSON Serialization",
       "Instant Client-Side Multi-Page PDF Generation",
       "Multi-Threaded In-Memory ZIP Packaging"
     ]

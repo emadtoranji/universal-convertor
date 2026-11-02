@@ -59,10 +59,6 @@
     "maintainAspectRatio": "Maintain Aspect Ratio",
     "backgroundColor": "Background Fill",
     "stripExif": "Strip EXIF Metadata",
-    "audioBitDepth": "Audio Bit Depth",
-    "audioSampleRate": "Sample Rate",
-    "audioChannels": "Channels",
-    "videoSnapshot": "Snapshot Frame",
     "pdfPageSize": "Page Size",
     "pdfOrientation": "Orientation",
     "reset": "Reset to Global"

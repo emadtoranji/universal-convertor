@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
-import { UploadCloud, FileImage, FileAudio, FileVideo, FileText } from 'lucide-react';
+import { UploadCloud, FileImage, Table } from 'lucide-react';
 import { t } from '../utils/i18n';
 
 interface DropzoneProps {
@@ -104,7 +104,7 @@ const DropzoneComponent: React.FC<DropzoneProps> = ({
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*,audio/*,video/*,.svg,.tiff,.tif,.bmp,.ico,.heic,.heif,.mp3,.wav,.ogg,.aac,.flac,.m4a,.mp4,.webm,.mov,.ogv,.md,.markdown,.json,.csv,.tsv,.txt,.pdf,.xml,.yaml,.yml"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/bmp,image/x-icon,image/vnd.microsoft.icon,image/gif,application/json,text/csv,text/tab-separated-values,.png,.jpg,.jpeg,.webp,.avif,.svg,.bmp,.ico,.gif,.json,.csv,.tsv"
           onChange={handleFileInputChange}
           className="hidden"
           aria-label={t.dropzone.aria.fileInput}
@@ -137,19 +137,11 @@ const DropzoneComponent: React.FC<DropzoneProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
               <FileImage className="w-3.5 h-3.5 text-cyan-500" />
-              Images
+              Images (PNG, JPG, WebP, AVIF, SVG, BMP, ICO, GIF)
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
-              <FileAudio className="w-3.5 h-3.5 text-emerald-500" />
-              Audio
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
-              <FileVideo className="w-3.5 h-3.5 text-indigo-500" />
-              Video
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
-              <FileText className="w-3.5 h-3.5 text-pink-500" />
-              Documents & Data
+              <Table className="w-3.5 h-3.5 text-pink-500" />
+              Data (CSV, TSV, JSON)
             </span>
           </div>
         </div>

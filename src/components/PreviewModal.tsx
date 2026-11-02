@@ -7,8 +7,7 @@ import {
   ArrowRight,
   ShieldCheck,
   ChevronsLeftRight,
-  FileAudio,
-  FileText,
+  Table,
 } from 'lucide-react';
 import { QueueItem } from '../types/converter';
 import { t } from '../utils/i18n';
@@ -90,7 +89,6 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
       ? Math.round(((item.originalSize - item.result.size) / item.originalSize) * 100)
       : null;
 
-  const isAudio = item.category === 'audio' || item.options.targetFormat === 'wav';
   const isDocument = item.category === 'document';
 
   return (
@@ -113,7 +111,7 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {!isAudio && !isDocument && (
+            {!isDocument && (
               <div className="flex items-center bg-zinc-200 dark:bg-zinc-900 rounded-xl p-1 border border-zinc-300 dark:border-zinc-800">
                 <button
                   type="button"
@@ -170,25 +168,10 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
         </div>
 
         <div className="flex-1 overflow-auto p-3 sm:p-6 flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-950/90 min-h-[300px] sm:min-h-[420px]">
-          {isAudio ? (
-            <div className="flex flex-col items-center justify-center gap-4 w-full max-w-lg p-6 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
-              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-500">
-                <FileAudio className="w-12 h-12" />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 mb-1">{item.name}</h4>
-                <p className="text-xs text-zinc-500">{t.preview.media.audio.title}</p>
-              </div>
-              {item.result ? (
-                <audio controls src={item.result.url} className="w-full mt-2" />
-              ) : (
-                <audio controls src={item.previewUrl} className="w-full mt-2" />
-              )}
-            </div>
-          ) : isDocument ? (
+          {isDocument ? (
             <div className="flex flex-col items-center justify-center gap-4 w-full max-w-lg p-6 bg-white dark:bg-zinc-900/60 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
               <div className="p-4 rounded-2xl bg-pink-50 dark:bg-pink-950/60 text-pink-500">
-                <FileText className="w-12 h-12" />
+                <Table className="w-12 h-12" />
               </div>
               <div>
                 <h4 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 mb-1">{item.name}</h4>

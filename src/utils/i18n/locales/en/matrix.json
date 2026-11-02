@@ -1,7 +1,7 @@
 {
   "title": "Comprehensive Format Matrix & Technical Specifications",
-  "subtitle": "Discover the full range of supported input and output formats across images, audio, video, and documents, all processed 100% client-side.",
-  "badge": "All Media Engines",
+  "subtitle": "Discover the full range of supported input and output formats across images and structured data, all processed 100% client-side.",
+  "badge": "Hardware Accelerated",
   "categories": {
     "images": {
       "id": "images",
@@ -9,7 +9,7 @@
       "badge": "Hardware Accelerated",
       "icon": "Image",
       "description": "High-performance image transformation powered by multi-threaded Web Workers and OffscreenCanvas with zero GPU memory leaks.",
-      "inputs": ["PNG", "JPG", "JPEG", "WebP", "AVIF", "SVG", "BMP", "ICO", "GIF", "TIFF", "HEIC"],
+      "inputs": ["PNG", "JPG", "JPEG", "WebP", "AVIF", "SVG", "BMP", "ICO", "GIF"],
       "outputs": ["WebP", "AVIF", "PNG", "JPEG", "ICO", "BMP", "TIFF", "PDF"],
       "specs": [
         {
@@ -30,84 +30,30 @@
         }
       ]
     },
-    "audio": {
-      "id": "audio",
-      "title": "Audio & Sound",
-      "badge": "Web Audio API",
-      "icon": "Music",
-      "description": "Studio-grade audio decoding and PCM WAV synthesis running entirely via the native browser AudioContext pipeline.",
-      "inputs": ["MP3", "WAV", "OGG", "AAC", "M4A", "FLAC", "WEBM"],
-      "outputs": ["WAV (Linear PCM)"],
-      "specs": [
-        {
-          "name": "Quantization Bit Depths",
-          "details": "16-bit signed integer, 24-bit signed integer, and 32-bit IEEE 754 floating-point PCM audio encoding"
-        },
-        {
-          "name": "Sample Rate Resampling",
-          "details": "OfflineAudioContext resampling to 48,000 Hz, 44,100 Hz, 22,050 Hz, or 16,000 Hz"
-        },
-        {
-          "name": "Channel Mapping",
-          "details": "Full stereo preservation or automated downmixing to clean single-channel mono"
-        },
-        {
-          "name": "Format Verification",
-          "details": "RIFF header validation and metadata duration extraction without external decoders"
-        }
-      ]
-    },
-    "video": {
-      "id": "video",
-      "title": "Video & Animation",
-      "badge": "GPU Stream Extraction",
-      "icon": "Video",
-      "description": "Client-side video demuxing for soundtrack extraction and high-resolution keyframe snapshots using native HTML5 media elements.",
-      "inputs": ["MP4", "WebM", "MOV", "OGV"],
-      "outputs": ["WAV (Audio Track)", "PNG (Keyframe)", "WebP (Keyframe)", "JPEG (Keyframe)"],
-      "specs": [
-        {
-          "name": "Soundtrack Extraction",
-          "details": "Directly demuxes audio tracks to uncompressed 16/24-bit PCM WAV at original sample rate"
-        },
-        {
-          "name": "Keyframe Capture",
-          "details": "Captures pristine full-resolution video frames at 0s, midpoint, or user-selected timestamps"
-        },
-        {
-          "name": "Hardware Decoding",
-          "details": "Leverages device GPU video decoding pipelines for fast frame seeking and zero server transfer"
-        },
-        {
-          "name": "Dimension Preservation",
-          "details": "Maintains native video width, height, and display aspect ratios during snapshot capture"
-        }
-      ]
-    },
     "documents": {
       "id": "documents",
-      "title": "Documents & Structured Data",
-      "badge": "In-Memory Parsing",
-      "icon": "FileText",
-      "description": "Instant document conversion, structured data serialization, and multi-page PDF generation running in pure TypeScript.",
-      "inputs": ["Markdown (.md)", "HTML (.html)", "JSON (.json)", "CSV (.csv)", "TSV (.tsv)", "Text (.txt)"],
-      "outputs": ["HTML", "Markdown", "CSV", "TSV", "JSON", "PDF", "Base64", "Hex"],
+      "title": "Structured Data & Tables",
+      "badge": "Deterministic RFC-4180",
+      "icon": "Table",
+      "description": "Instant tabular data conversion, RFC 4180 CSV/TSV parsing, and structured JSON table serialization running in pure TypeScript.",
+      "inputs": ["CSV (.csv)", "TSV (.tsv)", "JSON (.json)"],
+      "outputs": ["CSV", "TSV", "JSON"],
       "specs": [
         {
-          "name": "Markdown & HTML",
-          "details": "Bi-directional conversion with sanitized semantic HTML output conforming to CommonMark standards"
+          "name": "RFC-4180 Compliant",
+          "details": "Strict quotation, escape handling, and comma/tab delimiter detection"
         },
         {
-          "name": "Structured Data",
-          "details": "Bi-directional JSON to CSV/TSV table serialization with automated delimiter detection and escaping"
+          "name": "Bi-Directional Serialization",
+          "details": "Lossless conversion between structured JSON objects and tabular CSV/TSV spreadsheets"
         },
         {
-          "name": "Client-Side PDF Generation",
-          "details": "Compiles plain text and markdown into clean multi-page PDF documents with custom margins"
+          "name": "Memory Safety",
+          "details": "100% client-side in-memory execution with zero data transmission"
         },
         {
-          "name": "Binary Encoders",
-          "details": "Encodes and decodes UTF-8 text and raw files to RFC 4648 Base64 strings and Hex dumps"
+          "name": "Formatting & Formatting",
+          "details": "Custom indentation, alphabetical key sorting, and minification controls"
         }
       ]
     }

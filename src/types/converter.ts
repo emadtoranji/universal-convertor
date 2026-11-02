@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export type MediaCategory = 'image' | 'audio' | 'video' | 'document';
+export type MediaCategory = 'image' | 'document';
 
 export type ImageInputFormat =
   | 'png'
@@ -10,31 +10,14 @@ export type ImageInputFormat =
   | 'svg'
   | 'bmp'
   | 'ico'
-  | 'gif'
-  | 'tiff'
-  | 'heic';
-
-export type AudioInputFormat = 'wav' | 'mp3' | 'ogg' | 'flac' | 'aac' | 'm4a';
-
-export type VideoInputFormat = 'mp4' | 'webm' | 'mov' | 'mkv' | 'ogv';
+  | 'gif';
 
 export type DocumentInputFormat =
-  | 'pdf'
-  | 'md'
-  | 'html'
   | 'json'
   | 'csv'
-  | 'tsv'
-  | 'txt'
-  | 'xml'
-  | 'yaml'
-  | 'yml';
+  | 'tsv';
 
-export type InputFormat =
-  | ImageInputFormat
-  | AudioInputFormat
-  | VideoInputFormat
-  | DocumentInputFormat;
+export type InputFormat = ImageInputFormat | DocumentInputFormat;
 
 export type ImageOutputFormat =
   | 'png'
@@ -46,26 +29,12 @@ export type ImageOutputFormat =
   | 'tiff'
   | 'pdf';
 
-export type AudioOutputFormat = 'wav';
-
-export type VideoOutputFormat = 'wav' | 'png' | 'jpeg' | 'webp';
-
 export type DocumentOutputFormat =
-  | 'html'
-  | 'md'
-  | 'csv'
-  | 'tsv'
   | 'json'
-  | 'pdf'
-  | 'txt'
-  | 'xml'
-  | 'yaml';
+  | 'csv'
+  | 'tsv';
 
-export type OutputFormat =
-  | ImageOutputFormat
-  | AudioOutputFormat
-  | VideoOutputFormat
-  | DocumentOutputFormat;
+export type OutputFormat = ImageOutputFormat | DocumentOutputFormat;
 
 export type TargetFormat = OutputFormat;
 
@@ -81,10 +50,6 @@ export type ConversionStatus =
 export type ResizeMode = 'original' | 'percentage' | 'dimensions';
 export type PdfPageSize = 'original' | 'a4' | 'letter';
 export type PdfOrientation = 'portrait' | 'landscape' | 'auto';
-export type AudioBitDepth = '16' | '24' | '32';
-export type AudioChannels = 'mono' | 'stereo';
-export type AudioChannelMode = 'mono' | 'stereo' | 'original';
-export type AudioSampleRate = 16000 | 22050 | 44100 | 48000;
 
 export const ConversionOptionsSchema = z.object({
   targetFormat: z.enum([
@@ -96,15 +61,9 @@ export const ConversionOptionsSchema = z.object({
     'bmp',
     'tiff',
     'pdf',
-    'wav',
-    'html',
-    'md',
     'json',
     'csv',
     'tsv',
-    'txt',
-    'xml',
-    'yaml',
   ]),
   quality: z.number().min(1).max(100).default(90),
   resizeMode: z.enum(['original', 'percentage', 'dimensions']).default('original'),
@@ -116,12 +75,6 @@ export const ConversionOptionsSchema = z.object({
   stripExif: z.boolean().default(true),
   pdfPageSize: z.enum(['original', 'a4', 'letter']).default('original'),
   pdfOrientation: z.enum(['portrait', 'landscape', 'auto']).default('auto'),
-  audioBitDepth: z.enum(['16', '24', '32']).default('16').optional(),
-  audioSampleRate: z.number().default(44100).optional(),
-  audioChannels: z.enum(['mono', 'stereo']).default('stereo').optional(),
-  videoSnapshotPoint: z.enum(['start', 'mid', 'end']).default('mid').optional(),
-  videoSnapshotTime: z.number().min(0).default(0).optional(),
-  videoExtractAudio: z.boolean().default(false).optional(),
   documentDelimiter: z.enum([',', '\t']).default(',').optional(),
   documentWrapLines: z.boolean().default(true).optional(),
   jsonIndent: z.number().int().min(0).max(8).default(2).optional(),
@@ -168,32 +121,10 @@ export function getMediaCategory(format: InputFormat): MediaCategory {
     case 'bmp':
     case 'ico':
     case 'gif':
-    case 'tiff':
-    case 'heic':
       return 'image';
-    case 'wav':
-    case 'mp3':
-    case 'ogg':
-    case 'flac':
-    case 'aac':
-    case 'm4a':
-      return 'audio';
-    case 'mp4':
-    case 'webm':
-    case 'mov':
-    case 'mkv':
-    case 'ogv':
-      return 'video';
-    case 'pdf':
-    case 'md':
-    case 'html':
     case 'json':
     case 'csv':
     case 'tsv':
-    case 'txt':
-    case 'xml':
-    case 'yaml':
-    case 'yml':
       return 'document';
     default:
       return 'document';
@@ -204,41 +135,23 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
   const category = getMediaCategory(sourceFormat);
   switch (category) {
     case 'image': {
-      const allImageOutputs: OutputFormat[] = ['webp', 'png', 'jpeg', 'avif', 'ico', 'bmp', 'tiff', 'pdf'];
-      const normalizedSource = sourceFormat === 'heic' ? 'jpeg' : sourceFormat;
-      return allImageOutputs.filter((fmt) => fmt !== normalizedSource);
+      const allImageOutputs: ImageOutputFormat[] = ['webp', 'png', 'jpeg', 'avif', 'ico', 'bmp', 'tiff', 'pdf'];
+      return allImageOutputs.filter((fmt) => fmt !== sourceFormat);
     }
-    case 'audio':
-      return ['wav'];
-    case 'video':
-      return ['wav', 'png', 'jpeg', 'webp'];
     case 'document': {
       switch (sourceFormat) {
-        case 'md':
-          return ['html', 'pdf', 'txt'];
-        case 'html':
-          return ['md', 'pdf', 'txt'];
         case 'json':
-          return ['json', 'csv', 'tsv', 'yaml', 'xml', 'txt'];
+          return ['json', 'csv', 'tsv'];
         case 'csv':
-          return ['json', 'tsv', 'yaml', 'txt'];
+          return ['json', 'tsv'];
         case 'tsv':
-          return ['json', 'csv', 'yaml', 'txt'];
-        case 'xml':
-          return ['xml', 'json', 'yaml', 'txt'];
-        case 'yaml':
-        case 'yml':
-          return ['yaml', 'json', 'xml', 'txt'];
-        case 'txt':
-          return ['pdf', 'md', 'html'];
-        case 'pdf':
-          return ['txt', 'html', 'md', 'json', 'pdf', 'png'];
+          return ['json', 'csv'];
         default:
-          return ['txt', 'pdf'];
+          return ['json', 'csv', 'tsv'];
       }
     }
     default:
-      return ['txt', 'pdf'];
+      return [];
   }
 }
 

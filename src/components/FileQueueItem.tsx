@@ -14,9 +14,7 @@ import {
   Unlock,
   Shield,
   FileImage,
-  FileAudio,
-  FileVideo,
-  FileText,
+  Table,
 } from 'lucide-react';
 import {
   QueueItem,
@@ -24,9 +22,6 @@ import {
   getCompatibleOutputFormats,
   ConversionOptions,
   ResizeMode,
-  AudioBitDepth,
-  AudioSampleRate,
-  AudioChannels,
   PdfPageSize,
   PdfOrientation,
 } from '../types/converter';
@@ -86,8 +81,6 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
     ? item.result.previewUrl || item.result.url
     : item.previewUrl;
 
-  const isAudio = item.category === 'audio';
-  const isVideo = item.category === 'video';
   const isDocument = item.category === 'document';
 
   return (
@@ -96,7 +89,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
         <div className="flex items-center gap-3 min-w-0 flex-1 w-full sm:w-auto">
           <div
             onClick={() => {
-              if (item.status !== 'error' && (displayThumbnail || item.previewUrl)) {
+              if (item.status !== 'error' && (displayThumbnail || item.previewUrl || isDocument)) {
                 onPreview(item);
               }
             }}
@@ -104,12 +97,8 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
             title={t.queue.actions.previewTitle}
             aria-label={t.queue.actions.previewAria}
           >
-            {isAudio ? (
-              <FileAudio className="w-6 h-6 text-emerald-500" />
-            ) : isVideo ? (
-              <FileVideo className="w-6 h-6 text-indigo-500" />
-            ) : isDocument ? (
-              <FileText className="w-6 h-6 text-pink-500" />
+            {isDocument ? (
+              <Table className="w-6 h-6 text-pink-500" />
             ) : displayThumbnail ? (
               <img
                 src={displayThumbnail}
@@ -147,12 +136,6 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                   <span>
                     {item.originalWidth} × {item.originalHeight}
                   </span>
-                </>
-              )}
-              {item.duration !== undefined && item.duration > 0 && (
-                <>
-                  <span className="text-zinc-400 dark:text-zinc-600">•</span>
-                  <span>{item.duration.toFixed(1)}s</span>
                 </>
               )}
 
@@ -302,7 +285,12 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
               max="100"
               value={item.options.quality}
               onChange={(e) => updateItemOption('quality', Number(e.target.value))}
-              disabled={item.options.targetFormat === 'png' || item.options.targetFormat === 'bmp'}
+              disabled={
+                item.options.targetFormat === 'png' ||
+                item.options.targetFormat === 'bmp' ||
+                item.options.targetFormat === 'csv' ||
+                item.options.targetFormat === 'tsv'
+              }
               className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-1.5 disabled:opacity-40"
             />
           </div>
@@ -387,52 +375,11 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                   onChange={(e) => updateItemOption('stripExif', e.target.checked)}
                   className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500"
                 />
-                <Shield className="w-3 h-3 text-emerald-500" />
+                <Shield className="w-3.5 h-3.5 text-emerald-500" />
                 <span>EXIF</span>
               </label>
             </div>
           </div>
-
-          {(isAudio || item.options.targetFormat === 'wav') && (
-            <div className="space-y-1.5 col-span-full border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.queue.advanced.audioBitDepth}</label>
-                <select
-                  value={item.options.audioBitDepth ?? '16'}
-                  onChange={(e) => updateItemOption('audioBitDepth', e.target.value as AudioBitDepth)}
-                  className="w-full px-2 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
-                >
-                  <option value="16">16-bit PCM (Standard)</option>
-                  <option value="24">24-bit PCM (Studio)</option>
-                  <option value="32">32-bit Float (Master)</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.queue.advanced.audioSampleRate}</label>
-                <select
-                  value={item.options.audioSampleRate ?? 44100}
-                  onChange={(e) => updateItemOption('audioSampleRate', Number(e.target.value) as AudioSampleRate)}
-                  className="w-full px-2 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
-                >
-                  <option value="48000">48,000 Hz (Broadcast)</option>
-                  <option value="44100">44,100 Hz (CD Audio)</option>
-                  <option value="22050">22,050 Hz (Compact)</option>
-                  <option value="16000">16,000 Hz (Speech)</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.queue.advanced.audioChannels}</label>
-                <select
-                  value={item.options.audioChannels ?? 'stereo'}
-                  onChange={(e) => updateItemOption('audioChannels', e.target.value as AudioChannels)}
-                  className="w-full px-2 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
-                >
-                  <option value="stereo">Stereo (2 Channels)</option>
-                  <option value="mono">Mono (1 Channel Downmix)</option>
-                </select>
-              </div>
-            </div>
-          )}
 
           {item.options.targetFormat === 'pdf' && (
             <div className="space-y-1.5 col-span-full border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 grid grid-cols-2 gap-2">

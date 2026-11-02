@@ -44,13 +44,13 @@ describe('security - Attack Payload & Protection Test Suite', () => {
   });
 
   it('detects and flags spoofed file extensions with mismatched magic bytes', () => {
-    const fakePng = new TextEncoder().encode('<html><body>Not a PNG</body></html>');
+    const fakePng = new TextEncoder().encode('{"error": "Not a PNG"}');
     const result = validateMagicBytes(fakePng.buffer, 'document.png');
 
     assert.ok(result.isValid);
     if (result.isValid) {
       assert.notEqual(result.format, 'png');
-      assert.equal(result.format, 'html');
+      assert.equal(result.format, 'json');
     }
   });
 
@@ -69,9 +69,8 @@ describe('security - Attack Payload & Protection Test Suite', () => {
 
   it('safely handles null bytes and control characters inside text documents', () => {
     const binaryInsideText = new Uint8Array([0x00, 0x01, 0x02, 0x1f, 0x7f]);
-    const result = validateMagicBytes(binaryInsideText.buffer, 'notes.txt');
+    const result = validateMagicBytes(binaryInsideText.buffer, 'data.csv');
 
     assert.equal(typeof result.isValid, 'boolean');
   });
 });
-

@@ -21,28 +21,8 @@
     "convertedImageAlt": "Converted result file preview"
   },
   "media": {
-    "audio": {
-      "title": "Audio Waveform & Playback",
-      "originalAudio": "Original Audio Track",
-      "convertedAudio": "Converted PCM WAV Track",
-      "play": "Play",
-      "pause": "Pause",
-      "mute": "Mute",
-      "unmute": "Unmute",
-      "duration": "Duration: {duration}s",
-      "sampleRate": "Sample Rate: {sampleRate} Hz",
-      "channels": "Channels: {channels}"
-    },
-    "video": {
-      "title": "Video Snapshot & Audio Extraction",
-      "originalVideo": "Original Video Preview",
-      "snapshotFrame": "Extracted Snapshot Frame",
-      "extractedAudio": "Extracted Audio Track",
-      "resolution": "Resolution: {width} × {height}",
-      "duration": "Duration: {duration}s"
-    },
     "document": {
-      "title": "Document Content Preview",
+      "title": "Document & Table Preview",
       "originalContent": "Source Content",
       "convertedContent": "Converted Output",
       "lineCount": "{count} lines",

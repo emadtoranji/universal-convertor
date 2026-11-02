@@ -50,32 +50,11 @@ const OUTPUT_FORMAT_GROUPS: { group: string; formats: { label: string; format: O
     ],
   },
   {
-    group: 'Audio',
-    formats: [
-      { label: t.toolbar.formats.wav, format: 'wav' },
-    ],
-  },
-  {
-    group: 'Video',
-    formats: [
-      { label: 'Audio Extract (WAV)', format: 'wav' },
-      { label: 'Snapshot Frame (PNG)', format: 'png' },
-      { label: 'Snapshot Frame (JPEG)', format: 'jpeg' },
-      { label: 'Snapshot Frame (WebP)', format: 'webp' },
-    ],
-  },
-  {
     group: 'Documents & Data',
     formats: [
-      { label: t.toolbar.formats.json, format: 'json' },
-      { label: 'XML (.xml)', format: 'xml' },
-      { label: 'YAML (.yaml)', format: 'yaml' },
-      { label: t.toolbar.formats.html, format: 'html' },
-      { label: t.toolbar.formats.md, format: 'md' },
       { label: t.toolbar.formats.csv, format: 'csv' },
       { label: t.toolbar.formats.tsv, format: 'tsv' },
-      { label: t.toolbar.formats.txt, format: 'txt' },
-      { label: t.toolbar.formats.pdf, format: 'pdf' },
+      { label: t.toolbar.formats.json, format: 'json' },
     ],
   },
 ];
@@ -225,7 +204,12 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 max="100"
                 value={globalOptions.quality}
                 onChange={handleQualityChange}
-                disabled={globalOptions.targetFormat === 'png' || globalOptions.targetFormat === 'bmp' || globalOptions.targetFormat === 'wav'}
+                disabled={
+                  globalOptions.targetFormat === 'png' ||
+                  globalOptions.targetFormat === 'bmp' ||
+                  globalOptions.targetFormat === 'csv' ||
+                  globalOptions.targetFormat === 'tsv'
+                }
                 className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-2 disabled:opacity-40"
               />
             </div>

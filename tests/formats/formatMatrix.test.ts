@@ -10,22 +10,12 @@ import type { InputFormat, OutputFormat, QueueItem } from '../../src/types/conve
 
 describe('formatMatrix - Formats Test Suite', () => {
   it('maps all standard formats to their correct media categories', () => {
-    const images: InputFormat[] = ['png', 'jpeg', 'webp', 'avif', 'svg', 'bmp', 'ico', 'gif', 'tiff', 'heic'];
+    const images: InputFormat[] = ['png', 'jpeg', 'webp', 'avif', 'svg', 'bmp', 'ico', 'gif'];
     for (const fmt of images) {
       assert.equal(getMediaCategory(fmt), 'image');
     }
 
-    const audio: InputFormat[] = ['wav', 'mp3', 'ogg', 'flac', 'aac', 'm4a'];
-    for (const fmt of audio) {
-      assert.equal(getMediaCategory(fmt), 'audio');
-    }
-
-    const video: InputFormat[] = ['mp4', 'webm', 'mov', 'mkv', 'ogv'];
-    for (const fmt of video) {
-      assert.equal(getMediaCategory(fmt), 'video');
-    }
-
-    const documents: InputFormat[] = ['pdf', 'md', 'html', 'json', 'csv', 'tsv', 'txt', 'xml', 'yaml', 'yml'];
+    const documents: InputFormat[] = ['json', 'csv', 'tsv'];
     for (const fmt of documents) {
       assert.equal(getMediaCategory(fmt), 'document');
     }
@@ -38,46 +28,18 @@ describe('formatMatrix - Formats Test Suite', () => {
     assert.ok(pngOutputs.includes('avif'));
     assert.ok(!pngOutputs.includes('png'));
 
-    const mp3Outputs = getCompatibleOutputFormats('mp3');
-    assert.ok(mp3Outputs.includes('wav'));
-    assert.equal(mp3Outputs.length, 1);
-
-    const videoOutputs = getCompatibleOutputFormats('mp4');
-    assert.ok(videoOutputs.includes('wav'));
-    assert.ok(videoOutputs.includes('png'));
-    assert.ok(videoOutputs.includes('jpeg'));
-    assert.ok(videoOutputs.includes('webp'));
-    assert.equal(videoOutputs.length, 4);
-
-    const mdOutputs = getCompatibleOutputFormats('md');
-    assert.ok(mdOutputs.includes('html'));
-    assert.ok(mdOutputs.includes('pdf'));
-    assert.ok(mdOutputs.includes('txt'));
-
     const jsonOutputs = getCompatibleOutputFormats('json');
     assert.ok(jsonOutputs.includes('json'));
     assert.ok(jsonOutputs.includes('csv'));
     assert.ok(jsonOutputs.includes('tsv'));
-    assert.ok(jsonOutputs.includes('yaml'));
-    assert.ok(jsonOutputs.includes('xml'));
 
-    const xmlOutputs = getCompatibleOutputFormats('xml');
-    assert.ok(xmlOutputs.includes('json'));
-    assert.ok(xmlOutputs.includes('xml'));
+    const csvOutputs = getCompatibleOutputFormats('csv');
+    assert.ok(csvOutputs.includes('json'));
+    assert.ok(csvOutputs.includes('tsv'));
 
-    const yamlOutputs = getCompatibleOutputFormats('yaml');
-    assert.ok(yamlOutputs.includes('json'));
-    assert.ok(yamlOutputs.includes('yaml'));
-  });
-
-  it('does not offer unsupported phantom outputs for audio or video', () => {
-    const audioOutputs = getCompatibleOutputFormats('mp3');
-    assert.equal(audioOutputs.includes('mp3' as unknown as OutputFormat), false);
-
-    const videoOutputs = getCompatibleOutputFormats('mp4');
-    assert.equal(videoOutputs.includes('gif' as unknown as OutputFormat), false);
-    assert.equal(videoOutputs.includes('webm' as unknown as OutputFormat), false);
-    assert.equal(videoOutputs.includes('mp3' as unknown as OutputFormat), false);
+    const tsvOutputs = getCompatibleOutputFormats('tsv');
+    assert.ok(tsvOutputs.includes('json'));
+    assert.ok(tsvOutputs.includes('csv'));
   });
 
   it('safely handles unknown and unsupported file formats without throwing or returning undefined', () => {
@@ -87,7 +49,6 @@ describe('formatMatrix - Formats Test Suite', () => {
       assert.equal(cat, 'document');
       const outputs = getCompatibleOutputFormats(fmt);
       assert.ok(Array.isArray(outputs));
-      assert.ok(outputs.length > 0);
     }
   });
 

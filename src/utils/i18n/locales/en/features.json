@@ -4,7 +4,7 @@
   "badge": "100% Free • Unlimited Conversions • Zero Cloud Uploads",
   "heroTitle": "Universal Convertor",
   "heroTitleAccent": "Engine",
-  "heroSubtitle": "A completely free, 100% private client-side conversion engine. Transform images, audio, video, and documents instantly inside local browser memory using high-speed multi-threaded Web Workers and Web Audio API. Zero server uploads, zero subscriptions, and unlimited batch processing.",
+  "heroSubtitle": "A completely free, 100% private client-side conversion engine. Transform images and structured data instantly inside local browser memory using high-speed multi-threaded Web Workers. Zero server uploads, zero subscriptions, and unlimited batch processing.",
   "cards": [
     {
       "id": "privacy",
@@ -23,9 +23,9 @@
     {
       "id": "universal",
       "icon": "Layers",
-      "badge": "4 Media Engines",
-      "title": "Universal Multi-Media Engine",
-      "description": "Convert across all digital assets: modern images (WebP, AVIF, PNG, JPG, ICO, SVG), audio decoding & PCM WAV resampling, video soundtrack extraction, and structured document transformations."
+      "badge": "Images & Data",
+      "title": "High-Accuracy Image & Data Engine",
+      "description": "Convert across essential digital assets: modern images (WebP, AVIF, PNG, JPG, ICO, SVG, BMP, GIF) and structured tabular spreadsheets (CSV, TSV, JSON) with zero data corruption."
     },
     {
       "id": "packaging",

@@ -2,9 +2,7 @@
   "categories": {
     "all": "All Files",
     "images": "Images",
-    "audio": "Audio",
-    "video": "Video",
-    "documents": "Documents & Data"
+    "documents": "Structured Data"
   },
   "targetFormat": {
     "label": "Convert All To"
@@ -18,17 +16,9 @@
     "bmp": "BMP (Raster)",
     "tiff": "TIFF (Print)",
     "pdf": "PDF (Document)",
-    "wav": "WAV (Uncompressed PCM)",
-    "mp3": "MP3 (Audio)",
-    "videoWav": "Extract Audio (WAV)",
-    "videoPng": "Snapshot Frame (PNG)",
-    "videoWebp": "Snapshot Frame (WebP)",
-    "md": "Markdown (.md)",
-    "html": "HTML (.html)",
     "json": "JSON (.json)",
     "csv": "CSV (.csv)",
-    "tsv": "TSV (.tsv)",
-    "txt": "Plain Text (.txt)"
+    "tsv": "TSV (.tsv)"
   },
   "quality": {
     "label": "Quality",
@@ -80,41 +70,6 @@
     "title": "Metadata & Privacy",
     "stripExif": "Strip EXIF metadata for privacy",
     "stripExifTooltip": "Removes GPS location, camera model, timestamps, and device serial numbers"
-  },
-  "audioSettings": {
-    "title": "Audio Settings",
-    "bitDepthLabel": "Bit Depth",
-    "bitDepths": {
-      "pcm16": "16-bit PCM (Standard CD)",
-      "pcm24": "24-bit PCM (High-Res)",
-      "pcm32f": "32-bit Float (Studio)"
-    },
-    "sampleRateLabel": "Sample Rate",
-    "sampleRates": {
-      "rate48000": "48,000 Hz (Broadcast/Studio)",
-      "rate44100": "44,100 Hz (CD Audio)",
-      "rate22050": "22,050 Hz (Speech/Voice)",
-      "rate16000": "16,000 Hz (Compact Speech)"
-    },
-    "channelModeLabel": "Channel Mode",
-    "channels": {
-      "stereo": "Stereo (2 Channels)",
-      "mono": "Mono (1 Channel Downmix)"
-    }
-  },
-  "videoSettings": {
-    "title": "Video Extraction Settings",
-    "modeLabel": "Extraction Mode",
-    "modes": {
-      "soundtrack": "Soundtrack Extraction (WAV)",
-      "snapshot": "Frame Snapshot (Image)"
-    },
-    "timestampLabel": "Snapshot Timestamp",
-    "timestamps": {
-      "start": "Start (0s)",
-      "midpoint": "Midpoint (50%)",
-      "custom": "Custom Second"
-    }
   },
   "documentSettings": {
     "title": "Document & Data Formatting",

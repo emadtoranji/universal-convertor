@@ -1,6 +1,6 @@
 {
   "title": "Frequently Asked Questions",
-  "subtitle": "Direct, factual answers regarding privacy, client-side performance, multi-media format support, and offline capabilities.",
+  "subtitle": "Direct, factual answers regarding privacy, client-side performance, image and data format support, and offline capabilities.",
   "badge": "Direct Answers",
   "items": [
     {
@@ -10,23 +10,18 @@
     },
     {
       "id": "privacy-zero-uploads",
-      "question": "Are my photos, audio recordings, or documents uploaded to any external server?",
+      "question": "Are my photos or documents uploaded to any external server?",
       "answer": "No, your files are never uploaded or transmitted to any external server, cloud storage, or third-party service. All file processing occurs 100% locally inside your device volatile memory, guaranteeing absolute data confidentiality and eliminating the risk of data leaks or server breaches."
     },
     {
       "id": "offline-usage",
       "question": "Can I use Universal Convertor offline without an internet connection?",
-      "answer": "Yes, once the web application is loaded in your browser, all conversion tools work fully offline without an active internet connection. The Web Workers, WebAssembly modules, and Web Audio API pipelines run in your local browser sandbox independently of network availability."
+      "answer": "Yes, once the web application is loaded in your browser, all conversion tools work fully offline without an active internet connection. The Web Workers, OffscreenCanvas, and local algorithms run in your local browser sandbox independently of network availability."
     },
     {
-      "id": "audio-conversion",
-      "question": "How does client-side audio conversion work without cloud processing?",
-      "answer": "Audio files are decoded directly by your browser's native Web Audio API AudioContext and re-encoded into uncompressed Linear PCM WAV format locally. You can customize quantization bit depths (16-bit, 24-bit, 32-bit float), sample rates (up to 48,000 Hz), and channel configurations (stereo or mono) with zero server reliance."
-    },
-    {
-      "id": "video-extraction",
-      "question": "Can I extract audio tracks or capture image snapshots from video files?",
-      "answer": "Yes, you can extract soundtrack audio to uncompressed WAV files or capture full-resolution keyframe snapshots to PNG, WebP, or JPEG directly from video files. The engine leverages hardware-accelerated video decoding to seek frames and capture frames without uploading large video files."
+      "id": "supported-formats",
+      "question": "Which image and data formats are supported by the engine?",
+      "answer": "Universal Convertor supports high-fidelity conversions for all standard web images and tabular data files. You can convert between PNG, JPG, WebP, AVIF, SVG, BMP, ICO, and GIF for images, as well as CSV, TSV, and JSON for structured spreadsheets and tables."
     },
     {
       "id": "pdf-merging",
@@ -39,9 +34,9 @@
       "answer": "Batch conversion is substantially faster because your files are processed in parallel across your device multi-core CPU using Web Workers without network upload or download bottlenecks. By utilizing zero-copy Transferable ArrayBuffers and in-memory execution, you completely eliminate file queue wait times and server latency."
     },
     {
-      "id": "document-data-conversion",
-      "question": "Which document and structured data formats can be converted?",
-      "answer": "The engine supports bi-directional conversion between Markdown and sanitized HTML, JSON to CSV or TSV tables, plain text to PDF, and binary data to Base64 or Hex dumps. All transformations execute in pure TypeScript within browser memory to provide instant results with zero cloud exposure."
+      "id": "tabular-data-conversion",
+      "question": "How does client-side CSV, TSV, and JSON table conversion work?",
+      "answer": "Yes, you can convert between CSV, TSV, and JSON with 100% RFC 4180 parsing accuracy and zero data loss. The engine automatically handles quotes, commas, multiline cells, and type coercion locally in browser memory."
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Universal Convertor (llms.txt)
 
-> **Universal Convertor** is a 100% free, private, client-side image, audio, video, and document conversion engine. All decoders, encoders, resizers, and archivers run locally inside the user's browser memory via Web Workers, OffscreenCanvas, and the Web Audio API. Zero bytes are uploaded to external servers.
+> **Universal Convertor** is a 100% free, private, client-side image and structured data conversion engine. All decoders, encoders, resizers, and archivers run locally inside the user's browser memory via Web Workers, OffscreenCanvas, and native TypeScript algorithms. Zero bytes are uploaded to external servers.
 
 ---
 
@@ -24,31 +24,21 @@
 ## Supported Input & Output Formats
 
 ### 1. Images
-- **Input Formats:** PNG, JPEG, WebP, AVIF, SVG, BMP, ICO, GIF, TIFF, HEIC/HEIF
+- **Input Formats:** PNG, JPEG, WebP, AVIF, SVG, BMP, ICO, GIF
 - **Output Formats:** WebP (Modern lossy/lossless), AVIF (Next-gen), PNG (Lossless), JPEG (Universal), ICO (Multi-resolution 16/32/48px), BMP (Raster), TIFF (Print), PDF (Single or merged)
 - **Features:** SVG vector sanitization against XSS/XXE, canvas hardware acceleration, EXIF metadata stripping, dimension scaling, aspect ratio preservation, solid background color filling.
 
-### 2. Audio
-- **Input Formats:** WAV, MP3, OGG, FLAC, AAC, M4A
-- **Output Formats:** WAV (Uncompressed PCM, 16/24/32-bit)
-- **Features:** Web Audio API decoding, selectable bit depth (16-bit PCM, 24-bit Studio PCM, 32-bit Float Master), sample rate resampling (16kHz, 22.05kHz, 44.1kHz, 48kHz), stereo/mono channel downmixing.
-
-### 3. Video
-- **Input Formats:** MP4, WebM, MOV, MKV, OGV
-- **Output Formats:** Audio Extraction (WAV), Snapshot Frame (PNG, JPEG, WebP)
-- **Features:** Client-side HTML5 Video playback decoding, high-precision frame seeking, audio track demuxing.
-
-### 4. Documents & Structured Data
-- **Input Formats:** PDF, Markdown (.md), HTML (.html), JSON (.json), CSV (.csv), TSV (.tsv), Plain Text (.txt), XML (.xml), YAML (.yaml/.yml)
-- **Output Formats:** Plain Text (.txt), HTML (.html), Markdown (.md), JSON (.json), CSV (.csv), TSV (.tsv), XML (.xml), YAML (.yaml), PDF (.pdf), PNG (.png)
-- **Features:** JSON-to-JSON formatting, tabular conversion between CSV/TSV and JSON, HTML-to-Markdown and Markdown-to-HTML, client-side PDF document pagination via `pdf-lib`.
+### 2. Structured Data & Tables
+- **Input Formats:** CSV (.csv), TSV (.tsv), JSON (.json)
+- **Output Formats:** CSV (.csv), TSV (.tsv), JSON (.json)
+- **Features:** RFC 4180 deterministic serialization, bidirectional table-to-JSON and JSON-to-table conversion, automated delimiter detection, custom JSON indentation, key sorting, and minification.
 
 ---
 
 ## Batch Processing & Archiving
 - **Homogeneous Batch Conversion:** "Convert All" allows one-click batch transformation when queued files share the same category.
 - **ZIP Export:** Instant client-side ZIP packaging via `fflate` with multi-threaded DEFLATE compression.
-- **Merge to PDF:** Combine multiple converted images or documents into a single multi-page PDF document.
+- **Merge to PDF:** Combine multiple converted images into a single multi-page PDF document with custom page sizes and orientations.
 
 ---
 

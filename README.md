@@ -12,7 +12,7 @@
 [![Zero Uploads](https://img.shields.io/badge/Privacy-Zero_Uploads-10b981.svg?style=for-the-badge)](https://github.com/)
 
 <p align="center">
-  <b>Convert images, audio, video, documents, and structured data entirely inside your browser memory.</b><br>
+  <b>Convert images and structured tabular data entirely inside your browser memory.</b><br>
   No cloud queues. No file size limits. No privacy leaks.
 </p>
 
@@ -28,9 +28,7 @@
 
 ## 🌟 Why Universal Convertor?
 
-Most online converters secretly upload your private photos, audio notes, and
-confidential documents to cloud servers, queue your jobs behind paywalls, or
-downscale quality.
+Most online converters secretly upload your private photos and confidential files to cloud servers, queue your jobs behind paywalls, or downscale quality.
 
 **Universal Convertor is fundamentally different:**
 
@@ -44,8 +42,7 @@ downscale quality.
   without freezing the UI.
 - 🎯 **Two-Stage Validation Protocol:**
     - **Stage 1 (Pre-Upload):** Immediate extension checking prevents invalid or
-      unsupported files (like `.ppt` or `.exe`) from ever being misidentified as
-      images.
+      unsupported files (like `.ppt` or `.exe`) from ever being misidentified.
     - **Stage 2 (Pre-Flight):** Binary Magic Bytes and syntax checking ensure
       file contents genuinely match their extensions before processing.
 - 🎨 **Fullscreen Drag & Drop:** Drag files anywhere across the browser viewport
@@ -109,10 +106,8 @@ Executes all unit, security, and format matrix compatibility tests.
 
 | Category                | Input Formats                                                               | Compatible Output Formats                                                           | Processing Engine                    |
 | ----------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------ |
-| **🖼️ Images**           | `PNG`, `JPEG`, `WebP`, `AVIF`, `SVG`, `BMP`, `ICO`, `GIF`, `TIFF`, `HEIC`   | `WebP`, `AVIF`, `PNG`, `JPEG`, `ICO`, `BMP`, `TIFF`, `PDF`                          | Hardware Canvas / Web Workers        |
-| **🎵 Audio**            | `WAV`, `MP3`, `OGG`, `FLAC`, `AAC`, `M4A`                                   | `WAV`, `MP3`                                                                        | Web Audio API / PCM Encoder          |
-| **🎬 Video**            | `MP4`, `WebM`, `MOV`, `MKV`, `OGV`                                          | `Audio (WAV)`, `Audio (MP3)`, `Animated GIF`, `WebM`, `Frame (PNG)`, `Frame (JPEG)` | HTML5 Video / MediaRecorder / Canvas |
-| **📄 Documents & Data** | `PDF`, `Markdown (.md)`, `HTML`, `JSON`, `CSV`, `TSV`, `TXT`, `XML`, `YAML` | `JSON`, `XML`, `YAML`, `HTML`, `Markdown`, `CSV`, `TSV`, `TXT`, `PDF`               | Pure Client-Side Parser & `pdf-lib`  |
+| **🖼️ Images**           | `PNG`, `JPEG`, `WebP`, `AVIF`, `SVG`, `BMP`, `ICO`, `GIF`                   | `WebP`, `AVIF`, `PNG`, `JPEG`, `ICO`, `BMP`, `TIFF`, `PDF`                          | Hardware Canvas / Web Workers        |
+| **📄 Structured Data**   | `JSON`, `CSV`, `TSV`                                                        | `JSON`, `CSV`, `TSV`                                                                | RFC 4180 In-Memory Engine            |
 
 ---
 
@@ -121,8 +116,7 @@ Executes all unit, security, and format matrix compatibility tests.
 Universal Convertor provides fine-grained control over output quality,
 dimensions, and formatting:
 
-- **Quality Compression:** Adjustable 1% to 100% lossy slider (WebP, AVIF, JPEG,
-  Snapshot).
+- **Quality Compression:** Adjustable 1% to 100% lossy slider (WebP, AVIF, JPEG).
 - **Dimension Resizing:**
     - `Original`: Keeps original pixel dimensions.
     - `Percentage`: Scale resolution from 10% to 300%.
@@ -133,9 +127,7 @@ dimensions, and formatting:
   device metadata for maximum privacy.
 - **PDF Configuration:** Select page size (`A4`, `US Letter`, `Original`) and
   orientation (`Portrait`, `Landscape`, `Auto`).
-- **Audio Configuration:** 16-bit Standard, 24-bit Studio, or 32-bit Float PCM,
-  with customizable sample rates (16kHz to 48kHz).
-- **JSON Formatting:** Pretty-printed 2-space indentation, minification, and
+- **JSON & Data Formatting:** Pretty-printed 2-space indentation, minification, and
   alphabetical key sorting for clean version diffs.
 
 ---
@@ -155,9 +147,7 @@ User File (Local Device)
 3. Stage 2: Binary Magic Bytes Inspection (Verifies signature matches extension)
        │
        ├──► Web Worker Pool (Concurrency-Limited Image Transformation)
-       ├──► Web Audio API (In-Memory Audio Processing & WAV Encoding)
-       ├──► HTML5 Video & Canvas (Audio Extraction, GIF, & Frame Capture)
-       └──► Client Document Parser (JSON/XML/YAML/CSV/Markdown)
+       └──► Client Data Engine (RFC 4180 CSV/TSV/JSON Serialization)
        │
        ▼
 4. Local Output Blob ──► Instant Direct Download or ZIP Archiving (0 Uploads)

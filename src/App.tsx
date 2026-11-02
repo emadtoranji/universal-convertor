@@ -17,8 +17,6 @@ import { sanitizeSvgString } from './utils/svgSanitizer';
 import { ConversionWorkerPool } from './core/workerPool';
 import { createZipArchive } from './core/zipArchiver';
 import { generatePdfFromImages } from './core/pdfGenerator';
-import { convertAudioToWav, extractAudioMetadata, AudioSampleRate } from './core/audioConverter';
-import { captureVideoSnapshot, extractAudioFromVideo, extractVideoMetadata } from './core/videoConverter';
 import { convertDocument, DocumentFormat } from './core/documentConverter';
 import { t } from './utils/i18n';
 import {
@@ -51,10 +49,6 @@ const DEFAULT_OPTIONS: ConversionOptions = {
   maintainAspectRatio: true,
   backgroundColor: '#ffffff',
   stripExif: true,
-  audioBitDepth: '16',
-  audioSampleRate: 44100,
-  audioChannels: 'stereo',
-  videoSnapshotPoint: 'mid',
   pdfPageSize: 'original',
   pdfOrientation: 'auto',
 };
@@ -177,24 +171,12 @@ export default function App(): React.ReactElement {
         return 'avif';
       case 'webp':
         return 'webp';
-      case 'wav':
-        return 'wav';
-      case 'html':
-        return 'html';
-      case 'md':
-        return 'md';
       case 'json':
         return 'json';
       case 'csv':
         return 'csv';
       case 'tsv':
         return 'tsv';
-      case 'txt':
-        return 'txt';
-      case 'xml':
-        return 'xml';
-      case 'yaml':
-        return 'yaml';
       case 'png':
       default:
         return 'png';
@@ -216,7 +198,7 @@ export default function App(): React.ReactElement {
                 id,
                 file,
                 name: file.name,
-                sourceFormat: (extCheck.extension || 'txt') as InputFormat,
+                sourceFormat: (extCheck.extension || 'json') as InputFormat,
                 category: 'document',
                 originalSize: file.size,
                 originalWidth: 0,
@@ -224,7 +206,7 @@ export default function App(): React.ReactElement {
                 previewUrl: '',
                 status: 'error',
                 progress: 0,
-                errorMessage: `Unsupported file format (.${extCheck.extension || 'unknown'}). Supported: PNG, JPG, WebP, MP4, WAV, PDF, JSON, XML, YAML, etc.`,
+                errorMessage: `Unsupported file format (.${extCheck.extension || 'unknown'}). Supported: PNG, JPG, WebP, AVIF, SVG, BMP, ICO, GIF, JSON, CSV, TSV.`,
                 options: { ...globalOptions },
               });
               continue;
@@ -234,7 +216,6 @@ export default function App(): React.ReactElement {
             const category = extCheck.category;
             let width = 0;
             let height = 0;
-            let duration: number | undefined;
             let previewUrl = '';
 
             if (category === 'image') {
@@ -258,26 +239,12 @@ export default function App(): React.ReactElement {
                   bitmap.close();
                 } catch {}
               }
-            } else if (category === 'audio') {
-              try {
-                const ab = await file.slice(0, 8192).arrayBuffer();
-                const meta = await extractAudioMetadata(ab);
-                duration = meta.duration;
-              } catch {}
-            } else if (category === 'video') {
-              previewUrl = URL.createObjectURL(file);
-              try {
-                const meta = await extractVideoMetadata(file);
-                duration = meta.duration;
-                width = meta.videoWidth;
-                height = meta.videoHeight;
-              } catch {}
             }
 
             const compatible = getCompatibleOutputFormats(sourceFormat);
             const initialTarget = compatible.includes(globalOptions.targetFormat)
               ? globalOptions.targetFormat
-              : compatible[0] || (category === 'audio' ? 'wav' : category === 'video' ? 'wav' : category === 'document' ? 'json' : 'webp');
+              : compatible[0] || (category === 'document' ? 'json' : 'webp');
 
             chunkItems.push({
               id,
@@ -288,7 +255,6 @@ export default function App(): React.ReactElement {
               originalSize: file.size,
               originalWidth: width,
               originalHeight: height,
-              duration,
               previewUrl,
               status: 'idle',
               progress: 0,
@@ -439,106 +405,8 @@ export default function App(): React.ReactElement {
           return false;
         }
 
-        if (item.category === 'audio') {
-          const bitDepth = item.options.audioBitDepth ? (Number(item.options.audioBitDepth) as 16 | 24 | 32) : 16;
-          const sampleRate = item.options.audioSampleRate ? (item.options.audioSampleRate as AudioSampleRate) : undefined;
-          const ab = await item.file.arrayBuffer();
-          const result = await convertAudioToWav(
-            ab,
-            {
-              bitDepth,
-              sampleRate,
-              channelMode: item.options.audioChannels,
-            }
-          );
-
-          const resultUrl = URL.createObjectURL(result.blob);
-          setQueue((prev) =>
-            prev.map((i) =>
-              i.id === id
-                ? {
-                    ...i,
-                    status: 'completed',
-                    progress: 100,
-                    result: {
-                      blob: result.blob,
-                      url: resultUrl,
-                      previewUrl: resultUrl,
-                      size: result.size,
-                      format: 'wav',
-                      width: 0,
-                      height: 0,
-                      duration: result.duration,
-                      mimeType: 'audio/wav',
-                    },
-                  }
-                : i
-            )
-          );
-          return true;
-        }
-
-        if (item.category === 'video') {
-          if (item.options.targetFormat === 'wav') {
-            const result = await extractAudioFromVideo(item.file);
-            const resultUrl = URL.createObjectURL(result.blob);
-            setQueue((prev) =>
-              prev.map((i) =>
-                i.id === id
-                  ? {
-                      ...i,
-                      status: 'completed',
-                      progress: 100,
-                      result: {
-                        blob: result.blob,
-                        url: resultUrl,
-                        previewUrl: resultUrl,
-                        size: result.size,
-                        format: 'wav',
-                        width: 0,
-                        height: 0,
-                        duration: result.duration,
-                        mimeType: 'audio/wav',
-                      },
-                    }
-                  : i
-              )
-            );
-            return true;
-          } else {
-            const format = (item.options.targetFormat === 'jpeg' ? 'jpeg' : item.options.targetFormat === 'webp' ? 'webp' : 'png') as 'png' | 'jpeg' | 'webp';
-            const result = await captureVideoSnapshot(item.file, {
-              timePoint: item.options.videoSnapshotPoint ?? 'mid',
-              format,
-              quality: item.options.quality,
-            });
-            setQueue((prev) =>
-              prev.map((i) =>
-                i.id === id
-                  ? {
-                      ...i,
-                      status: 'completed',
-                      progress: 100,
-                      result: {
-                        blob: result.blob,
-                        url: result.url,
-                        previewUrl: result.url,
-                        size: result.size,
-                        format: result.format,
-                        width: result.width,
-                        height: result.height,
-                        mimeType: result.blob.type,
-                      },
-                    }
-                  : i
-              )
-            );
-            return true;
-          }
-        }
-
         if (item.category === 'document') {
-          const inputData = item.sourceFormat === 'pdf' ? await item.file.arrayBuffer() : await item.file.text();
+          const inputData = await item.file.text();
           const targetFmt = item.options.targetFormat as DocumentFormat;
           const result = await convertDocument(inputData, {
             sourceFormat: item.sourceFormat as DocumentFormat,
@@ -547,8 +415,6 @@ export default function App(): React.ReactElement {
             prettyJson: item.options.quality > 50,
             jsonIndent: item.options.jsonIndent ?? 2,
             jsonSortKeys: item.options.jsonSortKeys ?? false,
-            pdfPageSize: item.options.pdfPageSize === 'original' ? 'a4' : item.options.pdfPageSize,
-            pdfOrientation: item.options.pdfOrientation === 'auto' ? 'portrait' : item.options.pdfOrientation,
           });
 
           const blobData = typeof result.data === 'string' ? new TextEncoder().encode(result.data) : result.data;
@@ -567,8 +433,8 @@ export default function App(): React.ReactElement {
                       previewUrl: resultUrl,
                       size: blob.size,
                       format: item.options.targetFormat,
-                      width: targetFmt === 'png' ? 800 : 0,
-                      height: targetFmt === 'png' ? 1132 : 0,
+                      width: 0,
+                      height: 0,
                       mimeType: result.mimeType,
                     },
                   }
@@ -979,7 +845,7 @@ export default function App(): React.ReactElement {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             {Object.values(t.matrix.categories).map((cat) => (
               <div key={cat.id} className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800/80 space-y-2">
                 <h4 className="font-semibold text-zinc-900 dark:text-zinc-200 flex items-center gap-1.5">

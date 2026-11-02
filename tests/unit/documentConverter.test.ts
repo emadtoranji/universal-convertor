@@ -1,50 +1,16 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  markdownToHtml,
-  htmlToMarkdown,
   jsonToCsv,
   jsonToTsv,
   csvToJson,
   tsvToJson,
-  textToBase64,
-  base64ToText,
-  textToHex,
-  hexToText,
   parseCsvRows,
   convertDocument,
-  jsonToXml,
-  xmlToJson,
-  jsonToYaml,
-  yamlToJson,
   sortObjectKeys,
-  documentToPdf,
-  extractTextFromPdf,
-  documentToPng,
 } from '../../src/core/documentConverter.ts';
 
 describe('documentConverter - Unit Test Suite', () => {
-  it('converts markdown headings, lists, bold, and code to semantic HTML', () => {
-    const md = '# Main Title\n\n**Bold Text** and *Italic Text*\n\n- Item 1\n- Item 2\n\n`inline code`';
-    const html = markdownToHtml(md);
-
-    assert.match(html, /<h1[^>]*>Main Title<\/h1>/);
-    assert.match(html, /<strong>Bold Text<\/strong>/);
-    assert.match(html, /<em>Italic Text<\/em>/);
-    assert.match(html, /<li>Item 1<\/li>/);
-    assert.match(html, /<code>inline code<\/code>/);
-  });
-
-  it('converts basic HTML elements back to clean Markdown', () => {
-    const html = '<h1>Heading One</h1><p>A simple <strong>bold</strong> paragraph.</p><ul><li>First</li><li>Second</li></ul>';
-    const md = htmlToMarkdown(html);
-
-    assert.match(md, /# Heading One/);
-    assert.match(md, /\*\*bold\*\*/);
-    assert.match(md, /- First/);
-    assert.match(md, /- Second/);
-  });
-
   it('converts JSON records to CSV and TSV formats accurately', () => {
     const records = [
       { id: 1, name: 'Alice', role: 'Engineer' },
@@ -85,22 +51,6 @@ describe('documentConverter - Unit Test Suite', () => {
     assert.equal(rows[1][1], 'Senior "Lead" Architect');
   });
 
-  it('performs Base64 encoding and decoding roundtrip reliably', () => {
-    const sample = 'Universal Convertor: 100% Client-Side Engine 🚀';
-    const encoded = textToBase64(sample);
-    const decoded = base64ToText(encoded);
-
-    assert.equal(decoded, sample);
-  });
-
-  it('performs Hex encoding and decoding roundtrip reliably', () => {
-    const sample = 'Zero Network Transmission Guaranteed';
-    const hex = textToHex(sample);
-    const text = hexToText(hex);
-
-    assert.equal(text, sample);
-  });
-
   it('converts JSON to pretty-printed JSON and minified JSON correctly', async () => {
     const minified = '{"z":1,"a":2,"m":{"y":10,"x":20}}';
     const prettyResult = await convertDocument(minified, {
@@ -130,159 +80,45 @@ describe('documentConverter - Unit Test Suite', () => {
     assert.equal(String(miniResult.data).includes('\n'), false);
   });
 
-  it('converts JSON to XML and XML to JSON accurately', async () => {
-    const testObj = { title: 'App', version: '1.0' };
-    const xml = jsonToXml(testObj, 'root');
-    assert.match(xml, /<root>/);
-    assert.match(xml, /<title>App<\/title>/);
-    assert.match(xml, /<version>1\.0<\/version>/);
+  it('converts between CSV, TSV, and JSON formats seamlessly', async () => {
+    const jsonInput = JSON.stringify([
+      { sku: 'A1', qty: 10 },
+      { sku: 'B2', qty: 25 },
+    ]);
 
-    const jsonParsed = xmlToJson(xml) as Record<string, unknown>;
-    assert.ok(jsonParsed.root);
-
-    const docResult = await convertDocument(JSON.stringify(testObj), {
+    const csvResult = await convertDocument(jsonInput, {
       sourceFormat: 'json',
-      targetFormat: 'xml',
+      targetFormat: 'csv',
+      fileName: 'inventory.json',
     });
-    assert.match(String(docResult.data), /<title>App<\/title>/);
-  });
+    assert.equal(csvResult.mimeType, 'text/csv;charset=utf-8');
+    assert.equal(csvResult.fileName, 'inventory.csv');
+    assert.match(String(csvResult.data), /sku,qty/);
 
-  it('converts JSON to YAML and YAML to JSON accurately', async () => {
-    const testObj = { name: 'universal', count: 42 };
-    const yaml = jsonToYaml(testObj);
-    assert.match(yaml, /name: universal/);
-    assert.match(yaml, /count: 42/);
+    const tsvResult = await convertDocument(csvResult.data, {
+      sourceFormat: 'csv',
+      targetFormat: 'tsv',
+      fileName: 'inventory.csv',
+    });
+    assert.equal(tsvResult.mimeType, 'text/tab-separated-values;charset=utf-8');
+    assert.equal(tsvResult.fileName, 'inventory.tsv');
+    assert.match(String(tsvResult.data), /sku\tqty/);
 
-    const backToJson = yamlToJson(yaml) as Record<string, unknown>;
-    assert.equal(backToJson.name, 'universal');
-    assert.equal(backToJson.count, 42);
-
-    const docResult = await convertDocument(yaml, {
-      sourceFormat: 'yaml',
+    const backToJson = await convertDocument(tsvResult.data, {
+      sourceFormat: 'tsv',
       targetFormat: 'json',
+      fileName: 'inventory.tsv',
     });
-    const parsed = JSON.parse(String(docResult.data));
-    assert.equal(parsed.name, 'universal');
-    assert.equal(parsed.count, 42);
+    assert.equal(backToJson.mimeType, 'application/json;charset=utf-8');
+    const parsed = JSON.parse(String(backToJson.data));
+    assert.equal(parsed.length, 2);
+    assert.equal(parsed[0].sku, 'A1');
+    assert.equal(parsed[0].qty, 10);
   });
 
-  it('handles empty string inputs across document conversions', () => {
-    assert.equal(markdownToHtml(''), '');
-    assert.equal(htmlToMarkdown(''), '');
+  it('handles empty inputs across tabular data conversions', () => {
     assert.equal(jsonToCsv([]), '');
     assert.deepEqual(csvToJson(''), []);
-    assert.equal(textToBase64(''), '');
     assert.deepEqual(sortObjectKeys({}), {});
-  });
-
-  it('converts a PDF input document to plain UTF-8 text reliably', async () => {
-    const samplePdf = await documentToPdf('# Section Alpha\n\nFirst paragraph text content.\n\n## Section Beta\n\nSecond paragraph text content.');
-    const result = await convertDocument(samplePdf, {
-      sourceFormat: 'pdf',
-      targetFormat: 'txt',
-      fileName: 'report.pdf',
-    });
-
-    assert.equal(result.mimeType, 'text/plain;charset=utf-8');
-    assert.equal(result.fileName, 'report.txt');
-    assert.ok(String(result.data).includes('Section Alpha'));
-    assert.ok(String(result.data).includes('First paragraph'));
-  });
-
-  it('converts a PDF input document to semantic UTF-8 HTML', async () => {
-    const samplePdf = await documentToPdf('# Invoice Title\n\nTotal Due: $1000\n\nThank you for your business.');
-    const result = await convertDocument(samplePdf, {
-      sourceFormat: 'pdf',
-      targetFormat: 'html',
-      fileName: 'invoice.pdf',
-    });
-
-    assert.equal(result.mimeType, 'text/html;charset=utf-8');
-    assert.equal(result.fileName, 'invoice.html');
-    assert.match(String(result.data), /<meta charset="utf-8"/);
-    assert.match(String(result.data), /Invoice Title/);
-    assert.match(String(result.data), /<section class="pdf-page"/);
-  });
-
-  it('converts a PDF input document to structured Markdown', async () => {
-    const samplePdf = await documentToPdf('# Documentation\n\nWelcome to the user guide.');
-    const result = await convertDocument(samplePdf, {
-      sourceFormat: 'pdf',
-      targetFormat: 'md',
-      fileName: 'guide.pdf',
-    });
-
-    assert.equal(result.mimeType, 'text/markdown;charset=utf-8');
-    assert.equal(result.fileName, 'guide.md');
-    assert.ok(String(result.data).includes('## Page 1'));
-    assert.ok(String(result.data).includes('Documentation'));
-  });
-
-  it('converts a PDF input document to structured JSON with page array', async () => {
-    const samplePdf = await documentToPdf('# Contract Agreement\n\nParties agree to terms herein.');
-    const result = await convertDocument(samplePdf, {
-      sourceFormat: 'pdf',
-      targetFormat: 'json',
-      fileName: 'contract.pdf',
-    });
-
-    assert.equal(result.mimeType, 'application/json;charset=utf-8');
-    assert.equal(result.fileName, 'contract.json');
-
-    const parsed = JSON.parse(String(result.data));
-    assert.equal(parsed.fileName, 'contract.pdf');
-    assert.equal(parsed.totalPages, 1);
-    assert.ok(Array.isArray(parsed.pages));
-    assert.equal(parsed.pages[0].pageNumber, 1);
-    assert.ok(parsed.pages[0].text.includes('Contract Agreement'));
-  });
-
-  it('converts a PDF input document to another standardized PDF', async () => {
-    const samplePdf = await documentToPdf('# Page Orientation Test\n\nTesting PDF cloning.');
-    const result = await convertDocument(samplePdf, {
-      sourceFormat: 'pdf',
-      targetFormat: 'pdf',
-      fileName: 'test.pdf',
-      pdfOrientation: 'landscape',
-    });
-
-    assert.equal(result.mimeType, 'application/pdf');
-    assert.equal(result.fileName, 'test.pdf');
-    assert.ok(result.data instanceof Uint8Array);
-    const bytes = result.data as Uint8Array;
-    assert.equal(bytes[0], 0x25);
-    assert.equal(bytes[1], 0x50);
-    assert.equal(bytes[2], 0x44);
-    assert.equal(bytes[3], 0x46);
-  });
-
-  it('converts a PDF input document to PNG image buffer', async () => {
-    const samplePdf = await documentToPdf('# PNG Snapshot Test\n\nRendering page to image.');
-    const result = await convertDocument(samplePdf, {
-      sourceFormat: 'pdf',
-      targetFormat: 'png',
-      fileName: 'snapshot.pdf',
-    });
-
-    assert.equal(result.mimeType, 'image/png');
-    assert.equal(result.fileName, 'snapshot.png');
-    assert.ok(result.data instanceof Uint8Array);
-    const bytes = result.data as Uint8Array;
-    assert.equal(bytes[0], 0x89);
-    assert.equal(bytes[1], 0x50);
-    assert.equal(bytes[2], 0x4e);
-    assert.equal(bytes[3], 0x47);
-  });
-
-  it('encodes Persian, Arabic, and diverse UTF-8 characters into PDF without WinAnsi errors', async () => {
-    const persianUtf8Content = '# عنوان فارسی سند\n\nسلام دنیا! این یک سند متنی کامل با نویسه‌های فارسی و یونیکد است.\n\n- گچپژ و حروف ویژه\n- کاراکترهای فرانسوی: café, naïve\n- نمادهای بین‌المللی: € £ ¥ § © ®';
-    const pdfBytes = await documentToPdf(persianUtf8Content, { title: 'فارسی UTF-8' });
-
-    assert.ok(pdfBytes instanceof Uint8Array);
-    assert.ok(pdfBytes.byteLength > 100);
-    assert.equal(pdfBytes[0], 0x25);
-    assert.equal(pdfBytes[1], 0x50);
-    assert.equal(pdfBytes[2], 0x44);
-    assert.equal(pdfBytes[3], 0x46);
   });
 });

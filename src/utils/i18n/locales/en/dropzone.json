@@ -2,14 +2,12 @@
   "title": "Drag & drop files here, or",
   "browse": "browse files",
   "dragActive": "Drop files here to start converting",
-  "subtitle": "Batch convert images, audio, video & documents locally in browser memory. Paste with",
+  "subtitle": "Batch convert images and structured data locally in browser memory. Paste with",
   "pasteKey": "Ctrl+V",
   "pasteAria": "Paste files from clipboard with Ctrl+V",
   "supportedFormats": {
-    "images": "Images (PNG, JPG, WebP, AVIF, SVG, BMP, ICO, TIFF, GIF, HEIC)",
-    "audio": "Audio (MP3, WAV, OGG, AAC, M4A, FLAC, WEBM)",
-    "video": "Video (MP4, WebM, MOV, OGV)",
-    "documents": "Documents (MD, HTML, JSON, CSV, TSV, TXT, PDF)"
+    "images": "Images (PNG, JPG, WebP, AVIF, SVG, BMP, ICO, GIF)",
+    "documents": "Data (CSV, TSV, JSON)"
   },
   "aria": {
     "dropzone": "Drag and drop file upload area",
