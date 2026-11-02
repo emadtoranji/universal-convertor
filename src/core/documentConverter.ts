@@ -123,11 +123,14 @@ export function sanitizeHtml(rawHtml: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(withoutDoctype, 'text/html');
 
+  const body = doc.body;
+  if (!body) return '';
+
   const dangerousSelectors = 'script, style, iframe, object, embed, link, meta, base, form, input, button, textarea, select, option, noscript, template';
-  const dangerousNodes = doc.querySelectorAll(dangerousSelectors);
+  const dangerousNodes = body.querySelectorAll(dangerousSelectors);
   dangerousNodes.forEach((node) => node.remove());
 
-  const allElements = doc.querySelectorAll('*');
+  const allElements = Array.from(body.querySelectorAll('*'));
   const allowedTags = new Set([
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr',
     'blockquote', 'pre', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd',
@@ -138,8 +141,14 @@ export function sanitizeHtml(rawHtml: string): string {
 
   allElements.forEach((element) => {
     const tagName = element.tagName.toLowerCase();
+    if (tagName === 'html' || tagName === 'head' || tagName === 'body') {
+      return;
+    }
+
     if (!allowedTags.has(tagName)) {
-      element.replaceWith(...Array.from(element.childNodes));
+      if (element.parentElement && element.parentElement !== (doc as unknown as HTMLElement)) {
+        element.replaceWith(...Array.from(element.childNodes));
+      }
       return;
     }
 
@@ -161,7 +170,7 @@ export function sanitizeHtml(rawHtml: string): string {
     }
   });
 
-  return doc.body.innerHTML;
+  return body.innerHTML;
 }
 
 export function markdownToHtml(markdown: string): string {

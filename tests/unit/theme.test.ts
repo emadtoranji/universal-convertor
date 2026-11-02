@@ -62,3 +62,4 @@ describe('theme - Unit Test Suite', () => {
     assert.equal(THEME_COOKIE_MAX_AGE, 31536000);
   });
 });
+
