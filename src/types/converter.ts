@@ -147,7 +147,7 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
         case 'tsv':
           return ['json', 'csv'];
         default:
-          return ['json', 'csv', 'tsv'];
+          return [];
       }
     }
     default:

@@ -116,9 +116,69 @@ describe('documentConverter - Unit Test Suite', () => {
     assert.equal(parsed[0].qty, 10);
   });
 
-  it('handles empty inputs across tabular data conversions', () => {
+  it('handles empty inputs across tabular data conversions', async () => {
     assert.equal(jsonToCsv([]), '');
+    assert.equal(jsonToCsv(''), '');
+    assert.equal(jsonToCsv('   '), '');
     assert.deepEqual(csvToJson(''), []);
     assert.deepEqual(sortObjectKeys({}), {});
+
+    const emptyCsvRes = await convertDocument('', {
+      sourceFormat: 'json',
+      targetFormat: 'csv',
+    });
+    assert.equal(emptyCsvRes.data, '');
+
+    const emptyJsonRes = await convertDocument('   ', {
+      sourceFormat: 'csv',
+      targetFormat: 'json',
+    });
+    assert.equal(emptyJsonRes.data, '[]');
+  });
+
+  it('prevents prototype pollution in sortObjectKeys, csvToJson, and jsonToCsv', () => {
+    const maliciousJson = JSON.parse('{"__proto__": {"polluted": true}, "constructor": "evil", "prototype": "evil", "b": 2, "a": 1}');
+    const sorted = sortObjectKeys(maliciousJson) as Record<string, unknown>;
+
+    assert.equal(Object.prototype.hasOwnProperty.call(sorted, '__proto__'), false);
+    assert.equal(Object.prototype.hasOwnProperty.call(sorted, 'constructor'), false);
+    assert.equal(Object.prototype.hasOwnProperty.call(sorted, 'prototype'), false);
+    assert.deepEqual(Object.keys(sorted), ['a', 'b']);
+
+    const testClean: Record<string, unknown> = {};
+    assert.equal((testClean as { polluted?: boolean }).polluted, undefined);
+
+    const maliciousCsv = '__proto__,name,role\n{"polluted":true},Admin,Root';
+    const parsedCsv = csvToJson(maliciousCsv);
+    assert.equal(parsedCsv.length, 1);
+    assert.equal(parsedCsv[0].name, 'Admin');
+    assert.equal(Object.prototype.hasOwnProperty.call(parsedCsv[0], '__proto__'), false);
+
+    const csvFromMalicious = jsonToCsv([maliciousJson]);
+    assert.doesNotMatch(csvFromMalicious, /__proto__|constructor|prototype/);
+  });
+
+  it('preserves leading zeros on codes and identifiers per RFC 8259', () => {
+    const csvWithCodes = 'id,zip,ratio,count\n007,02138,0.75,42';
+    const parsed = csvToJson(csvWithCodes);
+
+    assert.equal(parsed.length, 1);
+    assert.equal(parsed[0].id, '007');
+    assert.equal(parsed[0].zip, '02138');
+    assert.equal(parsed[0].ratio, 0.75);
+    assert.equal(parsed[0].count, 42);
+  });
+
+  it('gracefully handles uneven rows and malformed CSV boundaries', () => {
+    const unevenCsv = 'a,b,c\n1,2\n3,4,5,6';
+    const parsed = csvToJson(unevenCsv);
+
+    assert.equal(parsed.length, 2);
+    assert.equal(parsed[0].a, 1);
+    assert.equal(parsed[0].b, 2);
+    assert.equal(parsed[0].c, null);
+    assert.equal(parsed[1].a, 3);
+    assert.equal(parsed[1].b, 4);
+    assert.equal(parsed[1].c, 5);
   });
 });

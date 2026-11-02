@@ -71,6 +71,9 @@ describe('security - Attack Payload & Protection Test Suite', () => {
     const binaryInsideText = new Uint8Array([0x00, 0x01, 0x02, 0x1f, 0x7f]);
     const result = validateMagicBytes(binaryInsideText.buffer, 'data.csv');
 
-    assert.equal(typeof result.isValid, 'boolean');
+    assert.equal(result.isValid, false);
+    if (!result.isValid) {
+      assert.match(result.error, /unrecognized|signature|mismatch/i);
+    }
   });
 });

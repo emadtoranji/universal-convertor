@@ -51,6 +51,40 @@ describe('pdfGenerator - Unit Test Suite', () => {
   });
 
   it('generates A4 sized PDF output with correct dimensions', async () => {
+    const pngBytes = new Uint8Array([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+      0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+      0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4, 0x89, 0x00, 0x00, 0x00,
+      0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+      0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49,
+      0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+    ]);
+
+    const inputs: PdfImageInput[] = [
+      {
+        buffer: toArrayBuffer(pngBytes),
+        mimeType: 'image/png',
+        name: 'sample.png',
+        width: 1,
+        height: 1,
+      },
+    ];
+
+    const options: PdfGenerationOptions = {
+      pageSize: 'a4',
+      orientation: 'portrait',
+    };
+
+    const outputBytes = await generatePdfFromImages(inputs, options);
+    const parsed = await PDFDocument.load(outputBytes);
+    const page = parsed.getPage(0);
+    const size = page.getSize();
+
+    assert.equal(Math.round(size.width), 595);
+    assert.equal(Math.round(size.height), 842);
+  });
+
+  it('preserves existing page dimensions when merging existing PDFs', async () => {
     const doc = await PDFDocument.create();
     doc.addPage([100, 100]);
     const pdfBytes = await doc.save();

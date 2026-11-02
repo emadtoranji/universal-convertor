@@ -136,6 +136,8 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
     }
   }
 
+  const hasNullByte = bytes.some((b) => b === 0);
+
   const textSample = new TextDecoder('utf-8', { fatal: false }).decode(bytes).trim();
   const lowerText = textSample.toLowerCase();
 
@@ -143,7 +145,7 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
     return { isValid: true, format: 'svg', mimeType: 'image/svg+xml', category: 'image' };
   }
 
-  if (lowerName.endsWith('.svg')) {
+  if (lowerName.endsWith('.svg') && !hasNullByte) {
     return { isValid: true, format: 'svg', mimeType: 'image/svg+xml', category: 'image' };
   }
 
@@ -151,15 +153,15 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
     return { isValid: true, format: 'json', mimeType: 'application/json', category: 'document' };
   }
 
-  if (lowerName.endsWith('.json')) {
+  if (lowerName.endsWith('.json') && !hasNullByte) {
     return { isValid: true, format: 'json', mimeType: 'application/json', category: 'document' };
   }
 
-  if (lowerName.endsWith('.csv')) {
+  if (lowerName.endsWith('.csv') && !hasNullByte) {
     return { isValid: true, format: 'csv', mimeType: 'text/csv', category: 'document' };
   }
 
-  if (lowerName.endsWith('.tsv')) {
+  if (lowerName.endsWith('.tsv') && !hasNullByte) {
     return { isValid: true, format: 'tsv', mimeType: 'text/tab-separated-values', category: 'document' };
   }
 
@@ -203,20 +205,6 @@ export function verifyContentMatchesFormat(
 
   if (detected.format === expectedFormat) {
     return { matches: true, detectedFormat: detected.format };
-  }
-
-  if (expectedFormat === 'csv' || expectedFormat === 'tsv') {
-    const bytes = new Uint8Array(buffer.slice(0, Math.min(buffer.byteLength, 1024)));
-    let hasNull = false;
-    for (let i = 0; i < bytes.length; i++) {
-      if (bytes[i] === 0) {
-        hasNull = true;
-        break;
-      }
-    }
-    if (!hasNull) {
-      return { matches: true, detectedFormat: expectedFormat };
-    }
   }
 
   return {

@@ -447,7 +447,18 @@ export default function App(): React.ReactElement {
         const pool = workerPoolRef.current;
         if (!pool) return false;
 
-        const fullBuffer = await item.file.arrayBuffer();
+        let fullBuffer: ArrayBuffer;
+        if (item.sourceFormat === 'svg') {
+          const text = await item.file.text();
+          const cleanSvg = sanitizeSvgString(text);
+          const encoded = new TextEncoder().encode(cleanSvg);
+          fullBuffer = encoded.buffer.slice(
+            encoded.byteOffset,
+            encoded.byteOffset + encoded.byteLength
+          ) as ArrayBuffer;
+        } else {
+          fullBuffer = await item.file.arrayBuffer();
+        }
 
         return await new Promise<boolean>((resolve) => {
           pool.enqueueTask({
@@ -467,33 +478,9 @@ export default function App(): React.ReactElement {
                 prev.map((i) => (i.id === id ? { ...i, progress } : i))
               );
             },
-            onSuccess: async (resultPayload) => {
-              let finalBuffer = resultPayload.buffer.slice(0);
-              let finalMime = resultPayload.mimeType;
-
-              if (resultPayload.targetFormat === 'pdf') {
-                const pdfBytes = await generatePdfFromImages(
-                  [
-                    {
-                      buffer: finalBuffer,
-                      mimeType: 'image/png',
-                      name: item.name,
-                      width: resultPayload.width,
-                      height: resultPayload.height,
-                    },
-                  ],
-                  {
-                    pageSize: item.options.pdfPageSize,
-                    orientation: item.options.pdfOrientation,
-                  }
-                );
-                const copy = pdfBytes.buffer.slice(
-                  pdfBytes.byteOffset,
-                  pdfBytes.byteOffset + pdfBytes.byteLength
-                );
-                finalBuffer = copy as ArrayBuffer;
-                finalMime = 'application/pdf';
-              }
+            onSuccess: (resultPayload) => {
+              const finalBuffer = resultPayload.buffer.slice(0);
+              const finalMime = resultPayload.mimeType;
 
               const mainBlob = new Blob([finalBuffer], { type: finalMime });
               const mainDownloadUrl = URL.createObjectURL(mainBlob);
@@ -611,7 +598,14 @@ export default function App(): React.ReactElement {
   }, [queue, getFormatExtension]);
 
   const handleMergeToPdf = useCallback(async (): Promise<void> => {
-    const completedItems = queue.filter((i) => i.status === 'completed' && i.result);
+    const completedItems = queue.filter(
+      (i) =>
+        i.status === 'completed' &&
+        i.result &&
+        (i.category === 'image' ||
+          i.result.mimeType.startsWith('image/') ||
+          i.result.mimeType === 'application/pdf')
+    );
     if (completedItems.length === 0) return;
 
     const pdfInputs = await Promise.all(
@@ -680,6 +674,19 @@ export default function App(): React.ReactElement {
     [queue]
   );
 
+  const canMergeToPdf = useMemo(
+    () =>
+      queue.some(
+        (i) =>
+          i.status === 'completed' &&
+          i.result &&
+          (i.category === 'image' ||
+            i.result.mimeType.startsWith('image/') ||
+            i.result.mimeType === 'application/pdf')
+      ),
+    [queue]
+  );
+
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(queue.length / PAGE_SIZE)),
     [queue.length]
@@ -737,6 +744,7 @@ export default function App(): React.ReactElement {
                 totalOriginalBytes={totalOriginalBytes}
                 totalConvertedBytes={totalConvertedBytes}
                 canConvertAll={canConvertAll}
+                canMergeToPdf={canMergeToPdf}
               />
 
               <div className="space-y-2.5">

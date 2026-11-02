@@ -43,7 +43,11 @@ function escapeCsvCell(cell: string, delimiter: string): string {
 export function jsonToCsv(jsonInput: string | unknown, delimiter = ','): string {
   let parsed: unknown = jsonInput;
   if (typeof jsonInput === 'string') {
-    parsed = JSON.parse(jsonInput);
+    const trimmed = jsonInput.trim();
+    if (!trimmed) {
+      return '';
+    }
+    parsed = JSON.parse(trimmed);
   }
 
   let rows: unknown[] = [];
@@ -72,7 +76,11 @@ export function jsonToCsv(jsonInput: string | unknown, delimiter = ','): string 
   const headerSet = new Set<string>();
   rows.forEach((row) => {
     if (row && typeof row === 'object') {
-      Object.keys(row as Record<string, unknown>).forEach((key) => headerSet.add(key));
+      Object.keys(row as Record<string, unknown>).forEach((key) => {
+        if (key !== '__proto__' && key !== 'constructor' && key !== 'prototype') {
+          headerSet.add(key);
+        }
+      });
     }
   });
 
@@ -140,9 +148,11 @@ function coerceScalar(val: string): unknown {
   if (trimmed.toLowerCase() === 'true') return true;
   if (trimmed.toLowerCase() === 'false') return false;
   if (trimmed.toLowerCase() === 'null') return null;
-  if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
+  if (/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/.test(trimmed)) {
     const num = Number(trimmed);
-    if (!Number.isNaN(num)) return num;
+    if (!Number.isNaN(num) && num <= Number.MAX_SAFE_INTEGER && num >= Number.MIN_SAFE_INTEGER) {
+      return num;
+    }
   }
   return val;
 }
@@ -227,13 +237,16 @@ export function csvToJson(csvString: string, delimiter?: string, options?: CsvPa
   const result: Array<Record<string, unknown>> = [];
 
   dataRows.forEach((row) => {
-    const item: Record<string, unknown> = {};
+    const item: Record<string, unknown> = Object.create(null);
     headers.forEach((header, colIdx) => {
+      if (header === '__proto__' || header === 'constructor' || header === 'prototype') {
+        return;
+      }
       let cell = row[colIdx] ?? '';
       if (shouldTrim) cell = cell.trim();
       item[header] = coerce ? coerceScalar(cell) : cell;
     });
-    result.push(item);
+    result.push({ ...item });
   });
 
   return result;
@@ -251,6 +264,9 @@ export function sortObjectKeys(obj: unknown): unknown {
     const sorted: Record<string, unknown> = {};
     const keys = Object.keys(obj as Record<string, unknown>).sort();
     for (const key of keys) {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
       sorted[key] = sortObjectKeys((obj as Record<string, unknown>)[key]);
     }
     return sorted;
@@ -273,6 +289,24 @@ export async function convertDocument(
     const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
     const decoder = new TextDecoder('utf-8', { fatal: false });
     textContent = decoder.decode(bytes);
+  }
+
+  const trimmedInput = textContent.trim();
+  if (!trimmedInput) {
+    if (target === 'json') {
+      return {
+        data: '[]',
+        mimeType: 'application/json;charset=utf-8',
+        fileName: `${baseName}.json`,
+        byteLength: 2,
+      };
+    }
+    return {
+      data: '',
+      mimeType: target === 'tsv' ? 'text/tab-separated-values;charset=utf-8' : 'text/csv;charset=utf-8',
+      fileName: `${baseName}.${target}`,
+      byteLength: 0,
+    };
   }
 
   if (target === 'csv') {

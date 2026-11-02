@@ -4,7 +4,10 @@ import {
   validateMagicBytes,
   isExtensionSupported,
   verifyContentMatchesFormat,
+  getMimeTypeForFormat,
+  detectFormatFromBuffer,
 } from '../../src/utils/magicBytes.ts';
+import type { InputFormat } from '../../src/types/converter.ts';
 
 function createArrayBuffer(bytes: number[]): ArrayBuffer {
   const u8 = new Uint8Array(bytes);
@@ -143,6 +146,10 @@ describe('validateMagicBytes - Unit Test Suite', () => {
     assert.equal(validCsv.supported, true);
     assert.equal(validCsv.format, 'csv');
 
+    const validTsv = isExtensionSupported('data.tsv');
+    assert.equal(validTsv.supported, true);
+    assert.equal(validTsv.format, 'tsv');
+
     const unsupportedPpt = isExtensionSupported('presentation.ppt');
     assert.equal(unsupportedPpt.supported, false);
     assert.equal(unsupportedPpt.extension, 'ppt');
@@ -155,6 +162,15 @@ describe('validateMagicBytes - Unit Test Suite', () => {
 
     const unsupportedMp4 = isExtensionSupported('video.mp4');
     assert.equal(unsupportedMp4.supported, false);
+
+    const unsupportedMp3 = isExtensionSupported('audio.mp3');
+    assert.equal(unsupportedMp3.supported, false);
+
+    const unsupportedTiff = isExtensionSupported('scan.tiff');
+    assert.equal(unsupportedTiff.supported, false);
+
+    const unsupportedHeic = isExtensionSupported('photo.heic');
+    assert.equal(unsupportedHeic.supported, false);
 
     const noExtension = isExtensionSupported('no_extension_file');
     assert.equal(noExtension.supported, false);
@@ -177,6 +193,29 @@ describe('validateMagicBytes - Unit Test Suite', () => {
     const invalidJsonBuffer = stringToArrayBuffer('{not valid json}');
     const jsonMismatch = verifyContentMatchesFormat(invalidJsonBuffer, 'json', 'corrupt.json');
     assert.equal(jsonMismatch.matches, false);
+
+    const jsonSpoofedAsCsv = stringToArrayBuffer('{"data": 123}');
+    const csvMismatch = verifyContentMatchesFormat(jsonSpoofedAsCsv, 'csv', 'data.csv');
+    assert.equal(csvMismatch.matches, false);
+    assert.equal(csvMismatch.detectedFormat, 'json');
+
+    const binarySpoofedAsCsv = createArrayBuffer([0x00, 0x01, 0x02, 0x03]);
+    const binaryMismatch = verifyContentMatchesFormat(binarySpoofedAsCsv, 'csv', 'malware.csv');
+    assert.equal(binaryMismatch.matches, false);
+  });
+
+  it('verifies mime types and format detection functions', () => {
+    const formats: InputFormat[] = ['png', 'jpeg', 'webp', 'avif', 'svg', 'bmp', 'ico', 'gif', 'json', 'csv', 'tsv'];
+    for (const fmt of formats) {
+      const mime = getMimeTypeForFormat(fmt);
+      assert.ok(typeof mime === 'string' && mime.length > 0);
+    }
+
+    const pngHeader = createArrayBuffer([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    assert.equal(detectFormatFromBuffer(pngHeader, 'sample.png'), 'png');
+
+    const empty = new ArrayBuffer(0);
+    assert.equal(detectFormatFromBuffer(empty), null);
   });
 
   it('rejects empty buffers', () => {

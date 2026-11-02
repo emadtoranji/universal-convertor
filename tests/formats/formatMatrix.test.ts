@@ -49,6 +49,7 @@ describe('formatMatrix - Formats Test Suite', () => {
       assert.equal(cat, 'document');
       const outputs = getCompatibleOutputFormats(fmt);
       assert.ok(Array.isArray(outputs));
+      assert.equal(outputs.length, 0);
     }
   });
 
