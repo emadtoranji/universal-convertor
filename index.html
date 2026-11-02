@@ -1,8 +1,28 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <script>
+      (function() {
+        try {
+          var match = document.cookie.match(/(?:^|;\s*)theme=([^;]*)/);
+          var theme = match ? decodeURIComponent(match[1]).trim().toLowerCase() : null;
+          if (theme !== 'dark' && theme !== 'light') {
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+            document.cookie = 'theme=' + encodeURIComponent(theme) + '; path=/; max-age=31536000; SameSite=Lax';
+          }
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <title>Universal Convertor - 100% Free Client-Side Image, Audio, Video and Document Converter</title>
     <meta name="description" content="100% Free, private, client-side universal converter. Convert images, audio, video, and documents directly in your browser with zero server uploads and complete privacy." />
     <meta name="keywords" content="universal convertor, free file converter, client side converter, batch image converter, audio to wav converter, video frame grabber, markdown to html, json to csv, zero cloud upload, private converter" />

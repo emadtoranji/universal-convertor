@@ -333,11 +333,7 @@ export class ConversionWorkerPool {
   private activeTasksMap = new Map<string, WorkerTask>();
 
   constructor() {
-    const coreCount =
-      typeof navigator !== 'undefined' && navigator.hardwareConcurrency
-        ? navigator.hardwareConcurrency
-        : 4;
-    this.poolSize = Math.max(2, Math.min(8, coreCount));
+    this.poolSize = 1;
   }
 
   private getWorkerUrl(): string {

@@ -28,11 +28,20 @@ import {
   FileCheck,
   HelpCircle,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Scale,
   FileCode,
   AlertTriangle,
   UploadCloud,
 } from 'lucide-react';
+import {
+  getOrInitEffectiveTheme,
+  setThemeCookie,
+  applyThemeToDocument,
+  getThemeCookie,
+  ThemeMode,
+} from './utils/theme';
 
 const DEFAULT_OPTIONS: ConversionOptions = {
   targetFormat: 'webp',
@@ -50,39 +59,28 @@ const DEFAULT_OPTIONS: ConversionOptions = {
   pdfOrientation: 'auto',
 };
 
-function getInitialTheme(): boolean {
-  if (typeof window !== 'undefined') {
-    try {
-      const savedTheme = localStorage.getItem('omni_theme');
-      return savedTheme !== 'light';
-    } catch {
-      return true;
-    }
-  }
-  return true;
-}
+const PAGE_SIZE = 25;
+const INGESTION_CHUNK_SIZE = 20;
 
 export default function App(): React.ReactElement {
   const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [globalOptions, setGlobalOptions] = useState<ConversionOptions>(DEFAULT_OPTIONS);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [previewItem, setPreviewItem] = useState<QueueItem | null>(null);
-  const [isDark, setIsDark] = useState<boolean>(getInitialTheme);
+  const [isDark, setIsDark] = useState<boolean>(() => getOrInitEffectiveTheme() === 'dark');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [isWindowDragOver, setIsWindowDragOver] = useState<boolean>(false);
   const [isBoxDragOver, setIsBoxDragOver] = useState<boolean>(false);
   const dragCounterRef = useRef<number>(0);
+  const abortProcessingRef = useRef<boolean>(false);
   const processIncomingFilesRef = useRef<(files: File[]) => Promise<void>>(() => Promise.resolve());
 
   const workerPoolRef = useRef<ConversionWorkerPool | null>(null);
 
   useEffect(() => {
     workerPoolRef.current = new ConversionWorkerPool();
-    if (getInitialTheme()) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyThemeToDocument(getOrInitEffectiveTheme());
 
     if (typeof window !== 'undefined' && window.location.pathname !== '/') {
       window.history.replaceState(null, '', '/');
@@ -136,18 +134,30 @@ export default function App(): React.ReactElement {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent): void => {
+      const existingCookie = getThemeCookie();
+      if (!existingCookie) {
+        const newTheme: ThemeMode = e.matches ? 'dark' : 'light';
+        setThemeCookie(newTheme);
+        applyThemeToDocument(newTheme);
+        setIsDark(newTheme === 'dark');
+      }
+    };
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
+
   const handleToggleTheme = useCallback((): void => {
     setIsDark((prev) => {
-      const next = !prev;
-      if (next) {
-        document.documentElement.classList.add('dark');
-        try {
-          localStorage.setItem('omni_theme', 'dark');
-        } catch {}
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      return next;
+      const nextMode: ThemeMode = prev ? 'light' : 'dark';
+      setThemeCookie(nextMode);
+      applyThemeToDocument(nextMode);
+      return !prev;
     });
   }, []);
 
@@ -199,118 +209,122 @@ export default function App(): React.ReactElement {
 
   const processIncomingFiles = useCallback(
     async (files: File[]): Promise<void> => {
-      const newItems: QueueItem[] = [];
+      for (let i = 0; i < files.length; i += INGESTION_CHUNK_SIZE) {
+        const chunk = files.slice(i, i + INGESTION_CHUNK_SIZE);
+        const chunkItems: QueueItem[] = [];
 
-      for (const file of files) {
-        const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        try {
-          const extCheck = isExtensionSupported(file.name);
-          if (!extCheck.supported || !extCheck.format || !extCheck.category) {
-            newItems.push({
+        for (const file of chunk) {
+          const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+          try {
+            const extCheck = isExtensionSupported(file.name);
+            if (!extCheck.supported || !extCheck.format || !extCheck.category) {
+              chunkItems.push({
+                id,
+                file,
+                name: file.name,
+                sourceFormat: (extCheck.extension || 'txt') as InputFormat,
+                category: 'document',
+                originalSize: file.size,
+                originalWidth: 0,
+                originalHeight: 0,
+                previewUrl: '',
+                status: 'error',
+                progress: 0,
+                errorMessage: `Unsupported file format (.${extCheck.extension || 'unknown'}). Supported: PNG, JPG, WebP, MP4, WAV, PDF, JSON, XML, YAML, etc.`,
+                options: { ...globalOptions },
+              });
+              continue;
+            }
+
+            const sourceFormat = extCheck.format;
+            const category = extCheck.category;
+            let width = 0;
+            let height = 0;
+            let duration: number | undefined;
+            let previewUrl = '';
+
+            if (category === 'image') {
+              if (sourceFormat === 'svg') {
+                const text = await file.text();
+                const cleanSvg = sanitizeSvgString(text);
+                const cleanBlob = new Blob([cleanSvg], { type: 'image/svg+xml' });
+                previewUrl = URL.createObjectURL(cleanBlob);
+                try {
+                  const bitmap = await createImageBitmap(cleanBlob);
+                  width = bitmap.width;
+                  height = bitmap.height;
+                  bitmap.close();
+                } catch {}
+              } else {
+                previewUrl = URL.createObjectURL(file);
+                try {
+                  const bitmap = await createImageBitmap(file);
+                  width = bitmap.width;
+                  height = bitmap.height;
+                  bitmap.close();
+                } catch {}
+              }
+            } else if (category === 'audio') {
+              try {
+                const ab = await file.slice(0, 8192).arrayBuffer();
+                const meta = await extractAudioMetadata(ab);
+                duration = meta.duration;
+              } catch {}
+            } else if (category === 'video') {
+              previewUrl = URL.createObjectURL(file);
+              try {
+                const meta = await extractVideoMetadata(file);
+                duration = meta.duration;
+                width = meta.videoWidth;
+                height = meta.videoHeight;
+              } catch {}
+            }
+
+            const compatible = getCompatibleOutputFormats(sourceFormat);
+            const initialTarget = compatible.includes(globalOptions.targetFormat)
+              ? globalOptions.targetFormat
+              : compatible[0] || (category === 'audio' ? 'wav' : category === 'video' ? 'wav' : category === 'document' ? 'json' : 'webp');
+
+            chunkItems.push({
               id,
               file,
               name: file.name,
-              sourceFormat: (extCheck.extension || 'txt') as InputFormat,
-              category: 'document',
+              sourceFormat,
+              category,
+              originalSize: file.size,
+              originalWidth: width,
+              originalHeight: height,
+              duration,
+              previewUrl,
+              status: 'idle',
+              progress: 0,
+              options: { ...globalOptions, targetFormat: initialTarget },
+            });
+          } catch {
+            chunkItems.push({
+              id,
+              file,
+              name: file.name,
+              sourceFormat: 'png',
+              category: 'image',
               originalSize: file.size,
               originalWidth: 0,
               originalHeight: 0,
               previewUrl: '',
               status: 'error',
               progress: 0,
-              errorMessage: `Unsupported file format (.${extCheck.extension || 'unknown'}). Supported: PNG, JPG, WebP, MP4, WAV, PDF, JSON, XML, YAML, etc.`,
+              errorMessage: 'Unable to process file.',
               options: { ...globalOptions },
             });
-            continue;
           }
+        }
 
-          const sourceFormat = extCheck.format;
-          const category = extCheck.category;
-          let width = 0;
-          let height = 0;
-          let duration: number | undefined;
-          let previewUrl = '';
+        setQueue((prev) => [...prev, ...chunkItems]);
 
-          if (category === 'image') {
-            if (sourceFormat === 'svg') {
-              const text = await file.text();
-              const cleanSvg = sanitizeSvgString(text);
-              const cleanBlob = new Blob([cleanSvg], { type: 'image/svg+xml' });
-              previewUrl = URL.createObjectURL(cleanBlob);
-              try {
-                const bitmap = await createImageBitmap(cleanBlob);
-                width = bitmap.width;
-                height = bitmap.height;
-                bitmap.close();
-              } catch {}
-            } else {
-              previewUrl = URL.createObjectURL(file);
-              try {
-                const bitmap = await createImageBitmap(file);
-                width = bitmap.width;
-                height = bitmap.height;
-                bitmap.close();
-              } catch {}
-            }
-          } else if (category === 'audio') {
-            previewUrl = URL.createObjectURL(file);
-            try {
-              const ab = await file.arrayBuffer();
-              const meta = await extractAudioMetadata(ab);
-              duration = meta.duration;
-            } catch {}
-          } else if (category === 'video') {
-            previewUrl = URL.createObjectURL(file);
-            try {
-              const meta = await extractVideoMetadata(file);
-              duration = meta.duration;
-              width = meta.videoWidth;
-              height = meta.videoHeight;
-            } catch {}
-          } else {
-            previewUrl = URL.createObjectURL(file);
-          }
-
-          const compatible = getCompatibleOutputFormats(sourceFormat);
-          const initialTarget = compatible.includes(globalOptions.targetFormat)
-            ? globalOptions.targetFormat
-            : compatible[0] || (category === 'audio' ? 'wav' : category === 'video' ? 'wav' : category === 'document' ? 'json' : 'webp');
-
-          newItems.push({
-            id,
-            file,
-            name: file.name,
-            sourceFormat,
-            category,
-            originalSize: file.size,
-            originalWidth: width,
-            originalHeight: height,
-            duration,
-            previewUrl,
-            status: 'idle',
-            progress: 0,
-            options: { ...globalOptions, targetFormat: initialTarget },
-          });
-        } catch {
-          newItems.push({
-            id,
-            file,
-            name: file.name,
-            sourceFormat: 'png',
-            category: 'image',
-            originalSize: file.size,
-            originalWidth: 0,
-            originalHeight: 0,
-            previewUrl: '',
-            status: 'error',
-            progress: 0,
-            errorMessage: 'Unable to process file.',
-            options: { ...globalOptions },
-          });
+        if (i + INGESTION_CHUNK_SIZE < files.length) {
+          await new Promise((resolve) => setTimeout(resolve, 0));
         }
       }
-
-      setQueue((prev) => [...prev, ...newItems]);
     },
     [globalOptions]
   );
@@ -386,6 +400,8 @@ export default function App(): React.ReactElement {
   }, []);
 
   const handleClearQueue = useCallback((): void => {
+    abortProcessingRef.current = true;
+    setIsProcessing(false);
     setQueue((prev) => {
       for (const item of prev) {
         URL.revokeObjectURL(item.previewUrl);
@@ -398,12 +414,13 @@ export default function App(): React.ReactElement {
       }
       return [];
     });
+    setCurrentPage(1);
   }, []);
 
   const convertSingleItem = useCallback(
-    async (id: string): Promise<void> => {
+    async (id: string): Promise<boolean> => {
       const item = queue.find((i) => i.id === id);
-      if (!item) return;
+      if (!item) return false;
 
       setQueue((prev) =>
         prev.map((i) => (i.id === id ? { ...i, status: 'processing', progress: 15 } : i))
@@ -425,7 +442,7 @@ export default function App(): React.ReactElement {
                 : i
             )
           );
-          return;
+          return false;
         }
 
         if (item.category === 'audio') {
@@ -464,7 +481,7 @@ export default function App(): React.ReactElement {
                 : i
             )
           );
-          return;
+          return true;
         }
 
         if (item.category === 'video') {
@@ -493,7 +510,7 @@ export default function App(): React.ReactElement {
                   : i
               )
             );
-            return;
+            return true;
           } else {
             const format = (item.options.targetFormat === 'jpeg' ? 'jpeg' : item.options.targetFormat === 'webp' ? 'webp' : 'png') as 'png' | 'jpeg' | 'webp';
             const result = await captureVideoSnapshot(item.file, {
@@ -522,7 +539,7 @@ export default function App(): React.ReactElement {
                   : i
               )
             );
-            return;
+            return true;
           }
         }
 
@@ -564,118 +581,128 @@ export default function App(): React.ReactElement {
                 : i
             )
           );
-          return;
+          return true;
         }
 
         const pool = workerPoolRef.current;
-        if (!pool) return;
+        if (!pool) return false;
 
         const fullBuffer = await item.file.arrayBuffer();
-        pool.enqueueTask({
-          payload: {
-            id: item.id,
-            buffer: fullBuffer,
-            sourceFormat: item.sourceFormat,
-            targetFormat: item.options.targetFormat,
-            options: item.options,
-            originalWidth: item.originalWidth,
-            originalHeight: item.originalHeight,
-            fileName: item.name,
-          },
-          transferables: [fullBuffer],
-          onProgress: (progress) => {
-            setQueue((prev) =>
-              prev.map((i) => (i.id === id ? { ...i, progress } : i))
-            );
-          },
-          onSuccess: async (resultPayload) => {
-            let finalBuffer = resultPayload.buffer.slice(0);
-            let finalMime = resultPayload.mimeType;
 
-            if (resultPayload.targetFormat === 'pdf') {
-              const pdfBytes = await generatePdfFromImages(
-                [
+        return await new Promise<boolean>((resolve) => {
+          pool.enqueueTask({
+            payload: {
+              id: item.id,
+              buffer: fullBuffer,
+              sourceFormat: item.sourceFormat,
+              targetFormat: item.options.targetFormat,
+              options: item.options,
+              originalWidth: item.originalWidth,
+              originalHeight: item.originalHeight,
+              fileName: item.name,
+            },
+            transferables: [fullBuffer],
+            onProgress: (progress) => {
+              setQueue((prev) =>
+                prev.map((i) => (i.id === id ? { ...i, progress } : i))
+              );
+            },
+            onSuccess: async (resultPayload) => {
+              let finalBuffer = resultPayload.buffer.slice(0);
+              let finalMime = resultPayload.mimeType;
+
+              if (resultPayload.targetFormat === 'pdf') {
+                const pdfBytes = await generatePdfFromImages(
+                  [
+                    {
+                      buffer: finalBuffer,
+                      mimeType: 'image/png',
+                      name: item.name,
+                      width: resultPayload.width,
+                      height: resultPayload.height,
+                    },
+                  ],
                   {
-                    buffer: finalBuffer,
-                    mimeType: 'image/png',
-                    name: item.name,
-                    width: resultPayload.width,
-                    height: resultPayload.height,
-                  },
-                ],
-                {
-                  pageSize: item.options.pdfPageSize,
-                  orientation: item.options.pdfOrientation,
-                }
+                    pageSize: item.options.pdfPageSize,
+                    orientation: item.options.pdfOrientation,
+                  }
+                );
+                const copy = pdfBytes.buffer.slice(
+                  pdfBytes.byteOffset,
+                  pdfBytes.byteOffset + pdfBytes.byteLength
+                );
+                finalBuffer = copy as ArrayBuffer;
+                finalMime = 'application/pdf';
+              }
+
+              const mainBlob = new Blob([finalBuffer], { type: finalMime });
+              const mainDownloadUrl = URL.createObjectURL(mainBlob);
+
+              let previewDisplayUrl: string;
+              if (resultPayload.previewBuffer) {
+                const previewBlob = new Blob([resultPayload.previewBuffer.slice(0)], {
+                  type: 'image/png',
+                });
+                previewDisplayUrl = URL.createObjectURL(previewBlob);
+              } else {
+                previewDisplayUrl = mainDownloadUrl;
+              }
+
+              setQueue((prev) =>
+                prev.map((i) =>
+                  i.id === id
+                    ? {
+                        ...i,
+                        status: 'completed',
+                        progress: 100,
+                        result: {
+                          blob: mainBlob,
+                          url: mainDownloadUrl,
+                          previewUrl: previewDisplayUrl,
+                          size: finalBuffer.byteLength,
+                          format: resultPayload.targetFormat,
+                          width: resultPayload.width,
+                          height: resultPayload.height,
+                          mimeType: finalMime,
+                        },
+                      }
+                    : i
+                )
               );
-              const copy = pdfBytes.buffer.slice(
-                pdfBytes.byteOffset,
-                pdfBytes.byteOffset + pdfBytes.byteLength
+              resolve(true);
+            },
+            onError: (errorMessage) => {
+              setQueue((prev) =>
+                prev.map((i) => (i.id === id ? { ...i, status: 'error', errorMessage } : i))
               );
-              finalBuffer = copy as ArrayBuffer;
-              finalMime = 'application/pdf';
-            }
-
-            const mainBlob = new Blob([finalBuffer], { type: finalMime });
-            const mainDownloadUrl = URL.createObjectURL(mainBlob);
-
-            let previewDisplayUrl: string;
-            if (resultPayload.previewBuffer) {
-              const previewBlob = new Blob([resultPayload.previewBuffer.slice(0)], {
-                type: 'image/png',
-              });
-              previewDisplayUrl = URL.createObjectURL(previewBlob);
-            } else {
-              previewDisplayUrl = mainDownloadUrl;
-            }
-
-            setQueue((prev) =>
-              prev.map((i) =>
-                i.id === id
-                  ? {
-                      ...i,
-                      status: 'completed',
-                      progress: 100,
-                      result: {
-                        blob: mainBlob,
-                        url: mainDownloadUrl,
-                        previewUrl: previewDisplayUrl,
-                        size: finalBuffer.byteLength,
-                        format: resultPayload.targetFormat,
-                        width: resultPayload.width,
-                        height: resultPayload.height,
-                        mimeType: finalMime,
-                      },
-                    }
-                  : i
-              )
-            );
-          },
-          onError: (errorMessage) => {
-            setQueue((prev) =>
-              prev.map((i) => (i.id === id ? { ...i, status: 'error', errorMessage } : i))
-            );
-          },
+              resolve(false);
+            },
+          });
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Conversion execution failed';
         setQueue((prev) =>
           prev.map((i) => (i.id === id ? { ...i, status: 'error', errorMessage: msg } : i))
         );
+        return false;
       }
     },
     [queue]
   );
 
   const handleConvertAll = useCallback(async (): Promise<void> => {
+    if (isProcessing) return;
     setIsProcessing(true);
+    abortProcessingRef.current = false;
     const idleIds = queue.filter((i) => i.status === 'idle' || i.status === 'error').map((i) => i.id);
 
     for (const id of idleIds) {
+      if (abortProcessingRef.current) break;
       await convertSingleItem(id);
+      await new Promise((resolve) => setTimeout(resolve, 16));
     }
     setIsProcessing(false);
-  }, [queue, convertSingleItem]);
+  }, [queue, convertSingleItem, isProcessing]);
 
   const handleDownloadSingle = useCallback(
     (item: QueueItem): void => {
@@ -793,6 +820,23 @@ export default function App(): React.ReactElement {
     [queue]
   );
 
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(queue.length / PAGE_SIZE)),
+    [queue.length]
+  );
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const visibleItems = useMemo(() => {
+    if (queue.length <= PAGE_SIZE) return queue;
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return queue.slice(start, start + PAGE_SIZE);
+  }, [queue, currentPage]);
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200">
       {isWindowDragOver && !isBoxDragOver && (
@@ -840,21 +884,52 @@ export default function App(): React.ReactElement {
                   <h2 className="text-xs sm:text-sm font-semibold tracking-wide uppercase text-zinc-600 dark:text-zinc-400">
                     {t.queue.header.title} {t('queue.header.countBadge', { count: queue.length })}
                   </h2>
+                  {totalPages > 1 && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-zinc-500 font-mono text-[11px]">
+                        {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, queue.length)} / {queue.length}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={currentPage === 1}
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          className="p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          aria-label="Previous Page"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="px-1.5 py-0.5 font-mono text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+                          {currentPage}/{totalPages}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={currentPage === totalPages}
+                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                          className="p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          aria-label="Next Page"
+                        >
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
-                  {queue.map((item) => (
-                    <FileQueueItem
-                      key={item.id}
-                      item={item}
-                      onRemove={handleRemoveItem}
-                      onConvertSingle={convertSingleItem}
-                      onDownloadSingle={handleDownloadSingle}
-                      onPreview={handleOpenPreview}
-                      onTargetFormatChange={handleItemFormatChange}
-                      onOptionsChange={handleItemOptionsChange}
-                      onRegenerate={handleRegenerate}
-                    />
+                  {visibleItems.map((item) => (
+                    <div key={item.id} style={{ contentVisibility: 'auto', containIntrinsicSize: '84px' }}>
+                      <FileQueueItem
+                        item={item}
+                        onRemove={handleRemoveItem}
+                        onConvertSingle={convertSingleItem}
+                        onDownloadSingle={handleDownloadSingle}
+                        onPreview={handleOpenPreview}
+                        onTargetFormatChange={handleItemFormatChange}
+                        onOptionsChange={handleItemOptionsChange}
+                        onRegenerate={handleRegenerate}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
