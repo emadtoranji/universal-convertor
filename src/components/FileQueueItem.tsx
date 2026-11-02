@@ -81,7 +81,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
       ? Math.round(((item.originalSize - item.result.size) / item.originalSize) * 100)
       : null;
 
-  const compatibleFormats = getCompatibleOutputFormats(item.sourceFormat);
+  const compatibleFormats = getCompatibleOutputFormats(item.sourceFormat) ?? [];
   const displayThumbnail = item.result
     ? item.result.previewUrl || item.result.url
     : item.previewUrl;
@@ -95,7 +95,11 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3 min-w-0 flex-1 w-full sm:w-auto">
           <div
-            onClick={() => onPreview(item)}
+            onClick={() => {
+              if (item.status !== 'error' && (displayThumbnail || item.previewUrl)) {
+                onPreview(item);
+              }
+            }}
             className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 overflow-hidden flex-shrink-0 cursor-pointer group/thumb shadow-inner flex items-center justify-center"
             title={t.queue.actions.previewTitle}
             aria-label={t.queue.actions.previewAria}
@@ -176,7 +180,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-100 dark:border-zinc-800/80">
-          {item.status !== 'completed' ? (
+          {item.status !== 'completed' && item.status !== 'error' && compatibleFormats.length > 0 ? (
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-zinc-500 uppercase font-semibold">{t.queue.meta.to}</span>
               <select
@@ -192,7 +196,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                 ))}
               </select>
             </div>
-          ) : (
+          ) : item.status === 'completed' ? (
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
@@ -205,22 +209,24 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                 <span className="hidden xs:inline">{t.queue.actions.regenerate}</span>
               </button>
             </div>
-          )}
+          ) : null}
 
           <div className="flex items-center gap-1 sm:gap-1.5">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((prev) => !prev)}
-              className={`p-2 rounded-lg border transition-colors cursor-pointer ${
-                showAdvanced
-                  ? 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-400 dark:border-cyan-500/40 text-cyan-700 dark:text-cyan-400'
-                  : 'bg-zinc-100 dark:bg-zinc-950 hover:bg-zinc-200 dark:hover:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
-              }`}
-              title={t.queue.actions.advancedTitle}
-              aria-label={t.queue.actions.advancedAria}
-            >
-              <Sliders className="w-4 h-4" />
-            </button>
+            {item.status !== 'error' && (
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((prev) => !prev)}
+                className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+                  showAdvanced
+                    ? 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-400 dark:border-cyan-500/40 text-cyan-700 dark:text-cyan-400'
+                    : 'bg-zinc-100 dark:bg-zinc-950 hover:bg-zinc-200 dark:hover:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
+                }`}
+                title={t.queue.actions.advancedTitle}
+                aria-label={t.queue.actions.advancedAria}
+              >
+                <Sliders className="w-4 h-4" />
+              </button>
+            )}
 
             {item.status === 'completed' && (
               <>

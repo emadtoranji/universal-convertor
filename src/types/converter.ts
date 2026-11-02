@@ -198,6 +198,8 @@ export function getMediaCategory(format: InputFormat): MediaCategory {
     case 'yaml':
     case 'yml':
       return 'document';
+    default:
+      return 'document';
   }
 }
 
@@ -238,6 +240,8 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
           return ['txt', 'pdf'];
       }
     }
+    default:
+      return ['txt', 'pdf'];
   }
 }
 

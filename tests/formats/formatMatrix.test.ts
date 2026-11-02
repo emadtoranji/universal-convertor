@@ -70,6 +70,17 @@ describe('formatMatrix - Formats Test Suite', () => {
     assert.ok(yamlOutputs.includes('yaml'));
   });
 
+  it('safely handles unknown and unsupported file formats without throwing or returning undefined', () => {
+    const unknownFormats = ['exe', 'ppt', 'bin', 'dll', 'iso', 'unknown'] as unknown as InputFormat[];
+    for (const fmt of unknownFormats) {
+      const cat = getMediaCategory(fmt);
+      assert.equal(cat, 'document');
+      const outputs = getCompatibleOutputFormats(fmt);
+      assert.ok(Array.isArray(outputs));
+      assert.ok(outputs.length > 0);
+    }
+  });
+
   it('correctly evaluates queue homogeneity', () => {
     const dummyFile = new File([''], 'test.png', { type: 'image/png' });
     const dummyOptions = ConversionOptionsSchema.parse({ targetFormat: 'webp' });

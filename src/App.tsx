@@ -694,7 +694,7 @@ export default function App(): React.ReactElement {
     if (isProcessing) return;
     setIsProcessing(true);
     abortProcessingRef.current = false;
-    const idleIds = queue.filter((i) => i.status === 'idle' || i.status === 'error').map((i) => i.id);
+    const idleIds = queue.filter((i) => i.status === 'idle').map((i) => i.id);
 
     for (const id of idleIds) {
       if (abortProcessingRef.current) break;
