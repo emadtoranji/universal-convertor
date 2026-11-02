@@ -19,7 +19,7 @@ import { createZipArchive } from './core/zipArchiver';
 import { generatePdfFromImages } from './core/pdfGenerator';
 import { convertAudioToWav, extractAudioMetadata, AudioSampleRate } from './core/audioConverter';
 import { captureVideoSnapshot, extractAudioFromVideo, extractVideoMetadata } from './core/videoConverter';
-import { convertDocument } from './core/documentConverter';
+import { convertDocument, DocumentFormat } from './core/documentConverter';
 import { t } from './utils/i18n';
 import {
   Layers,
@@ -544,10 +544,10 @@ export default function App(): React.ReactElement {
         }
 
         if (item.category === 'document') {
-          const content = await item.file.text();
-          const targetFmt = item.options.targetFormat as 'html' | 'md' | 'json' | 'csv' | 'tsv' | 'txt' | 'pdf' | 'xml' | 'yaml';
-          const result = await convertDocument(content, {
-            sourceFormat: item.sourceFormat as 'html' | 'md' | 'json' | 'csv' | 'tsv' | 'txt' | 'xml' | 'yaml' | 'yml',
+          const inputData = item.sourceFormat === 'pdf' ? await item.file.arrayBuffer() : await item.file.text();
+          const targetFmt = item.options.targetFormat as DocumentFormat;
+          const result = await convertDocument(inputData, {
+            sourceFormat: item.sourceFormat as DocumentFormat,
             targetFormat: targetFmt,
             fileName: item.name,
             prettyJson: item.options.quality > 50,
@@ -572,9 +572,9 @@ export default function App(): React.ReactElement {
                       url: resultUrl,
                       previewUrl: resultUrl,
                       size: blob.size,
-                      format: targetFmt,
-                      width: 0,
-                      height: 0,
+                      format: item.options.targetFormat,
+                      width: targetFmt === 'png' ? 800 : 0,
+                      height: targetFmt === 'png' ? 1132 : 0,
                       mimeType: result.mimeType,
                     },
                   }

@@ -1,4 +1,5 @@
-import { PDFDocument, StandardFonts, rgb, grayscale } from 'pdf-lib';
+import * as fflate from 'fflate';
+import { PDFDocument, StandardFonts, PDFRawStream, PDFArray, rgb, grayscale, degrees } from 'pdf-lib';
 import type { PDFFont, PDFPage } from 'pdf-lib';
 
 export type DocumentFormat =
@@ -14,7 +15,19 @@ export type DocumentFormat =
   | 'hex'
   | 'xml'
   | 'yaml'
-  | 'yml';
+  | 'yml'
+  | 'png';
+
+export interface ExtractedPdfPage {
+  pageNumber: number;
+  text: string;
+}
+
+export interface ExtractedPdfResult {
+  text: string;
+  pages: ExtractedPdfPage[];
+  totalPages: number;
+}
 
 export interface CsvParseOptions {
   delimiter?: string;
@@ -650,8 +663,558 @@ export function tsvToJson(tsvString: string, options?: CsvParseOptions): Array<R
   return csvToJson(tsvString, '\t', options);
 }
 
+function decodePdfToken(tok: string): string {
+  if (tok.startsWith('<') && tok.endsWith('>')) {
+    const hex = tok.slice(1, -1).replace(/\s/g, '');
+    if (hex.length % 2 !== 0) return '';
+    const byteArr = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+      byteArr[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+    }
+    if (byteArr.length >= 2 && byteArr[0] === 0xfe && byteArr[1] === 0xff) {
+      return new TextDecoder('utf-16be', { fatal: false }).decode(byteArr.slice(2));
+    }
+    return new TextDecoder('utf-8', { fatal: false }).decode(byteArr);
+  }
+  if (tok.startsWith('(') && tok.endsWith(')')) {
+    return tok
+      .slice(1, -1)
+      .replace(/\\([0-7]{1,3})/g, (_m, oct: string) => String.fromCharCode(parseInt(oct, 8)))
+      .replace(/\\n/g, '\n')
+      .replace(/\\r/g, '\r')
+      .replace(/\\t/g, '\t')
+      .replace(/\\\(/g, '(')
+      .replace(/\\\)/g, ')')
+      .replace(/\\\\/g, '\\');
+  }
+  return tok;
+}
+
+function extractTextFromStream(streamStr: string): string {
+  const lines: string[] = [];
+  const btBlocks = streamStr.match(/BT[\s\S]*?ET/g);
+  const blocksToProcess = btBlocks && btBlocks.length > 0 ? btBlocks : [streamStr];
+
+  for (const block of blocksToProcess) {
+    let currentLine = '';
+    const opRegex = /(?:\[([\s\S]*?)\]\s*TJ)|(?:(<[0-9a-fA-F\s]+>|\([^)\\]*(?:\\.[^)\\]*)*\))\s*(?:Tj|'|"))|(T\*|T[dD]|Tm)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = opRegex.exec(block)) !== null) {
+      if (match[1] !== undefined) {
+        const arrayContent = match[1];
+        const itemRegex = /(<[0-9a-fA-F\s]+>|\([^)\\]*(?:\\.[^)\\]*)*\)|-?\d+(?:\.\d+)?)/g;
+        let itemMatch: RegExpExecArray | null;
+        while ((itemMatch = itemRegex.exec(arrayContent)) !== null) {
+          const item = itemMatch[1];
+          if (item.startsWith('<') || item.startsWith('(')) {
+            currentLine += decodePdfToken(item);
+          } else {
+            const spacing = parseFloat(item);
+            if (spacing < -150) {
+              currentLine += ' ';
+            }
+          }
+        }
+      } else if (match[2] !== undefined) {
+        currentLine += decodePdfToken(match[2]);
+      } else if (match[3] !== undefined) {
+        if (currentLine.trim().length > 0) {
+          lines.push(currentLine.trim());
+          currentLine = '';
+        }
+      }
+    }
+
+    if (currentLine.trim().length > 0) {
+      lines.push(currentLine.trim());
+    }
+  }
+
+  return lines.join('\n');
+}
+
+export async function extractTextFromPdf(pdfBytes: Uint8Array | ArrayBuffer): Promise<ExtractedPdfResult> {
+  const bytes = pdfBytes instanceof Uint8Array ? pdfBytes : new Uint8Array(pdfBytes);
+  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const totalPages = doc.getPageCount();
+  const pages: ExtractedPdfPage[] = [];
+
+  for (let i = 0; i < totalPages; i++) {
+    const page = doc.getPage(i);
+    const contents = page.node.Contents();
+    const refs = contents instanceof PDFArray ? contents.asArray() : (contents ? [contents] : []);
+    const pageLines: string[] = [];
+
+    for (const ref of refs) {
+      const stream = doc.context.lookup(ref);
+      if (stream instanceof PDFRawStream) {
+        const rawBytes = stream.asUint8Array();
+        let decompressedBytes = rawBytes;
+        try {
+          decompressedBytes = fflate.unzlibSync(rawBytes);
+        } catch {
+          try {
+            decompressedBytes = fflate.inflateSync(rawBytes);
+          } catch {
+            decompressedBytes = rawBytes;
+          }
+        }
+        const streamStr = new TextDecoder('utf-8', { fatal: false }).decode(decompressedBytes);
+        const extracted = extractTextFromStream(streamStr);
+        if (extracted.trim().length > 0) {
+          pageLines.push(extracted.trim());
+        }
+      }
+    }
+
+    let pageText = pageLines.join('\n').trim();
+    if (pageText.length === 0) {
+      pageText = `[Page ${i + 1}]`;
+    }
+
+    pages.push({
+      pageNumber: i + 1,
+      text: pageText,
+    });
+  }
+
+  const allText = pages.map((p) => p.text).filter((t) => t.length > 0).join('\n\n');
+
+  return {
+    text: allText,
+    pages,
+    totalPages,
+  };
+}
+
+function pdfPagesToHtml(extracted: ExtractedPdfResult, title: string): string {
+  const pagesHtml = extracted.pages
+    .map((p) => {
+      const escaped = escapeHtml(p.text);
+      const paragraphs = escaped
+        .split(/\n\s*\n/)
+        .map((para) => `<p>${para.replace(/\n/g, '<br/>')}</p>`)
+        .join('');
+      return `<section class="pdf-page" data-page="${p.pageNumber}"><header class="page-header">Page ${p.pageNumber}</header>${paragraphs}</section>`;
+    })
+    .join('\n');
+
+  return `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n  <title>${escapeHtml(title)}</title>\n  <style>\n    body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem; color: #1e293b; background: #ffffff; }\n    .pdf-page { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; }\n    .page-header { font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }\n    p { margin-bottom: 1rem; }\n  </style>\n</head>\n<body>\n  <h1>${escapeHtml(title)}</h1>\n${pagesHtml}\n</body>\n</html>`;
+}
+
+function pdfPagesToMarkdown(extracted: ExtractedPdfResult, title: string): string {
+  const parts: string[] = [`# ${title}\n`];
+  extracted.pages.forEach((p, idx) => {
+    if (idx > 0) {
+      parts.push('\n---\n');
+    }
+    parts.push(`## Page ${p.pageNumber}\n\n${p.text}`);
+  });
+  return parts.join('\n');
+}
+
+function pdfPagesToCsv(extracted: ExtractedPdfResult, delimiter = ','): string {
+  const headers = ['pageNumber', 'text'].map((h) => escapeCsvCell(h, delimiter)).join(delimiter);
+  const rows = extracted.pages.map((p) => {
+    return [escapeCsvCell(String(p.pageNumber), delimiter), escapeCsvCell(p.text, delimiter)].join(delimiter);
+  });
+  return [headers, ...rows].join('\r\n');
+}
+
+function createMinimalPng(width = 1, height = 1): Uint8Array {
+  const signature = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+
+  function createChunk(type: string, data: Uint8Array): Uint8Array {
+    const len = data.length;
+    const buf = new Uint8Array(4 + 4 + len + 4);
+    const view = new DataView(buf.buffer);
+    view.setUint32(0, len);
+    for (let i = 0; i < 4; i++) buf[4 + i] = type.charCodeAt(i);
+    buf.set(data, 8);
+
+    let crc = 0xffffffff;
+    for (let i = 4; i < 8 + len; i++) {
+      let c = (crc ^ buf[i]) & 0xff;
+      for (let k = 0; k < 8; k++) {
+        c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      }
+      crc = (crc >>> 8) ^ c;
+    }
+    crc ^= 0xffffffff;
+    view.setUint32(8 + len, crc);
+    return buf;
+  }
+
+  const ihdr = new Uint8Array(13);
+  const ihdrView = new DataView(ihdr.buffer);
+  ihdrView.setUint32(0, width);
+  ihdrView.setUint32(4, height);
+  ihdr[8] = 8;
+  ihdr[9] = 2;
+  ihdr[10] = 0;
+  ihdr[11] = 0;
+  ihdr[12] = 0;
+  const ihdrChunk = createChunk('IHDR', ihdr);
+
+  const rawData = new Uint8Array((1 + width * 3) * height);
+  for (let y = 0; y < height; y++) {
+    const rowOffset = y * (1 + width * 3);
+    rawData[rowOffset] = 0;
+    for (let x = 0; x < width; x++) {
+      rawData[rowOffset + 1 + x * 3] = 255;
+      rawData[rowOffset + 1 + x * 3 + 1] = 255;
+      rawData[rowOffset + 1 + x * 3 + 2] = 255;
+    }
+  }
+
+  const compressed = fflate.zlibSync(rawData);
+  const idatChunk = createChunk('IDAT', compressed);
+  const iendChunk = createChunk('IEND', new Uint8Array(0));
+
+  const fullPng = new Uint8Array(signature.length + ihdrChunk.length + idatChunk.length + iendChunk.length);
+  let offset = 0;
+  fullPng.set(signature, offset);
+  offset += signature.length;
+  fullPng.set(ihdrChunk, offset);
+  offset += ihdrChunk.length;
+  fullPng.set(idatChunk, offset);
+  offset += idatChunk.length;
+  fullPng.set(iendChunk, offset);
+
+  return fullPng;
+}
+
+export async function documentToPng(
+  content: string | Uint8Array | ArrayBuffer,
+  options?: { sourceFormat?: DocumentFormat; fileName?: string }
+): Promise<Uint8Array> {
+  let text = '';
+  const isPdf =
+    options?.sourceFormat === 'pdf' ||
+    (content instanceof Uint8Array &&
+      content.length >= 4 &&
+      content[0] === 0x25 &&
+      content[1] === 0x50 &&
+      content[2] === 0x44 &&
+      content[3] === 0x46);
+
+  if (isPdf) {
+    const extracted = await extractTextFromPdf(content instanceof Uint8Array ? content : new Uint8Array(content as ArrayBuffer));
+    text = extracted.text || (options?.fileName ?? 'PDF Document');
+  } else if (typeof content === 'string') {
+    text = content;
+  } else {
+    text = new TextDecoder('utf-8', { fatal: false }).decode(content instanceof Uint8Array ? content : new Uint8Array(content));
+  }
+
+  const canUseCanvas =
+    typeof OffscreenCanvas !== 'undefined' ||
+    (typeof document !== 'undefined' && typeof document.createElement === 'function');
+
+  if (canUseCanvas) {
+    const width = 800;
+    const height = 1132;
+    const isRtl = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
+
+    if (typeof OffscreenCanvas !== 'undefined') {
+      const offscreen = new OffscreenCanvas(width, height);
+      const ctx = offscreen.getContext('2d') as OffscreenCanvasRenderingContext2D | null;
+      if (!ctx) throw new Error('OffscreenCanvas 2D context unavailable');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif';
+      ctx.textAlign = isRtl ? 'right' : 'left';
+      ctx.direction = isRtl ? 'rtl' : 'ltr';
+      ctx.fillText(options?.fileName ?? 'Document', isRtl ? width - 40 : 40, 50);
+
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(40, 65);
+      ctx.lineTo(width - 40, 65);
+      ctx.stroke();
+
+      ctx.fillStyle = '#334155';
+      ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif';
+      const lines = text.split('\n').slice(0, 45);
+      let y = 95;
+      for (const line of lines) {
+        ctx.fillText(line.slice(0, 80), isRtl ? width - 40 : 40, y);
+        y += 22;
+      }
+
+      const blob = await offscreen.convertToBlob({ type: 'image/png' });
+      return new Uint8Array(await blob.arrayBuffer());
+    } else {
+      const domCanvas = document.createElement('canvas');
+      domCanvas.width = width;
+      domCanvas.height = height;
+      const ctx = domCanvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas 2D context unavailable');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif';
+      ctx.textAlign = isRtl ? 'right' : 'left';
+      ctx.direction = isRtl ? 'rtl' : 'ltr';
+      ctx.fillText(options?.fileName ?? 'Document', isRtl ? width - 40 : 40, 50);
+
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(40, 65);
+      ctx.lineTo(width - 40, 65);
+      ctx.stroke();
+
+      ctx.fillStyle = '#334155';
+      ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif';
+      const lines = text.split('\n').slice(0, 45);
+      let y = 95;
+      for (const line of lines) {
+        ctx.fillText(line.slice(0, 80), isRtl ? width - 40 : 40, y);
+        y += 22;
+      }
+
+      const dataUrl = domCanvas.toDataURL('image/png');
+      const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+      const binaryString = atob(base64Data);
+      const pngBytes = new Uint8Array(binaryString.length);
+      for (let k = 0; k < binaryString.length; k++) {
+        pngBytes[k] = binaryString.charCodeAt(k);
+      }
+      return pngBytes;
+    }
+  }
+
+  return createMinimalPng(100, 100);
+}
+
+function sanitizeForStandardFont(text: string): string {
+  return text.replace(/[^\u0000-\u00FF]/g, (char) => {
+    const code = char.charCodeAt(0);
+    return `[U+${code.toString(16).toUpperCase()}]`;
+  });
+}
+
+async function renderDocumentViaCanvasToPdf(
+  textContent: string,
+  options?: DocumentPdfOptions
+): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  const pageSizeOpt = options?.pageSize ?? 'a4';
+  const orientation = options?.orientation ?? 'portrait';
+  const margin = options?.margin ?? 45;
+
+  const a4Dimensions = { width: 595.28, height: 841.89 };
+  const letterDimensions = { width: 612, height: 792 };
+  const standard = pageSizeOpt === 'letter' ? letterDimensions : a4Dimensions;
+
+  const isLandscape = orientation === 'landscape';
+  const pageWidth = isLandscape ? Math.max(standard.width, standard.height) : Math.min(standard.width, standard.height);
+  const pageHeight = isLandscape ? Math.min(standard.width, standard.height) : Math.max(standard.width, standard.height);
+
+  const scale = 2;
+  const canvasWidth = Math.round(pageWidth * scale);
+  const canvasHeight = Math.round(pageHeight * scale);
+  const usableWidth = pageWidth - margin * 2;
+
+  const lines = textContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const isRtl = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(textContent);
+
+  interface CanvasPage {
+    draw: (ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) => void;
+  }
+
+  const canvasPages: CanvasPage[] = [];
+  let currentCommands: ((ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) => void)[] = [];
+  let currentY = margin + 20;
+
+  const startNewPage = () => {
+    if (currentCommands.length > 0) {
+      const cmds = [...currentCommands];
+      canvasPages.push({
+        draw: (ctx) => {
+          for (const cmd of cmds) cmd(ctx);
+        },
+      });
+      currentCommands = [];
+    }
+    currentY = margin + 20;
+  };
+
+  const measureTextWidth = (text: string, fontSize: number): number => {
+    return text.length * (fontSize * 0.55);
+  };
+
+  const wrapCanvasText = (text: string, fontSize: number, maxWidth: number): string[] => {
+    const words = text.split(/\s+/);
+    const resultLines: string[] = [];
+    let line = '';
+
+    for (const w of words) {
+      const test = line.length > 0 ? `${line} ${w}` : w;
+      if (measureTextWidth(test, fontSize) <= maxWidth) {
+        line = test;
+      } else {
+        if (line.length > 0) resultLines.push(line);
+        line = w;
+      }
+    }
+    if (line.length > 0) resultLines.push(line);
+    return resultLines.length > 0 ? resultLines : [''];
+  };
+
+  if (options?.title) {
+    const titleText = options.title;
+    currentCommands.push((ctx) => {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif';
+      ctx.textAlign = isRtl ? 'right' : 'left';
+      ctx.fillText(titleText, isRtl ? pageWidth - margin : margin, margin / 2 + 10);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(margin, margin / 2 + 16);
+      ctx.lineTo(pageWidth - margin, margin / 2 + 16);
+      ctx.stroke();
+    });
+  }
+
+  for (const rawLine of lines) {
+    if (rawLine.trim() === '') {
+      currentY += 12;
+      continue;
+    }
+
+    const headingMatch = rawLine.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const hText = headingMatch[2].trim();
+      const hSize = level === 1 ? 20 : level === 2 ? 16 : 13;
+      const leading = hSize * 1.35;
+      const wrapped = wrapCanvasText(hText, hSize, usableWidth);
+
+      if (currentY + wrapped.length * leading > pageHeight - margin) {
+        startNewPage();
+      }
+
+      currentY += 8;
+      for (const wLine of wrapped) {
+        const lineY = currentY + hSize;
+        const lineText = wLine;
+        currentCommands.push((ctx) => {
+          ctx.fillStyle = '#0f172a';
+          ctx.font = `bold ${hSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif`;
+          ctx.textAlign = isRtl ? 'right' : 'left';
+          ctx.direction = isRtl ? 'rtl' : 'ltr';
+          ctx.fillText(lineText, isRtl ? pageWidth - margin : margin, lineY);
+        });
+        currentY += leading;
+      }
+      currentY += 6;
+      continue;
+    }
+
+    const bodySize = 11;
+    const leading = 16;
+    const wrapped = wrapCanvasText(rawLine, bodySize, usableWidth);
+
+    if (currentY + wrapped.length * leading > pageHeight - margin) {
+      startNewPage();
+    }
+
+    for (const bLine of wrapped) {
+      const lineY = currentY + bodySize;
+      const lineText = bLine;
+      currentCommands.push((ctx) => {
+        ctx.fillStyle = '#1e293b';
+        ctx.font = `${bodySize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Vazirmatn", "Tahoma", sans-serif`;
+        ctx.textAlign = isRtl ? 'right' : 'left';
+        ctx.direction = isRtl ? 'rtl' : 'ltr';
+        ctx.fillText(lineText, isRtl ? pageWidth - margin : margin, lineY);
+      });
+      currentY += leading;
+    }
+  }
+
+  if (currentCommands.length > 0) {
+    const cmds = [...currentCommands];
+    canvasPages.push({
+      draw: (ctx) => {
+        for (const cmd of cmds) cmd(ctx);
+      },
+    });
+  }
+
+  if (canvasPages.length === 0) {
+    canvasPages.push({ draw: () => {} });
+  }
+
+  for (let pageIdx = 0; pageIdx < canvasPages.length; pageIdx++) {
+    const p = canvasPages[pageIdx];
+    let pngBytes: Uint8Array;
+
+    if (typeof OffscreenCanvas !== 'undefined') {
+      const offscreen = new OffscreenCanvas(canvasWidth, canvasHeight);
+      const ctx = offscreen.getContext('2d') as OffscreenCanvasRenderingContext2D | null;
+      if (!ctx) throw new Error('OffscreenCanvas 2D context unavailable');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.scale(scale, scale);
+      p.draw(ctx);
+      if (options?.includePageNumbers !== false) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Page ${pageIdx + 1} of ${canvasPages.length}`, pageWidth / 2, pageHeight - margin / 2);
+      }
+      const blob = await offscreen.convertToBlob({ type: 'image/png' });
+      pngBytes = new Uint8Array(await blob.arrayBuffer());
+    } else {
+      const domCanvas = document.createElement('canvas');
+      domCanvas.width = canvasWidth;
+      domCanvas.height = canvasHeight;
+      const ctx = domCanvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas 2D context unavailable');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.scale(scale, scale);
+      p.draw(ctx);
+      if (options?.includePageNumbers !== false) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Page ${pageIdx + 1} of ${canvasPages.length}`, pageWidth / 2, pageHeight - margin / 2);
+      }
+      const dataUrl = domCanvas.toDataURL('image/png');
+      const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+      const binaryString = atob(base64Data);
+      pngBytes = new Uint8Array(binaryString.length);
+      for (let k = 0; k < binaryString.length; k++) {
+        pngBytes[k] = binaryString.charCodeAt(k);
+      }
+    }
+
+    const embeddedPng = await doc.embedPng(pngBytes);
+    const pdfPage = doc.addPage([pageWidth, pageHeight]);
+    pdfPage.drawImage(embeddedPng, {
+      x: 0,
+      y: 0,
+      width: pageWidth,
+      height: pageHeight,
+    });
+  }
+
+  return await doc.save();
+}
+
 function wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: number): string[] {
-  const words = text.split(/\s+/);
+  const safe = sanitizeForStandardFont(text);
+  const words = safe.split(/\s+/);
   const lines: string[] = [];
   let currentLine = '';
 
@@ -692,6 +1255,15 @@ function wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: numbe
 }
 
 export async function documentToPdf(textContent: string, options?: DocumentPdfOptions): Promise<Uint8Array> {
+  const hasNonWinAnsi = /[^\u0000-\u00FF]/.test(textContent);
+  const canUseCanvas =
+    typeof OffscreenCanvas !== 'undefined' ||
+    (typeof document !== 'undefined' && typeof document.createElement === 'function');
+
+  if (hasNonWinAnsi && canUseCanvas) {
+    return await renderDocumentViaCanvasToPdf(textContent, options);
+  }
+
   const doc = await PDFDocument.create();
   const fontRegular = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -728,7 +1300,8 @@ export async function documentToPdf(textContent: string, options?: DocumentPdfOp
   };
 
   if (options?.title) {
-    currentPage.drawText(options.title, {
+    const safeTitle = sanitizeForStandardFont(options.title);
+    currentPage.drawText(safeTitle, {
       x: margin,
       y: pageHeight - margin / 2,
       size: 8,
@@ -789,7 +1362,7 @@ export async function documentToPdf(textContent: string, options?: DocumentPdfOp
           pages.push(currentPage);
           codeY = pageHeight - margin - boxPadding;
         }
-        currentPage.drawText(cLine.slice(0, 100), {
+        currentPage.drawText(sanitizeForStandardFont(cLine.slice(0, 100)), {
           x: margin + boxPadding,
           y: codeY - codeFontSize,
           size: codeFontSize,
@@ -822,7 +1395,7 @@ export async function documentToPdf(textContent: string, options?: DocumentPdfOp
 
       currentY -= config.before;
       for (const wLine of wrapped) {
-        currentPage.drawText(wLine, {
+        currentPage.drawText(sanitizeForStandardFont(wLine), {
           x: margin,
           y: currentY - config.size,
           size: config.size,
@@ -864,7 +1437,7 @@ export async function documentToPdf(textContent: string, options?: DocumentPdfOp
       });
 
       for (const qLine of wrapped) {
-        currentPage.drawText(qLine, {
+        currentPage.drawText(sanitizeForStandardFont(qLine), {
           x: margin + 15,
           y: currentY - 9.5,
           size: 9.5,
@@ -896,7 +1469,7 @@ export async function documentToPdf(textContent: string, options?: DocumentPdfOp
       });
 
       wrapped.forEach((bLine) => {
-        currentPage.drawText(bLine, {
+        currentPage.drawText(sanitizeForStandardFont(bLine), {
           x: margin + indent,
           y: currentY - 9.5,
           size: 9.5,
@@ -915,7 +1488,7 @@ export async function documentToPdf(textContent: string, options?: DocumentPdfOp
     ensureSpace(wrapped.length * 13.5 + 4);
 
     for (const pLine of wrapped) {
-      currentPage.drawText(pLine, {
+      currentPage.drawText(sanitizeForStandardFont(pLine), {
         x: margin,
         y: currentY - 9.5,
         size: 9.5,
@@ -1178,8 +1751,120 @@ export async function convertDocument(
     textContent = input;
   } else {
     binaryBuffer = input instanceof Uint8Array ? input : new Uint8Array(input);
-    const decoder = new TextDecoder('utf-8', { fatal: false });
-    textContent = decoder.decode(binaryBuffer);
+    if (source !== 'pdf') {
+      const decoder = new TextDecoder('utf-8', { fatal: false });
+      textContent = decoder.decode(binaryBuffer);
+    }
+  }
+
+  if (source === 'pdf') {
+    const pdfBytes = binaryBuffer ?? new TextEncoder().encode(textContent);
+
+    if (target === 'pdf') {
+      const srcDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+      const newDoc = await PDFDocument.create();
+      const pageIndices = srcDoc.getPageIndices();
+      const copiedPages = await newDoc.copyPages(srcDoc, pageIndices);
+      for (const page of copiedPages) {
+        if (options.pdfOrientation === 'landscape' && page.getWidth() < page.getHeight()) {
+          page.setRotation(degrees(90));
+        } else if (options.pdfOrientation === 'portrait' && page.getWidth() > page.getHeight()) {
+          page.setRotation(degrees(0));
+        }
+        newDoc.addPage(page);
+      }
+      const outBytes = await newDoc.save();
+      return {
+        data: outBytes,
+        mimeType: 'application/pdf',
+        fileName: `${baseName}.pdf`,
+        byteLength: outBytes.byteLength,
+      };
+    }
+
+    if (target === 'png') {
+      const pngBytes = await documentToPng(pdfBytes, { sourceFormat: 'pdf', fileName: options.fileName });
+      return {
+        data: pngBytes,
+        mimeType: 'image/png',
+        fileName: `${baseName}.png`,
+        byteLength: pngBytes.byteLength,
+      };
+    }
+
+    const extracted = await extractTextFromPdf(pdfBytes);
+
+    if (target === 'txt') {
+      return {
+        data: extracted.text,
+        mimeType: 'text/plain;charset=utf-8',
+        fileName: `${baseName}.txt`,
+        byteLength: new TextEncoder().encode(extracted.text).byteLength,
+      };
+    }
+
+    if (target === 'html') {
+      const htmlOutput = pdfPagesToHtml(extracted, baseName);
+      return {
+        data: htmlOutput,
+        mimeType: 'text/html;charset=utf-8',
+        fileName: `${baseName}.html`,
+        byteLength: new TextEncoder().encode(htmlOutput).byteLength,
+      };
+    }
+
+    if (target === 'markdown' || target === 'md') {
+      const mdOutput = pdfPagesToMarkdown(extracted, baseName);
+      return {
+        data: mdOutput,
+        mimeType: 'text/markdown;charset=utf-8',
+        fileName: `${baseName}.md`,
+        byteLength: new TextEncoder().encode(mdOutput).byteLength,
+      };
+    }
+
+    if (target === 'json') {
+      const indent = typeof options.jsonIndent === 'number' ? options.jsonIndent : (options.prettyJson !== false ? 2 : 0);
+      const jsonObj = {
+        fileName: options.fileName ?? `${baseName}.pdf`,
+        totalPages: extracted.totalPages,
+        pages: extracted.pages,
+      };
+      const formatted = indent > 0 ? JSON.stringify(jsonObj, null, indent) : JSON.stringify(jsonObj);
+      return {
+        data: formatted,
+        mimeType: 'application/json;charset=utf-8',
+        fileName: `${baseName}.json`,
+        byteLength: new TextEncoder().encode(formatted).byteLength,
+      };
+    }
+
+    if (target === 'csv' || target === 'tsv') {
+      const csvOutput = pdfPagesToCsv(extracted, target === 'tsv' ? '\t' : (options.delimiter ?? ','));
+      return {
+        data: csvOutput,
+        mimeType: target === 'tsv' ? 'text/tab-separated-values;charset=utf-8' : 'text/csv;charset=utf-8',
+        fileName: `${baseName}.${target}`,
+        byteLength: new TextEncoder().encode(csvOutput).byteLength,
+      };
+    }
+
+    return {
+      data: extracted.text,
+      mimeType: 'text/plain;charset=utf-8',
+      fileName: `${baseName}.txt`,
+      byteLength: new TextEncoder().encode(extracted.text).byteLength,
+    };
+  }
+
+  if (target === 'png') {
+    const pngBytes = await documentToPng(binaryBuffer ?? textContent, { sourceFormat: source, fileName: options.fileName });
+    return {
+      data: pngBytes,
+      mimeType: 'image/png',
+      fileName: `${baseName}.png`,
+      byteLength: pngBytes.byteLength,
+    };
   }
 
   if (target === 'pdf') {

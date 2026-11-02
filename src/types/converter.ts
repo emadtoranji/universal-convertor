@@ -235,7 +235,7 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
         case 'txt':
           return ['pdf', 'md', 'html'];
         case 'pdf':
-          return ['pdf', 'png', 'txt'];
+          return ['txt', 'html', 'md', 'json', 'pdf', 'png'];
         default:
           return ['txt', 'pdf'];
       }

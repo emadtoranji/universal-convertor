@@ -18,6 +18,9 @@ import {
   jsonToYaml,
   yamlToJson,
   sortObjectKeys,
+  documentToPdf,
+  extractTextFromPdf,
+  documentToPng,
 } from '../../src/core/documentConverter.ts';
 
 describe('documentConverter - Unit Test Suite', () => {
@@ -170,5 +173,116 @@ describe('documentConverter - Unit Test Suite', () => {
     assert.deepEqual(csvToJson(''), []);
     assert.equal(textToBase64(''), '');
     assert.deepEqual(sortObjectKeys({}), {});
+  });
+
+  it('converts a PDF input document to plain UTF-8 text reliably', async () => {
+    const samplePdf = await documentToPdf('# Section Alpha\n\nFirst paragraph text content.\n\n## Section Beta\n\nSecond paragraph text content.');
+    const result = await convertDocument(samplePdf, {
+      sourceFormat: 'pdf',
+      targetFormat: 'txt',
+      fileName: 'report.pdf',
+    });
+
+    assert.equal(result.mimeType, 'text/plain;charset=utf-8');
+    assert.equal(result.fileName, 'report.txt');
+    assert.ok(String(result.data).includes('Section Alpha'));
+    assert.ok(String(result.data).includes('First paragraph'));
+  });
+
+  it('converts a PDF input document to semantic UTF-8 HTML', async () => {
+    const samplePdf = await documentToPdf('# Invoice Title\n\nTotal Due: $1000\n\nThank you for your business.');
+    const result = await convertDocument(samplePdf, {
+      sourceFormat: 'pdf',
+      targetFormat: 'html',
+      fileName: 'invoice.pdf',
+    });
+
+    assert.equal(result.mimeType, 'text/html;charset=utf-8');
+    assert.equal(result.fileName, 'invoice.html');
+    assert.match(String(result.data), /<meta charset="utf-8"/);
+    assert.match(String(result.data), /Invoice Title/);
+    assert.match(String(result.data), /<section class="pdf-page"/);
+  });
+
+  it('converts a PDF input document to structured Markdown', async () => {
+    const samplePdf = await documentToPdf('# Documentation\n\nWelcome to the user guide.');
+    const result = await convertDocument(samplePdf, {
+      sourceFormat: 'pdf',
+      targetFormat: 'md',
+      fileName: 'guide.pdf',
+    });
+
+    assert.equal(result.mimeType, 'text/markdown;charset=utf-8');
+    assert.equal(result.fileName, 'guide.md');
+    assert.ok(String(result.data).includes('## Page 1'));
+    assert.ok(String(result.data).includes('Documentation'));
+  });
+
+  it('converts a PDF input document to structured JSON with page array', async () => {
+    const samplePdf = await documentToPdf('# Contract Agreement\n\nParties agree to terms herein.');
+    const result = await convertDocument(samplePdf, {
+      sourceFormat: 'pdf',
+      targetFormat: 'json',
+      fileName: 'contract.pdf',
+    });
+
+    assert.equal(result.mimeType, 'application/json;charset=utf-8');
+    assert.equal(result.fileName, 'contract.json');
+
+    const parsed = JSON.parse(String(result.data));
+    assert.equal(parsed.fileName, 'contract.pdf');
+    assert.equal(parsed.totalPages, 1);
+    assert.ok(Array.isArray(parsed.pages));
+    assert.equal(parsed.pages[0].pageNumber, 1);
+    assert.ok(parsed.pages[0].text.includes('Contract Agreement'));
+  });
+
+  it('converts a PDF input document to another standardized PDF', async () => {
+    const samplePdf = await documentToPdf('# Page Orientation Test\n\nTesting PDF cloning.');
+    const result = await convertDocument(samplePdf, {
+      sourceFormat: 'pdf',
+      targetFormat: 'pdf',
+      fileName: 'test.pdf',
+      pdfOrientation: 'landscape',
+    });
+
+    assert.equal(result.mimeType, 'application/pdf');
+    assert.equal(result.fileName, 'test.pdf');
+    assert.ok(result.data instanceof Uint8Array);
+    const bytes = result.data as Uint8Array;
+    assert.equal(bytes[0], 0x25);
+    assert.equal(bytes[1], 0x50);
+    assert.equal(bytes[2], 0x44);
+    assert.equal(bytes[3], 0x46);
+  });
+
+  it('converts a PDF input document to PNG image buffer', async () => {
+    const samplePdf = await documentToPdf('# PNG Snapshot Test\n\nRendering page to image.');
+    const result = await convertDocument(samplePdf, {
+      sourceFormat: 'pdf',
+      targetFormat: 'png',
+      fileName: 'snapshot.pdf',
+    });
+
+    assert.equal(result.mimeType, 'image/png');
+    assert.equal(result.fileName, 'snapshot.png');
+    assert.ok(result.data instanceof Uint8Array);
+    const bytes = result.data as Uint8Array;
+    assert.equal(bytes[0], 0x89);
+    assert.equal(bytes[1], 0x50);
+    assert.equal(bytes[2], 0x4e);
+    assert.equal(bytes[3], 0x47);
+  });
+
+  it('encodes Persian, Arabic, and diverse UTF-8 characters into PDF without WinAnsi errors', async () => {
+    const persianUtf8Content = '# عنوان فارسی سند\n\nسلام دنیا! این یک سند متنی کامل با نویسه‌های فارسی و یونیکد است.\n\n- گچپژ و حروف ویژه\n- کاراکترهای فرانسوی: café, naïve\n- نمادهای بین‌المللی: € £ ¥ § © ®';
+    const pdfBytes = await documentToPdf(persianUtf8Content, { title: 'فارسی UTF-8' });
+
+    assert.ok(pdfBytes instanceof Uint8Array);
+    assert.ok(pdfBytes.byteLength > 100);
+    assert.equal(pdfBytes[0], 0x25);
+    assert.equal(pdfBytes[1], 0x50);
+    assert.equal(pdfBytes[2], 0x44);
+    assert.equal(pdfBytes[3], 0x46);
   });
 });
