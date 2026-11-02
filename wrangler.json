@@ -1,13 +1,29 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "universal-convertor",
-  "main": "src/worker-edge.ts",
-  "compatibility_date": "2026-11-02",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS",
-    "not_found_handling": "single-page-application",
-    "html_handling": "auto-trailing-slash"
-  }
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "universal-convertor",
+    "main": "src/worker-edge.ts",
+    "compatibility_date": "2026-11-02",
+    "compatibility_flags": ["nodejs_compat"],
+    "assets": {
+        "directory": "./dist",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "html_handling": "auto-trailing-slash"
+    },
+    "observability": {
+        "logs": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "invocation_logs": true,
+            "persist": true
+        },
+        "traces": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "persist": true
+        },
+        "issue_detection": {
+            "enabled": true
+        }
+    }
 }
