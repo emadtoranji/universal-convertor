@@ -1,0 +1,16 @@
+{
+  "brand": {
+    "name": "Universal Convertor",
+    "tagline": "100% Free Client-Side Multi-Media & Document Converter",
+    "badge": "100% Free"
+  },
+  "github": {
+    "ariaLabel": "GitHub Repository",
+    "title": "View source on GitHub (emadtoranji)"
+  },
+  "themeToggle": {
+    "ariaLabel": "Toggle color theme",
+    "lightTitle": "Switch to Light theme",
+    "darkTitle": "Switch to Dark theme"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "title": "Frequently Asked Questions",
+  "subtitle": "Direct, factual answers regarding privacy, client-side performance, multi-media format support, and offline capabilities.",
+  "badge": "Direct Answers",
+  "items": [
+    {
+      "id": "free-pricing",
+      "question": "Is Universal Convertor really 100% free with no conversion limits?",
+      "answer": "Yes, Universal Convertor is completely free with no file size limits, daily caps, subscriptions, or hidden paywalls. Because all decoding, resizing, compression, and encoding run entirely within your device browser using native hardware acceleration and Web Workers, there are no cloud server costs or storage bills for us to pass on to you."
+    },
+    {
+      "id": "privacy-zero-uploads",
+      "question": "Are my photos, audio recordings, or documents uploaded to any external server?",
+      "answer": "No, your files are never uploaded or transmitted to any external server, cloud storage, or third-party service. All file processing occurs 100% locally inside your device volatile memory, guaranteeing absolute data confidentiality and eliminating the risk of data leaks or server breaches."
+    },
+    {
+      "id": "offline-usage",
+      "question": "Can I use Universal Convertor offline without an internet connection?",
+      "answer": "Yes, once the web application is loaded in your browser, all conversion tools work fully offline without an active internet connection. The Web Workers, WebAssembly modules, and Web Audio API pipelines run in your local browser sandbox independently of network availability."
+    },
+    {
+      "id": "audio-conversion",
+      "question": "How does client-side audio conversion work without cloud processing?",
+      "answer": "Audio files are decoded directly by your browser's native Web Audio API AudioContext and re-encoded into uncompressed Linear PCM WAV format locally. You can customize quantization bit depths (16-bit, 24-bit, 32-bit float), sample rates (up to 48,000 Hz), and channel configurations (stereo or mono) with zero server reliance."
+    },
+    {
+      "id": "video-extraction",
+      "question": "Can I extract audio tracks or capture image snapshots from video files?",
+      "answer": "Yes, you can extract soundtrack audio to uncompressed WAV files or capture full-resolution keyframe snapshots to PNG, WebP, or JPEG directly from video files. The engine leverages hardware-accelerated video decoding to seek frames and capture frames without uploading large video files."
+    },
+    {
+      "id": "pdf-merging",
+      "question": "How do I merge multiple photos into a single multi-page PDF document?",
+      "answer": "You can merge multiple images into a single PDF document by adding your pictures to the queue, converting them, and clicking the Merge All to PDF button. You can customize page orientation (Auto, Portrait, Landscape) and select standard paper dimensions including Original Image Dimensions, ISO A4, or US Letter."
+    },
+    {
+      "id": "batch-speed",
+      "question": "Why is batch conversion faster in this engine than in traditional online converters?",
+      "answer": "Batch conversion is substantially faster because your files are processed in parallel across your device multi-core CPU using Web Workers without network upload or download bottlenecks. By utilizing zero-copy Transferable ArrayBuffers and in-memory execution, you completely eliminate file queue wait times and server latency."
+    },
+    {
+      "id": "document-data-conversion",
+      "question": "Which document and structured data formats can be converted?",
+      "answer": "The engine supports bi-directional conversion between Markdown and sanitized HTML, JSON to CSV or TSV tables, plain text to PDF, and binary data to Base64 or Hex dumps. All transformations execute in pure TypeScript within browser memory to provide instant results with zero cloud exposure."
+    }
+  ]
+}

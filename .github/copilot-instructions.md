@@ -1,0 +1,2 @@
+- read .agents/rules/*
+- read .agents/PROJECT_STRUCTURE.md

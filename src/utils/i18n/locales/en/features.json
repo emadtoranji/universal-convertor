@@ -1,0 +1,45 @@
+{
+  "sectionTitle": "Engine Features",
+  "sectionSubtitle": "Engineered for maximum speed, absolute privacy, and universal media conversion without server costs.",
+  "badge": "100% Free • Unlimited Conversions • Zero Cloud Uploads",
+  "heroTitle": "Universal Convertor",
+  "heroTitleAccent": "Engine",
+  "heroSubtitle": "A completely free, 100% private client-side conversion engine. Transform images, audio, video, and documents instantly inside local browser memory using high-speed multi-threaded Web Workers and Web Audio API. Zero server uploads, zero subscriptions, and unlimited batch processing.",
+  "cards": [
+    {
+      "id": "privacy",
+      "icon": "ShieldCheck",
+      "badge": "Zero Cloud Uploads",
+      "title": "100% Client-Side Privacy",
+      "description": "Your files never leave your device. All decoding, compression, and encoding execute entirely inside local browser memory with zero network requests or third-party telemetry."
+    },
+    {
+      "id": "performance",
+      "icon": "Zap",
+      "badge": "Multi-Threaded Pool",
+      "title": "High-Performance Web Workers",
+      "description": "Leverage your multi-core processor with a hardware-concurrency Web Worker pool and Transferable ArrayBuffers for rapid parallel conversions with zero main-thread UI lag."
+    },
+    {
+      "id": "universal",
+      "icon": "Layers",
+      "badge": "4 Media Engines",
+      "title": "Universal Multi-Media Engine",
+      "description": "Convert across all digital assets: modern images (WebP, AVIF, PNG, JPG, ICO, SVG), audio decoding & PCM WAV resampling, video soundtrack extraction, and structured document transformations."
+    },
+    {
+      "id": "packaging",
+      "icon": "FileArchive",
+      "badge": "In-Memory Packaging",
+      "title": "Instant ZIP & PDF Merging",
+      "description": "Bundle batch conversions into compressed ZIP archives in memory with fflate, or assemble multi-image albums into single, publication-ready multi-page PDF documents."
+    },
+    {
+      "id": "tuning",
+      "icon": "Sliders",
+      "badge": "Precision Controls",
+      "title": "Advanced Tuning Controls",
+      "description": "Customize your output with granular controls: quality compression sliders, dimension resizing, aspect ratio locks, transparent background replacement, and EXIF metadata stripping."
+    }
+  ]
+}

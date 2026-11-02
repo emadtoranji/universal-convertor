@@ -1,0 +1,115 @@
+{
+  "title": "Comprehensive Format Matrix & Technical Specifications",
+  "subtitle": "Discover the full range of supported input and output formats across images, audio, video, and documents, all processed 100% client-side.",
+  "badge": "All Media Engines",
+  "categories": {
+    "images": {
+      "id": "images",
+      "title": "Images & Vector Graphics",
+      "badge": "Hardware Accelerated",
+      "icon": "Image",
+      "description": "High-performance image transformation powered by multi-threaded Web Workers and OffscreenCanvas with zero GPU memory leaks.",
+      "inputs": ["PNG", "JPG", "JPEG", "WebP", "AVIF", "SVG", "BMP", "ICO", "GIF", "TIFF", "HEIC"],
+      "outputs": ["WebP", "AVIF", "PNG", "JPEG", "ICO", "BMP", "TIFF", "PDF"],
+      "specs": [
+        {
+          "name": "Color Bit Depths",
+          "details": "8-bit, 24-bit RGB, and 32-bit RGBA with full alpha transparency preservation"
+        },
+        {
+          "name": "Multi-Resolution ICO",
+          "details": "Packs 16x16, 32x32, 48x48, 64x64, 128x128, and 256x256 icons into a single binary file"
+        },
+        {
+          "name": "Lossless & Lossy Modes",
+          "details": "Configurable WebP, AVIF, and JPEG quality compression (1% to 100%) and lossless PNG"
+        },
+        {
+          "name": "Vector Sanitization",
+          "details": "Automated SVG DOMParser sanitization stripping scripts, external URLs, and event listeners"
+        }
+      ]
+    },
+    "audio": {
+      "id": "audio",
+      "title": "Audio & Sound",
+      "badge": "Web Audio API",
+      "icon": "Music",
+      "description": "Studio-grade audio decoding and PCM WAV synthesis running entirely via the native browser AudioContext pipeline.",
+      "inputs": ["MP3", "WAV", "OGG", "AAC", "M4A", "FLAC", "WEBM"],
+      "outputs": ["WAV (Linear PCM)"],
+      "specs": [
+        {
+          "name": "Quantization Bit Depths",
+          "details": "16-bit signed integer, 24-bit signed integer, and 32-bit IEEE 754 floating-point PCM audio encoding"
+        },
+        {
+          "name": "Sample Rate Resampling",
+          "details": "OfflineAudioContext resampling to 48,000 Hz, 44,100 Hz, 22,050 Hz, or 16,000 Hz"
+        },
+        {
+          "name": "Channel Mapping",
+          "details": "Full stereo preservation or automated downmixing to clean single-channel mono"
+        },
+        {
+          "name": "Format Verification",
+          "details": "RIFF header validation and metadata duration extraction without external decoders"
+        }
+      ]
+    },
+    "video": {
+      "id": "video",
+      "title": "Video & Animation",
+      "badge": "GPU Stream Extraction",
+      "icon": "Video",
+      "description": "Client-side video demuxing for soundtrack extraction and high-resolution keyframe snapshots using native HTML5 media elements.",
+      "inputs": ["MP4", "WebM", "MOV", "OGV"],
+      "outputs": ["WAV (Audio Track)", "PNG (Keyframe)", "WebP (Keyframe)", "JPEG (Keyframe)"],
+      "specs": [
+        {
+          "name": "Soundtrack Extraction",
+          "details": "Directly demuxes audio tracks to uncompressed 16/24-bit PCM WAV at original sample rate"
+        },
+        {
+          "name": "Keyframe Capture",
+          "details": "Captures pristine full-resolution video frames at 0s, midpoint, or user-selected timestamps"
+        },
+        {
+          "name": "Hardware Decoding",
+          "details": "Leverages device GPU video decoding pipelines for fast frame seeking and zero server transfer"
+        },
+        {
+          "name": "Dimension Preservation",
+          "details": "Maintains native video width, height, and display aspect ratios during snapshot capture"
+        }
+      ]
+    },
+    "documents": {
+      "id": "documents",
+      "title": "Documents & Structured Data",
+      "badge": "In-Memory Parsing",
+      "icon": "FileText",
+      "description": "Instant document conversion, structured data serialization, and multi-page PDF generation running in pure TypeScript.",
+      "inputs": ["Markdown (.md)", "HTML (.html)", "JSON (.json)", "CSV (.csv)", "TSV (.tsv)", "Text (.txt)"],
+      "outputs": ["HTML", "Markdown", "CSV", "TSV", "JSON", "PDF", "Base64", "Hex"],
+      "specs": [
+        {
+          "name": "Markdown & HTML",
+          "details": "Bi-directional conversion with sanitized semantic HTML output conforming to CommonMark standards"
+        },
+        {
+          "name": "Structured Data",
+          "details": "Bi-directional JSON to CSV/TSV table serialization with automated delimiter detection and escaping"
+        },
+        {
+          "name": "Client-Side PDF Generation",
+          "details": "Compiles plain text and markdown into clean multi-page PDF documents with custom margins"
+        },
+        {
+          "name": "Binary Encoders",
+          "details": "Encodes and decodes UTF-8 text and raw files to RFC 4648 Base64 strings and Hex dumps"
+        }
+      ]
+    }
+  }
+}

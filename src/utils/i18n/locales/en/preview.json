@@ -1,0 +1,64 @@
+{
+  "header": {
+    "title": "File Preview & Comparison",
+    "formatIndicator": "{source} → {target}",
+    "closeAria": "Close modal",
+    "closeTitle": "Close modal (Esc)"
+  },
+  "modes": {
+    "slider": "Split Slider",
+    "sliderTitle": "Split slider view",
+    "sliderAria": "Switch to split slider comparison mode",
+    "sideBySide": "Side by Side",
+    "sideBySideTitle": "Side by side view",
+    "sideBySideAria": "Switch to side by side comparison mode"
+  },
+  "overlays": {
+    "originalBadge": "Original ({format})",
+    "convertedBadge": "Converted ({format})",
+    "sliderHandleAria": "Drag to compare original and converted files",
+    "originalImageAlt": "Original source file preview",
+    "convertedImageAlt": "Converted result file preview"
+  },
+  "media": {
+    "audio": {
+      "title": "Audio Waveform & Playback",
+      "originalAudio": "Original Audio Track",
+      "convertedAudio": "Converted PCM WAV Track",
+      "play": "Play",
+      "pause": "Pause",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "duration": "Duration: {duration}s",
+      "sampleRate": "Sample Rate: {sampleRate} Hz",
+      "channels": "Channels: {channels}"
+    },
+    "video": {
+      "title": "Video Snapshot & Audio Extraction",
+      "originalVideo": "Original Video Preview",
+      "snapshotFrame": "Extracted Snapshot Frame",
+      "extractedAudio": "Extracted Audio Track",
+      "resolution": "Resolution: {width} × {height}",
+      "duration": "Duration: {duration}s"
+    },
+    "document": {
+      "title": "Document Content Preview",
+      "originalContent": "Source Content",
+      "convertedContent": "Converted Output",
+      "lineCount": "{count} lines",
+      "charCount": "{count} characters"
+    }
+  },
+  "footer": {
+    "originalFile": "Original File",
+    "convertedFile": "Converted File",
+    "clientSideGuarantee": "100% Client-Side Rendered"
+  },
+  "actions": {
+    "download": "Download",
+    "downloadTitle": "Download converted file",
+    "downloadAria": "Download converted file to device",
+    "close": "Close",
+    "closeAria": "Close preview modal"
+  }
+}

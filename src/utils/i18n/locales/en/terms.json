@@ -1,0 +1,33 @@
+{
+  "title": "Terms of Service & Disclaimer",
+  "badge": "Legal & Transparency",
+  "subtitle": "Clear, honest terms regarding open-source usage, absolute privacy guarantees, and limitation of liability.",
+  "items": [
+    {
+      "id": "opensource",
+      "title": "100% Free & Open-Source Software",
+      "description": "Universal Convertor is fully open-source software distributed free of charge. You are free to inspect, audit, modify, and run this application for personal, educational, or commercial purposes."
+    },
+    {
+      "id": "privacy",
+      "title": "Zero Network Usage & Absolute Privacy",
+      "description": "This application executes 100% locally within your device browser memory using Web Workers and the Web Audio API. Zero bytes of your files, metadata, or conversion results are ever uploaded, transmitted, cached, or logged on any external server."
+    },
+    {
+      "id": "warranty",
+      "title": "No Warranty (Provided 'AS IS')",
+      "description": "The software is provided 'as is', without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. We make no guarantees regarding output fidelity, file compatibility, or conversion accuracy."
+    },
+    {
+      "id": "liability",
+      "title": "Limitation of Liability",
+      "description": "In no event shall the authors, maintainers, or contributors be held liable for any claim, damages, data loss, corrupted files, loss of revenue, or other liability arising from the use of or inability to use this software or its converted outputs."
+    },
+    {
+      "id": "responsibility",
+      "title": "User Responsibility & Compliance",
+      "description": "You retain full ownership and sole responsibility for all files you choose to process. You agree to comply with all applicable copyright and intellectual property laws and confirm that you possess the necessary legal rights to convert and store your files."
+    }
+  ]
+}
+

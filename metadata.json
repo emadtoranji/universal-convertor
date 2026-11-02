@@ -1,0 +1,6 @@
+{
+  "name": "Universal Convertor",
+  "description": "High-performance, 100% client-side universal image and document converter with zero network usage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

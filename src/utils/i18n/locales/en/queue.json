@@ -1,0 +1,70 @@
+{
+  "header": {
+    "title": "Processing Queue",
+    "countBadge": "({count})",
+    "clearAll": "Clear All"
+  },
+  "emptyState": {
+    "title": "Queue is empty",
+    "subtitle": "Drag & drop files above to start converting."
+  },
+  "status": {
+    "idle": "Ready",
+    "validating": "Validating",
+    "queued": "Queued",
+    "processing": "Converting",
+    "completed": "Completed",
+    "error": "Failed",
+    "canceled": "Canceled"
+  },
+  "messages": {
+    "converting": "Converting format...",
+    "completed": "Conversion complete • Ready for export",
+    "errorFallback": "Conversion failed"
+  },
+  "meta": {
+    "to": "To:",
+    "original": "Original:",
+    "converted": "Converted:",
+    "dimensions": "{width} × {height}",
+    "duration": "Duration: {duration}",
+    "audioSpecs": "{sampleRate}Hz • {channels}"
+  },
+  "actions": {
+    "convertSingle": "Convert",
+    "convertSingleTitle": "Convert this item",
+    "convertSingleAria": "Convert this file immediately",
+    "download": "Download",
+    "downloadTitle": "Download converted file",
+    "downloadAria": "Download converted file to device",
+    "preview": "Compare",
+    "previewTitle": "Compare Before & After",
+    "previewAria": "Click to compare Before & After",
+    "regenerate": "Regenerate",
+    "regenerateTitle": "Regenerate / Change output format",
+    "regenerateAria": "Regenerate file with different format or settings",
+    "remove": "Remove",
+    "removeTitle": "Remove from queue",
+    "removeAria": "Remove this item from queue",
+    "advanced": "Settings",
+    "advancedTitle": "Personalize conversion settings for this file",
+    "advancedAria": "Toggle advanced settings for this item"
+  },
+  "advanced": {
+    "title": "Item-Level Custom Settings",
+    "quality": "Quality",
+    "resize": "Resize",
+    "width": "Width",
+    "height": "Height",
+    "maintainAspectRatio": "Maintain Aspect Ratio",
+    "backgroundColor": "Background Fill",
+    "stripExif": "Strip EXIF Metadata",
+    "audioBitDepth": "Audio Bit Depth",
+    "audioSampleRate": "Sample Rate",
+    "audioChannels": "Channels",
+    "videoSnapshot": "Snapshot Frame",
+    "pdfPageSize": "Page Size",
+    "pdfOrientation": "Orientation",
+    "reset": "Reset to Global"
+  }
+}

@@ -1,0 +1,58 @@
+# Universal Convertor (llms.txt)
+
+> **Universal Convertor** is a 100% free, private, client-side image, audio, video, and document conversion engine. All decoders, encoders, resizers, and archivers run locally inside the user's browser memory via Web Workers, OffscreenCanvas, and the Web Audio API. Zero bytes are uploaded to external servers.
+
+---
+
+## Key Architectural Principles
+
+1. **Zero Cloud Uploads & 100% Privacy:**
+   - All conversions occur locally in-memory on the client device.
+   - Files, image buffers, base64 data, and file metadata are never transmitted to any third-party API or server.
+2. **Hardware Concurrency & Web Workers:**
+   - Multi-threaded processing pool bounded dynamically by `navigator.hardwareConcurrency` (2 to 8 threads).
+   - Zero main-thread blocking; 60fps UI responsiveness during bulk batch conversions.
+3. **Memory Safety & Transferables:**
+   - Large ArrayBuffers are passed as Transferables across thread boundaries.
+   - Bitmaps are closed (`bitmap.close()`) and Object URLs revoked (`URL.revokeObjectURL()`) immediately upon task cleanup.
+4. **Two-Stage Validation Protocol:**
+   - Stage 1: File extension registry lookup on drag/drop to instantly isolate unsupported formats.
+   - Stage 2: Deep Magic Bytes binary signature and syntax verification prior to conversion execution.
+
+---
+
+## Supported Input & Output Formats
+
+### 1. Images
+- **Input Formats:** PNG, JPEG, WebP, AVIF, SVG, BMP, ICO, GIF, TIFF, HEIC/HEIF
+- **Output Formats:** WebP (Modern lossy/lossless), AVIF (Next-gen), PNG (Lossless), JPEG (Universal), ICO (Multi-resolution 16/32/48px), BMP (Raster), TIFF (Print), PDF (Single or merged)
+- **Features:** SVG vector sanitization against XSS/XXE, canvas hardware acceleration, EXIF metadata stripping, dimension scaling, aspect ratio preservation, solid background color filling.
+
+### 2. Audio
+- **Input Formats:** WAV, MP3, OGG, FLAC, AAC, M4A
+- **Output Formats:** WAV (Uncompressed PCM), MP3
+- **Features:** Web Audio API decoding, selectable bit depth (16-bit PCM, 24-bit Studio PCM, 32-bit Float Master), sample rate resampling (16kHz, 22.05kHz, 44.1kHz, 48kHz), stereo/mono channel downmixing.
+
+### 3. Video
+- **Input Formats:** MP4, WebM, MOV, MKV, OGV
+- **Output Formats:** Audio Extraction (WAV, MP3), Animated GIF, WebM Video, Snapshot Frame (PNG, JPEG)
+- **Features:** Client-side HTML5 Video playback decoding, high-precision frame seeking, audio track demuxing.
+
+### 4. Documents & Structured Data
+- **Input Formats:** PDF, Markdown (.md), HTML (.html), JSON (.json), CSV (.csv), TSV (.tsv), Plain Text (.txt), XML (.xml), YAML (.yaml/.yml)
+- **Output Formats:** JSON (Pretty 2-space or minified, sorted keys), XML, YAML, HTML, Markdown, CSV, TSV, Plain Text, PDF
+- **Features:** JSON-to-JSON formatting, tabular conversion between CSV/TSV and JSON, HTML-to-Markdown and Markdown-to-HTML, client-side PDF document pagination via `pdf-lib`.
+
+---
+
+## Batch Processing & Archiving
+- **Homogeneous Batch Conversion:** "Convert All" allows one-click batch transformation when queued files share the same category.
+- **ZIP Export:** Instant client-side ZIP packaging via `fflate` with multi-threaded DEFLATE compression.
+- **Merge to PDF:** Combine multiple converted images or documents into a single multi-page PDF document.
+
+---
+
+## URL & Deployment
+- Production Domain: https://universal-convertor.pages.dev
+- Repository: https://github.com/universal-convertor/universal-convertor
+- License: The Unlicense (Public Domain Dedication, 100% Free for all commercial and personal use)

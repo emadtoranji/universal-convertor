@@ -1,0 +1,42 @@
+{
+  "printWidth": 80,
+  "tabWidth": 4,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "singleAttributePerLine": true,
+  "htmlWhitespaceSensitivity": "css",
+  "proseWrap": "always",
+  "embeddedLanguageFormatting": "auto",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": ["*.json", ".prettierrc"],
+      "options": {
+        "parser": "json",
+        "tabWidth": 4,
+        "singleQuote": false
+      }
+    },
+    {
+      "files": "*.json5",
+      "options": {
+        "parser": "json5",
+        "singleQuote": false
+      }
+    },
+    {
+      "files": "*.jsonc",
+      "options": {
+        "parser": "jsonc",
+        "singleQuote": false
+      }
+    }
+  ]
+}
