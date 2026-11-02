@@ -6,7 +6,7 @@ import {
   ConversionOptionsSchema,
   isHomogeneousQueue,
 } from '../../src/types/converter.ts';
-import type { InputFormat, QueueItem } from '../../src/types/converter.ts';
+import type { InputFormat, OutputFormat, QueueItem } from '../../src/types/converter.ts';
 
 describe('formatMatrix - Formats Test Suite', () => {
   it('maps all standard formats to their correct media categories', () => {
@@ -40,14 +40,14 @@ describe('formatMatrix - Formats Test Suite', () => {
 
     const mp3Outputs = getCompatibleOutputFormats('mp3');
     assert.ok(mp3Outputs.includes('wav'));
-    assert.ok(mp3Outputs.includes('mp3'));
+    assert.equal(mp3Outputs.length, 1);
 
     const videoOutputs = getCompatibleOutputFormats('mp4');
     assert.ok(videoOutputs.includes('wav'));
-    assert.ok(videoOutputs.includes('gif'));
-    assert.ok(videoOutputs.includes('webm'));
     assert.ok(videoOutputs.includes('png'));
     assert.ok(videoOutputs.includes('jpeg'));
+    assert.ok(videoOutputs.includes('webp'));
+    assert.equal(videoOutputs.length, 4);
 
     const mdOutputs = getCompatibleOutputFormats('md');
     assert.ok(mdOutputs.includes('html'));
@@ -68,6 +68,16 @@ describe('formatMatrix - Formats Test Suite', () => {
     const yamlOutputs = getCompatibleOutputFormats('yaml');
     assert.ok(yamlOutputs.includes('json'));
     assert.ok(yamlOutputs.includes('yaml'));
+  });
+
+  it('does not offer unsupported phantom outputs for audio or video', () => {
+    const audioOutputs = getCompatibleOutputFormats('mp3');
+    assert.equal(audioOutputs.includes('mp3' as unknown as OutputFormat), false);
+
+    const videoOutputs = getCompatibleOutputFormats('mp4');
+    assert.equal(videoOutputs.includes('gif' as unknown as OutputFormat), false);
+    assert.equal(videoOutputs.includes('webm' as unknown as OutputFormat), false);
+    assert.equal(videoOutputs.includes('mp3' as unknown as OutputFormat), false);
   });
 
   it('safely handles unknown and unsupported file formats without throwing or returning undefined', () => {

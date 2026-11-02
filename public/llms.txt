@@ -30,17 +30,17 @@
 
 ### 2. Audio
 - **Input Formats:** WAV, MP3, OGG, FLAC, AAC, M4A
-- **Output Formats:** WAV (Uncompressed PCM), MP3
+- **Output Formats:** WAV (Uncompressed PCM, 16/24/32-bit)
 - **Features:** Web Audio API decoding, selectable bit depth (16-bit PCM, 24-bit Studio PCM, 32-bit Float Master), sample rate resampling (16kHz, 22.05kHz, 44.1kHz, 48kHz), stereo/mono channel downmixing.
 
 ### 3. Video
 - **Input Formats:** MP4, WebM, MOV, MKV, OGV
-- **Output Formats:** Audio Extraction (WAV, MP3), Animated GIF, WebM Video, Snapshot Frame (PNG, JPEG)
+- **Output Formats:** Audio Extraction (WAV), Snapshot Frame (PNG, JPEG, WebP)
 - **Features:** Client-side HTML5 Video playback decoding, high-precision frame seeking, audio track demuxing.
 
 ### 4. Documents & Structured Data
 - **Input Formats:** PDF, Markdown (.md), HTML (.html), JSON (.json), CSV (.csv), TSV (.tsv), Plain Text (.txt), XML (.xml), YAML (.yaml/.yml)
-- **Output Formats:** JSON (Pretty 2-space or minified, sorted keys), XML, YAML, HTML, Markdown, CSV, TSV, Plain Text, PDF
+- **Output Formats:** Plain Text (.txt), HTML (.html), Markdown (.md), JSON (.json), CSV (.csv), TSV (.tsv), XML (.xml), YAML (.yaml), PDF (.pdf), PNG (.png)
 - **Features:** JSON-to-JSON formatting, tabular conversion between CSV/TSV and JSON, HTML-to-Markdown and Markdown-to-HTML, client-side PDF document pagination via `pdf-lib`.
 
 ---

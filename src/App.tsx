@@ -179,12 +179,6 @@ export default function App(): React.ReactElement {
         return 'webp';
       case 'wav':
         return 'wav';
-      case 'mp3':
-        return 'mp3';
-      case 'gif':
-        return 'gif';
-      case 'webm':
-        return 'webm';
       case 'html':
         return 'html';
       case 'md':

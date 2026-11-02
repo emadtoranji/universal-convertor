@@ -53,18 +53,15 @@ const OUTPUT_FORMAT_GROUPS: { group: string; formats: { label: string; format: O
     group: 'Audio',
     formats: [
       { label: t.toolbar.formats.wav, format: 'wav' },
-      { label: 'MP3 (Audio)', format: 'mp3' },
     ],
   },
   {
     group: 'Video',
     formats: [
       { label: 'Audio Extract (WAV)', format: 'wav' },
-      { label: 'Audio Extract (MP3)', format: 'mp3' },
-      { label: 'Animated GIF', format: 'gif' },
-      { label: 'WebM Video', format: 'webm' },
       { label: 'Snapshot Frame (PNG)', format: 'png' },
       { label: 'Snapshot Frame (JPEG)', format: 'jpeg' },
+      { label: 'Snapshot Frame (WebP)', format: 'webp' },
     ],
   },
   {

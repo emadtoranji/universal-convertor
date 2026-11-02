@@ -46,9 +46,9 @@ export type ImageOutputFormat =
   | 'tiff'
   | 'pdf';
 
-export type AudioOutputFormat = 'wav' | 'mp3';
+export type AudioOutputFormat = 'wav';
 
-export type VideoOutputFormat = 'wav' | 'mp3' | 'gif' | 'webm' | 'png' | 'jpeg';
+export type VideoOutputFormat = 'wav' | 'png' | 'jpeg' | 'webp';
 
 export type DocumentOutputFormat =
   | 'html'
@@ -97,9 +97,6 @@ export const ConversionOptionsSchema = z.object({
     'tiff',
     'pdf',
     'wav',
-    'mp3',
-    'gif',
-    'webm',
     'html',
     'md',
     'json',
@@ -212,9 +209,9 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
       return allImageOutputs.filter((fmt) => fmt !== normalizedSource);
     }
     case 'audio':
-      return ['wav', 'mp3'];
+      return ['wav'];
     case 'video':
-      return ['wav', 'mp3', 'gif', 'webm', 'png', 'jpeg'];
+      return ['wav', 'png', 'jpeg', 'webp'];
     case 'document': {
       switch (sourceFormat) {
         case 'md':
