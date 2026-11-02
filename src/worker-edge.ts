@@ -64,7 +64,7 @@ const workerEdgeHandler = {
     );
     headers.set(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://picsum.photos; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self';"
+      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://buttons.github.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://picsum.photos; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' data: blob: https://api.github.com; frame-src https://ghbtns.com https://buttons.github.io; object-src 'none'; base-uri 'self';"
     );
 
     return new Response(response.body, {
