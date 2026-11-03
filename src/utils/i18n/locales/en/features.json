@@ -1,10 +1,10 @@
 {
-  "sectionTitle": "Engine Features",
-  "sectionSubtitle": "Engineered for maximum speed, absolute privacy, and universal media conversion without server costs.",
+  "sectionTitle": "Key Capabilities",
+  "sectionSubtitle": "Built for maximum speed, absolute privacy, and universal file conversion and compression without server costs.",
   "badge": "100% Free • Unlimited Conversions • Zero Cloud Uploads",
   "heroTitle": "Universal Convertor",
-  "heroTitleAccent": "Engine",
-  "heroSubtitle": "A completely free, 100% private client-side conversion engine. Transform images and structured data instantly inside local browser memory using high-speed multi-threaded Web Workers. Zero server uploads, zero subscriptions, and unlimited batch processing.",
+  "heroTitleAccent": "& Compressor",
+  "heroSubtitle": "A completely free, 100% private client-side file converter and compressor. Transform images and documents or reduce file size instantly inside local browser memory using high-speed multi-threaded Web Workers. Zero server uploads, zero subscriptions, and unlimited batch processing.",
   "cards": [
     {
       "id": "privacy",
@@ -18,14 +18,14 @@
       "icon": "Zap",
       "badge": "Multi-Threaded Pool",
       "title": "High-Performance Web Workers",
-      "description": "Leverage your multi-core processor with a hardware-concurrency Web Worker pool and Transferable ArrayBuffers for rapid parallel conversions with zero main-thread UI lag."
+      "description": "Leverage your multi-core processor with a hardware-concurrency Web Worker pool and Transferable ArrayBuffers for rapid parallel conversions and compression with zero main-thread UI lag."
     },
     {
       "id": "universal",
       "icon": "Layers",
-      "badge": "Images & Data",
-      "title": "High-Accuracy Image & Data Engine",
-      "description": "Convert across essential digital assets: modern images (WebP, AVIF, PNG, JPG, ICO, SVG, BMP, GIF) and structured tabular spreadsheets (CSV, TSV, JSON) with zero data corruption."
+      "badge": "Images & Documents",
+      "title": "High-Accuracy Media & Document Conversion",
+      "description": "Convert and compress across essential digital assets: modern images (WebP, AVIF, PNG, JPG, JFIF, TIFF, PSD, ICO, SVG, BMP, GIF) and documents (Markdown, HTML, Plain Text, XML, CSV, TSV, JSON, PDF) with 99%+ fidelity."
     },
     {
       "id": "packaging",
@@ -38,8 +38,8 @@
       "id": "tuning",
       "icon": "Sliders",
       "badge": "Precision Controls",
-      "title": "Advanced Tuning Controls",
-      "description": "Customize your output with granular controls: quality compression sliders, dimension resizing, aspect ratio locks, transparent background replacement, and EXIF metadata stripping."
+      "title": "Advanced Tuning & Compression Controls",
+      "description": "Customize your output with granular controls: quality compression sliders, black & white monochrome mode, dimension resizing, transparent background replacement, and EXIF metadata stripping."
     }
   ]
 }

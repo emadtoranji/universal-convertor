@@ -10,6 +10,9 @@ import {
   Shield,
   Lock,
   Unlock,
+  RotateCcw,
+  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import {
   ConversionOptions,
@@ -27,6 +30,7 @@ interface ConversionToolbarProps {
   onDownloadZip: () => void;
   onMergeToPdf: () => void;
   onClearQueue: () => void;
+  onResetAll?: () => void;
   isProcessing: boolean;
   totalCount: number;
   completedCount: number;
@@ -53,9 +57,13 @@ const OUTPUT_FORMAT_GROUPS: { group: string; formats: { label: string; format: O
   {
     group: 'Documents & Data',
     formats: [
+      { label: t.toolbar.formats.json, format: 'json' },
       { label: t.toolbar.formats.csv, format: 'csv' },
       { label: t.toolbar.formats.tsv, format: 'tsv' },
-      { label: t.toolbar.formats.json, format: 'json' },
+      { label: t.toolbar.formats.md, format: 'md' },
+      { label: t.toolbar.formats.html, format: 'html' },
+      { label: t.toolbar.formats.txt, format: 'txt' },
+      { label: t.toolbar.formats.xml, format: 'xml' },
     ],
   },
 ];
@@ -67,6 +75,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
   onDownloadZip,
   onMergeToPdf,
   onClearQueue,
+  onResetAll,
   isProcessing,
   totalCount,
   completedCount,
@@ -75,7 +84,11 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
   canConvertAll,
   canMergeToPdf = true,
 }): React.ReactElement => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
+  const [manualShowSettings, setManualShowSettings] = useState<boolean>(false);
+
+  const isAllCompleted = totalCount > 0 && completedCount === totalCount;
+  const isSettingsHidden = isAllCompleted && !manualShowSettings;
 
   const formatSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -155,6 +168,13 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
     });
   };
 
+  const handleGrayscaleToggle = (): void => {
+    onOptionsChange({
+      ...globalOptions,
+      grayscale: !globalOptions.grayscale,
+    });
+  };
+
   const handlePdfPageSizeChange = (e: ChangeEvent<HTMLSelectElement>): void => {
     onOptionsChange({
       ...globalOptions,
@@ -169,130 +189,250 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
     });
   };
 
+  const handleJsonIndentChange = (e: ChangeEvent<HTMLSelectElement>): void => {
+    onOptionsChange({
+      ...globalOptions,
+      jsonIndent: Number(e.target.value),
+    });
+  };
+
+  const handleDelimiterChange = (e: ChangeEvent<HTMLSelectElement>): void => {
+    onOptionsChange({
+      ...globalOptions,
+      documentDelimiter: e.target.value as ',' | '\t' | ';',
+    });
+  };
+
+  const handleReset = (): void => {
+    setManualShowSettings(false);
+    if (onResetAll) {
+      onResetAll();
+    }
+  };
+
   return (
     <div className="w-full bg-white dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800/90 rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-lg transition-all">
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
-          <div className="flex flex-col gap-1 w-full sm:w-auto min-w-[190px]">
-            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              {t.toolbar.targetFormat.label}
-            </label>
-            <select
-              value={globalOptions.targetFormat}
-              onChange={handleFormatChange}
-              className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700/80 text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
+      {isSettingsHidden ? (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-1">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800/70 text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
+                  All {totalCount} files converted successfully
+                </span>
+                {savingsPercentage !== 0 && (
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      savingsPercentage > 0
+                        ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                    }`}
+                  >
+                    {savingsPercentage > 0 ? `-${savingsPercentage}% size reduction` : `+${Math.abs(savingsPercentage)}%`}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Processed locally in browser memory with zero network uploads.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/40 text-cyan-700 dark:text-cyan-400 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs"
+              title={t.toolbar.actions.resetConversionTitle}
             >
-              {OUTPUT_FORMAT_GROUPS.map((grp) => (
-                <optgroup key={grp.group} label={grp.group} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-                  {grp.formats.map((item) => (
-                    <option key={item.format} value={item.format} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-                      {item.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
+              <RotateCcw className="w-4 h-4" />
+              <span>{t.toolbar.actions.resetConversion}</span>
+            </button>
 
-          <div className="flex flex-col gap-1 w-full sm:w-auto min-w-[160px]">
-            <div className="flex justify-between items-center text-xs">
-              <span className="font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{t.toolbar.quality.label}</span>
-              <span className="font-mono text-cyan-600 dark:text-cyan-400 font-bold">{globalOptions.quality}%</span>
-            </div>
-            <div className="flex items-center gap-2 h-9">
-              <input
-                type="range"
-                min="1"
-                max="100"
-                value={globalOptions.quality}
-                onChange={handleQualityChange}
-                disabled={
-                  globalOptions.targetFormat === 'png' ||
-                  globalOptions.targetFormat === 'bmp' ||
-                  globalOptions.targetFormat === 'csv' ||
-                  globalOptions.targetFormat === 'tsv'
-                }
-                className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-2 disabled:opacity-40"
-              />
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className={`flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all cursor-pointer self-stretch sm:self-end ${
-              showAdvanced
-                ? 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-400 dark:border-cyan-500/40 text-cyan-700 dark:text-cyan-400 shadow-sm'
-                : 'bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100'
-            }`}
-          >
-            <Sliders className="w-4 h-4 text-cyan-500" />
-            <span>{showAdvanced ? t.toolbar.advancedToggle.hide : t.toolbar.advancedToggle.show}</span>
-          </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-end lg:self-center">
-          <button
-            type="button"
-            onClick={onConvertAll}
-            disabled={isProcessing || totalCount === 0 || canConvertAll === false}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-zinc-950 font-bold text-xs sm:text-sm shadow-md shadow-cyan-500/25 transition-all cursor-pointer ${
-              canConvertAll === false || totalCount === 0 || isProcessing
-                ? 'opacity-30 cursor-not-allowed hover:from-cyan-500 hover:to-teal-500 shadow-none pointer-events-none'
-                : ''
-            }`}
-            title={
-              canConvertAll === false
-                ? 'Batch conversion disabled: Queue contains mixed file categories. Convert items individually or remove mismatched types.'
-                : t.toolbar.actions.convertAll
-            }
-          >
-            <Play className={`w-4 h-4 fill-current ${isProcessing ? 'animate-spin' : ''}`} />
-            <span>{isProcessing ? t.toolbar.actions.converting : t.toolbar.actions.convertAll}</span>
-          </button>
-
-          {completedCount > 0 && (
-            <>
-              <button
-                type="button"
-                onClick={onDownloadZip}
-                className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm font-medium transition-all cursor-pointer"
-                title={t.toolbar.actions.downloadZipTitle}
-                aria-label={t.toolbar.actions.downloadZipAria}
-              >
-                <FileArchive className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <span className="hidden xs:inline">{t.toolbar.actions.downloadZip}</span>
-              </button>
-
-              {canMergeToPdf && (
+            {completedCount > 0 && (
+              <>
                 <button
                   type="button"
-                  onClick={onMergeToPdf}
+                  onClick={onDownloadZip}
                   className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm font-medium transition-all cursor-pointer"
-                  title={t.toolbar.actions.mergePdfTitle}
-                  aria-label={t.toolbar.actions.mergePdfAria}
+                  title={t.toolbar.actions.downloadZipTitle}
+                  aria-label={t.toolbar.actions.downloadZipAria}
                 >
-                  <FileText className="w-4 h-4 text-pink-600 dark:text-pink-400" />
-                  <span className="hidden xs:inline">{t.toolbar.actions.mergePdf}</span>
+                  <FileArchive className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                  <span className="hidden xs:inline">{t.toolbar.actions.downloadZip}</span>
                 </button>
-              )}
-            </>
-          )}
 
-          {totalCount > 0 && (
+                {canMergeToPdf && (
+                  <button
+                    type="button"
+                    onClick={onMergeToPdf}
+                    className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm font-medium transition-all cursor-pointer"
+                    title={t.toolbar.actions.mergePdfTitle}
+                    aria-label={t.toolbar.actions.mergePdfAria}
+                  >
+                    <FileText className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+                    <span className="hidden xs:inline">{t.toolbar.actions.mergePdf}</span>
+                  </button>
+                )}
+              </>
+            )}
+
             <button
               type="button"
               onClick={onClearQueue}
-              disabled={isProcessing}
-              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer disabled:opacity-40"
+              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer"
               title={t.toolbar.actions.clearQueueTitle}
               aria-label={t.toolbar.actions.clearQueueAria}
             >
               <Trash2 className="w-4 h-4" />
             </button>
-          )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+            <div className="flex flex-col gap-1 w-full sm:w-auto min-w-[210px]">
+              <div className="flex items-center justify-between text-xs">
+                <label className="font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  {t.toolbar.targetFormat.label}
+                </label>
+              </div>
+              <select
+                value={globalOptions.targetFormat}
+                onChange={handleFormatChange}
+                className="w-full px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700/80 text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
+              >
+                {OUTPUT_FORMAT_GROUPS.map((grp) => (
+                  <optgroup
+                    key={grp.group}
+                    label={grp.group}
+                    className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-semibold"
+                  >
+                    {grp.formats.map((item) => (
+                      <option
+                        key={item.format}
+                        value={item.format}
+                        className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+                      >
+                        {item.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1 w-full sm:w-auto min-w-[170px]">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  {t.toolbar.quality.label}
+                </span>
+                <span className="font-mono text-cyan-600 dark:text-cyan-400 font-bold">
+                  {globalOptions.quality}%
+                </span>
+              </div>
+              <div className="flex items-center gap-2 h-9">
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={globalOptions.quality}
+                  onChange={handleQualityChange}
+                  disabled={
+                    globalOptions.targetFormat === 'png' ||
+                    globalOptions.targetFormat === 'bmp' ||
+                    globalOptions.targetFormat === 'csv' ||
+                    globalOptions.targetFormat === 'tsv' ||
+                    globalOptions.targetFormat === 'md' ||
+                    globalOptions.targetFormat === 'html' ||
+                    globalOptions.targetFormat === 'txt' ||
+                    globalOptions.targetFormat === 'xml'
+                  }
+                  className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-2 disabled:opacity-40"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className={`flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all cursor-pointer self-stretch sm:self-end ${
+                showAdvanced
+                  ? 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-400 dark:border-cyan-500/40 text-cyan-700 dark:text-cyan-400 shadow-sm'
+                  : 'bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100'
+              }`}
+            >
+              <Sliders className="w-4 h-4 text-cyan-500" />
+              <span>{showAdvanced ? t.toolbar.advancedToggle.hide : t.toolbar.advancedToggle.show}</span>
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-end lg:self-center">
+            <button
+              type="button"
+              onClick={onConvertAll}
+              disabled={isProcessing || totalCount === 0 || canConvertAll === false}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-zinc-950 font-bold text-xs sm:text-sm shadow-md shadow-cyan-500/25 transition-all cursor-pointer ${
+                canConvertAll === false || totalCount === 0 || isProcessing
+                  ? 'opacity-30 cursor-not-allowed hover:from-cyan-500 hover:to-teal-500 shadow-none pointer-events-none'
+                  : ''
+              }`}
+              title={
+                canConvertAll === false
+                  ? 'Batch conversion disabled: Queue contains mixed file categories. Convert items individually below.'
+                  : t.toolbar.actions.convertAll
+              }
+            >
+              <Play className={`w-4 h-4 fill-current ${isProcessing ? 'animate-spin' : ''}`} />
+              <span>{isProcessing ? t.toolbar.actions.converting : t.toolbar.actions.convertAll}</span>
+            </button>
+
+            {completedCount > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={onDownloadZip}
+                  className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm font-medium transition-all cursor-pointer"
+                  title={t.toolbar.actions.downloadZipTitle}
+                  aria-label={t.toolbar.actions.downloadZipAria}
+                >
+                  <FileArchive className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                  <span className="hidden xs:inline">{t.toolbar.actions.downloadZip}</span>
+                </button>
+
+                {canMergeToPdf && (
+                  <button
+                    type="button"
+                    onClick={onMergeToPdf}
+                    className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm font-medium transition-all cursor-pointer"
+                    title={t.toolbar.actions.mergePdfTitle}
+                    aria-label={t.toolbar.actions.mergePdfAria}
+                  >
+                    <FileText className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+                    <span className="hidden xs:inline">{t.toolbar.actions.mergePdf}</span>
+                  </button>
+                )}
+              </>
+            )}
+
+            {totalCount > 0 && (
+              <button
+                type="button"
+                onClick={onClearQueue}
+                disabled={isProcessing}
+                className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer disabled:opacity-40"
+                title={t.toolbar.actions.clearQueueTitle}
+                aria-label={t.toolbar.actions.clearQueueAria}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {totalCount > 0 && (
         <div className="mt-3.5 pt-3 border-t border-zinc-200 dark:border-zinc-800/80 flex flex-wrap items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 gap-2">
@@ -335,11 +475,11 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
       {canConvertAll === false && totalCount > 0 && (
         <div className="mt-3 px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-2">
           <span className="font-semibold">Batch convert disabled:</span>
-          <span>Files in queue are from mixed categories. Convert files individually below.</span>
+          <span>Queue contains mixed file categories. Convert files individually below.</span>
         </div>
       )}
 
-      {showAdvanced && (
+      {showAdvanced && !isSettingsHidden && (
         <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
           <div className="space-y-2.5">
             <div className="flex items-center gap-2 font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
@@ -419,6 +559,19 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 </div>
               </div>
             )}
+
+            <div className="pt-2">
+              <label className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={globalOptions.grayscale}
+                  onChange={handleGrayscaleToggle}
+                  className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500 bg-white dark:bg-zinc-950"
+                />
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>{t.toolbar.colorEffects.grayscale}</span>
+              </label>
+            </div>
           </div>
 
           <div className="space-y-2.5">
@@ -454,6 +607,13 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 <span>{t.toolbar.metadata.stripExif}</span>
               </label>
             </div>
+
+            <div className="pt-1 space-y-1">
+              <span className="text-[11px] text-zinc-500 block">Quality Preset:</span>
+              <div className="text-[11px] text-cyan-600 dark:text-cyan-400 font-medium">
+                {t.toolbar.quality.recommended}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2.5">
@@ -485,6 +645,42 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                   <option value="portrait">{t.toolbar.pdfSettings.orientations.portrait}</option>
                   <option value="landscape">{t.toolbar.pdfSettings.orientations.landscape}</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+              <span className="block font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-[11px] mb-1.5">
+                {t.toolbar.documentSettings.title}
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-0.5">
+                    {t.toolbar.documentSettings.jsonIndentLabel}
+                  </label>
+                  <select
+                    value={globalOptions.jsonIndent ?? 2}
+                    onChange={handleJsonIndentChange}
+                    className="w-full px-2 py-1 rounded bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs"
+                  >
+                    <option value={2}>{t.toolbar.documentSettings.indentations.spaces2}</option>
+                    <option value={4}>{t.toolbar.documentSettings.indentations.spaces4}</option>
+                    <option value={0}>{t.toolbar.documentSettings.indentations.minified}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] text-zinc-500 mb-0.5">
+                    {t.toolbar.documentSettings.delimiterLabel}
+                  </label>
+                  <select
+                    value={globalOptions.documentDelimiter ?? ','}
+                    onChange={handleDelimiterChange}
+                    className="w-full px-2 py-1 rounded bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs"
+                  >
+                    <option value=",">{t.toolbar.documentSettings.delimiters.comma}</option>
+                    <option value={'\t'}>{t.toolbar.documentSettings.delimiters.tab}</option>
+                    <option value=";">{t.toolbar.documentSettings.delimiters.semicolon}</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>

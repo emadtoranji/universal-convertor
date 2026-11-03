@@ -1,6 +1,6 @@
 {
   "title": "Frequently Asked Questions",
-  "subtitle": "Direct, factual answers regarding privacy, client-side performance, image and data format support, and offline capabilities.",
+  "subtitle": "Direct, factual answers regarding privacy, client-side performance, format support, compression, and offline capabilities.",
   "badge": "Direct Answers",
   "items": [
     {
@@ -9,19 +9,29 @@
       "answer": "Yes, Universal Convertor is completely free with no file size limits, daily caps, subscriptions, or hidden paywalls. Because all decoding, resizing, compression, and encoding run entirely within your device browser using native hardware acceleration and Web Workers, there are no cloud server costs or storage bills for us to pass on to you."
     },
     {
+      "id": "compression-size-reduction",
+      "question": "Can I reduce and compress file sizes without changing formats?",
+      "answer": "Yes, absolutely. You can reduce image file size significantly by choosing modern compressed formats like WebP or AVIF, adjusting the quality slider (85% recommended), resizing pixel dimensions, or converting to monochrome Black & White mode. Size savings are calculated and displayed in real time."
+    },
+    {
       "id": "privacy-zero-uploads",
       "question": "Are my photos or documents uploaded to any external server?",
       "answer": "No, your files are never uploaded or transmitted to any external server, cloud storage, or third-party service. All file processing occurs 100% locally inside your device volatile memory, guaranteeing absolute data confidentiality and eliminating the risk of data leaks or server breaches."
     },
     {
+      "id": "supported-formats",
+      "question": "Which image and document formats are supported?",
+      "answer": "Universal Convertor supports high-fidelity conversions for all standard images and document files. You can convert between PNG, JPG, JPEG, JFIF, WebP, AVIF, SVG, BMP, ICO, TIFF, PSD, and GIF for images, as well as Markdown (.md), HTML, Plain Text (.txt), XML, CSV, TSV, and JSON for documents and data."
+    },
+    {
+      "id": "unsupported-formats-policy",
+      "question": "Why are video, audio, and proprietary archives excluded from the converter?",
+      "answer": "Quality and 100% reliable output are non-negotiable. Converting video (MP4, MKV, AVI) and audio (MP3, OGG) inside client-side browser memory currently requires bloated 30MB+ WebAssembly runtimes that suffer from severe audio drift, frame dropping, and unpredictable browser crashes. To guarantee 99%+ perfection on every single file, we strictly support formats that can be processed with 100% fidelity directly in browser memory."
+    },
+    {
       "id": "offline-usage",
       "question": "Can I use Universal Convertor offline without an internet connection?",
       "answer": "Yes, once the web application is loaded in your browser, all conversion tools work fully offline without an active internet connection. The Web Workers, OffscreenCanvas, and local algorithms run in your local browser sandbox independently of network availability."
-    },
-    {
-      "id": "supported-formats",
-      "question": "Which image and data formats are supported by the engine?",
-      "answer": "Universal Convertor supports high-fidelity conversions for all standard web images and tabular data files. You can convert between PNG, JPG, WebP, AVIF, SVG, BMP, ICO, and GIF for images, as well as CSV, TSV, and JSON for structured spreadsheets and tables."
     },
     {
       "id": "pdf-merging",
@@ -30,13 +40,8 @@
     },
     {
       "id": "batch-speed",
-      "question": "Why is batch conversion faster in this engine than in traditional online converters?",
+      "question": "Why is batch conversion faster than traditional online converters?",
       "answer": "Batch conversion is substantially faster because your files are processed in parallel across your device multi-core CPU using Web Workers without network upload or download bottlenecks. By utilizing zero-copy Transferable ArrayBuffers and in-memory execution, you completely eliminate file queue wait times and server latency."
-    },
-    {
-      "id": "tabular-data-conversion",
-      "question": "How does client-side CSV, TSV, and JSON table conversion work?",
-      "answer": "Yes, you can convert between CSV, TSV, and JSON with 100% RFC 4180 parsing accuracy and zero data loss. The engine automatically handles quotes, commas, multiline cells, and type coercion locally in browser memory."
     }
   ]
 }

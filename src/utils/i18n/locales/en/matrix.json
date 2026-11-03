@@ -1,59 +1,59 @@
 {
   "title": "Comprehensive Format Matrix & Technical Specifications",
-  "subtitle": "Discover the full range of supported input and output formats across images and structured data, all processed 100% client-side.",
+  "subtitle": "Discover the full range of supported input and output formats across images, documents, and structured data, all processed 100% client-side with zero cloud uploads.",
   "badge": "Hardware Accelerated",
   "categories": {
     "images": {
       "id": "images",
-      "title": "Images & Vector Graphics",
+      "title": "Images & Visual Media",
       "badge": "Hardware Accelerated",
       "icon": "Image",
-      "description": "High-performance image transformation powered by multi-threaded Web Workers and OffscreenCanvas with zero GPU memory leaks.",
-      "inputs": ["PNG", "JPG", "JPEG", "WebP", "AVIF", "SVG", "BMP", "ICO", "GIF"],
+      "description": "High-performance image conversion and size compression powered by multi-threaded Web Workers and OffscreenCanvas with zero GPU memory leaks.",
+      "inputs": ["PNG", "JPG", "JPEG", "JFIF", "WebP", "AVIF", "SVG", "BMP", "ICO", "GIF", "TIFF", "PSD"],
       "outputs": ["WebP", "AVIF", "PNG", "JPEG", "ICO", "BMP", "TIFF", "PDF"],
       "specs": [
         {
+          "name": "Quality & Compression",
+          "details": "Configurable lossy & lossless compression (1% to 100%) with recommended presets for web optimization"
+        },
+        {
           "name": "Color Bit Depths",
-          "details": "8-bit, 24-bit RGB, and 32-bit RGBA with full alpha transparency preservation"
+          "details": "8-bit, 24-bit RGB, 32-bit RGBA, and monochrome Black & White mode with alpha transparency preservation"
         },
         {
           "name": "Multi-Resolution ICO",
           "details": "Packs 16x16, 32x32, 48x48, 64x64, 128x128, and 256x256 icons into a single binary file"
         },
         {
-          "name": "Lossless & Lossy Modes",
-          "details": "Configurable WebP, AVIF, and JPEG quality compression (1% to 100%) and lossless PNG"
-        },
-        {
-          "name": "Vector Sanitization",
-          "details": "Automated SVG DOMParser sanitization stripping scripts, external URLs, and event listeners"
+          "name": "Professional Formats",
+          "details": "High-fidelity Adobe Photoshop PSD composite extraction and native TIFF raster conversion"
         }
       ]
     },
     "documents": {
       "id": "documents",
-      "title": "Structured Data & Tables",
+      "title": "Documents & Structured Data",
       "badge": "Deterministic RFC-4180",
       "icon": "Table",
-      "description": "Instant tabular data conversion, RFC 4180 CSV/TSV parsing, and structured JSON table serialization running in pure TypeScript.",
-      "inputs": ["CSV (.csv)", "TSV (.tsv)", "JSON (.json)"],
-      "outputs": ["CSV", "TSV", "JSON"],
+      "description": "Instant document and tabular data conversion across Markdown, HTML, Plain Text, XML, CSV, TSV, and JSON running in pure TypeScript.",
+      "inputs": ["Markdown (.md)", "HTML (.html)", "Plain Text (.txt)", "XML (.xml)", "CSV (.csv)", "TSV (.tsv)", "JSON (.json)"],
+      "outputs": ["Markdown (.md)", "HTML (.html)", "Plain Text (.txt)", "XML (.xml)", "CSV (.csv)", "TSV (.tsv)", "JSON (.json)"],
       "specs": [
         {
+          "name": "Document Transformation",
+          "details": "High-fidelity bi-directional conversion between Markdown formatted text, web HTML, clean plain text, and XML"
+        },
+        {
           "name": "RFC-4180 Compliant",
-          "details": "Strict quotation, escape handling, and comma/tab delimiter detection"
+          "details": "Strict quotation, escape handling, and comma/tab delimiter detection for spreadsheets"
         },
         {
-          "name": "Bi-Directional Serialization",
-          "details": "Lossless conversion between structured JSON objects and tabular CSV/TSV spreadsheets"
+          "name": "Hierarchical Serialization",
+          "details": "Lossless conversion between structured JSON objects, XML tags, and tabular spreadsheets"
         },
         {
-          "name": "Memory Safety",
-          "details": "100% client-side in-memory execution with zero data transmission"
-        },
-        {
-          "name": "Formatting & Formatting",
-          "details": "Custom indentation, alphabetical key sorting, and minification controls"
+          "name": "Formatting & Minification",
+          "details": "Custom indentation, alphabetical key sorting, and compact minification controls"
         }
       ]
     }

@@ -10,12 +10,18 @@ export type ImageInputFormat =
   | 'svg'
   | 'bmp'
   | 'ico'
-  | 'gif';
+  | 'gif'
+  | 'tiff'
+  | 'psd';
 
 export type DocumentInputFormat =
   | 'json'
   | 'csv'
-  | 'tsv';
+  | 'tsv'
+  | 'md'
+  | 'html'
+  | 'txt'
+  | 'xml';
 
 export type InputFormat = ImageInputFormat | DocumentInputFormat;
 
@@ -32,7 +38,11 @@ export type ImageOutputFormat =
 export type DocumentOutputFormat =
   | 'json'
   | 'csv'
-  | 'tsv';
+  | 'tsv'
+  | 'md'
+  | 'html'
+  | 'txt'
+  | 'xml';
 
 export type OutputFormat = ImageOutputFormat | DocumentOutputFormat;
 
@@ -64,6 +74,10 @@ export const ConversionOptionsSchema = z.object({
     'json',
     'csv',
     'tsv',
+    'md',
+    'html',
+    'txt',
+    'xml',
   ]),
   quality: z.number().min(1).max(100).default(90),
   resizeMode: z.enum(['original', 'percentage', 'dimensions']).default('original'),
@@ -73,12 +87,14 @@ export const ConversionOptionsSchema = z.object({
   maintainAspectRatio: z.boolean().default(true),
   backgroundColor: z.string().default('#ffffff'),
   stripExif: z.boolean().default(true),
+  grayscale: z.boolean().default(false),
   pdfPageSize: z.enum(['original', 'a4', 'letter']).default('original'),
   pdfOrientation: z.enum(['portrait', 'landscape', 'auto']).default('auto'),
-  documentDelimiter: z.enum([',', '\t']).default(',').optional(),
+  documentDelimiter: z.enum([',', '\t', ';']).default(',').optional(),
   documentWrapLines: z.boolean().default(true).optional(),
   jsonIndent: z.number().int().min(0).max(8).default(2).optional(),
   jsonSortKeys: z.boolean().default(false).optional(),
+  htmlWrapDocument: z.boolean().default(true).optional(),
 });
 
 export type ConversionOptions = z.infer<typeof ConversionOptionsSchema>;
@@ -121,10 +137,16 @@ export function getMediaCategory(format: InputFormat): MediaCategory {
     case 'bmp':
     case 'ico':
     case 'gif':
+    case 'tiff':
+    case 'psd':
       return 'image';
     case 'json':
     case 'csv':
     case 'tsv':
+    case 'md':
+    case 'html':
+    case 'txt':
+    case 'xml':
       return 'document';
     default:
       return 'document';
@@ -135,17 +157,34 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
   const category = getMediaCategory(sourceFormat);
   switch (category) {
     case 'image': {
-      const allImageOutputs: ImageOutputFormat[] = ['webp', 'png', 'jpeg', 'avif', 'ico', 'bmp', 'tiff', 'pdf'];
+      const allImageOutputs: ImageOutputFormat[] = [
+        'webp',
+        'avif',
+        'png',
+        'jpeg',
+        'ico',
+        'bmp',
+        'tiff',
+        'pdf',
+      ];
       return allImageOutputs.filter((fmt) => fmt !== sourceFormat);
     }
     case 'document': {
       switch (sourceFormat) {
         case 'json':
-          return ['json', 'csv', 'tsv'];
+          return ['json', 'csv', 'tsv', 'xml', 'md', 'txt'];
         case 'csv':
-          return ['json', 'tsv'];
+          return ['json', 'csv', 'tsv', 'xml', 'txt', 'html'];
         case 'tsv':
-          return ['json', 'csv'];
+          return ['json', 'csv', 'tsv', 'xml', 'txt', 'html'];
+        case 'md':
+          return ['html', 'txt', 'json'];
+        case 'html':
+          return ['md', 'txt', 'html'];
+        case 'txt':
+          return ['md', 'json', 'html', 'txt'];
+        case 'xml':
+          return ['json', 'csv', 'tsv', 'txt', 'xml'];
         default:
           return [];
       }

@@ -15,6 +15,7 @@ import {
   Shield,
   FileImage,
   Table,
+  Sparkles,
 } from 'lucide-react';
 import {
   QueueItem,
@@ -184,18 +185,18 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
               <button
                 type="button"
                 onClick={() => onRegenerate(item.id)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
                 title={t.queue.actions.regenerateTitle}
                 aria-label={t.queue.actions.regenerateAria}
               >
                 <RotateCcw className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                <span className="hidden xs:inline">{t.queue.actions.regenerate}</span>
+                <span>Reset</span>
               </button>
             </div>
           ) : null}
 
           <div className="flex items-center gap-1 sm:gap-1.5">
-            {item.status !== 'error' && (
+            {item.status === 'idle' && (
               <button
                 type="button"
                 onClick={() => setShowAdvanced((prev) => !prev)}
@@ -272,7 +273,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
         </div>
       </div>
 
-      {showAdvanced && (
+      {showAdvanced && item.status === 'idle' && (
         <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs bg-zinc-50 dark:bg-zinc-950/50 p-3 rounded-xl">
           <div className="space-y-1.5">
             <div className="flex justify-between text-zinc-600 dark:text-zinc-400 font-medium">
@@ -289,7 +290,11 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                 item.options.targetFormat === 'png' ||
                 item.options.targetFormat === 'bmp' ||
                 item.options.targetFormat === 'csv' ||
-                item.options.targetFormat === 'tsv'
+                item.options.targetFormat === 'tsv' ||
+                item.options.targetFormat === 'md' ||
+                item.options.targetFormat === 'html' ||
+                item.options.targetFormat === 'txt' ||
+                item.options.targetFormat === 'xml'
               }
               className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-1.5 disabled:opacity-40"
             />
@@ -377,6 +382,18 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                 />
                 <Shield className="w-3.5 h-3.5 text-emerald-500" />
                 <span>EXIF</span>
+              </label>
+            </div>
+            <div className="pt-1">
+              <label className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 cursor-pointer text-[11px]">
+                <input
+                  type="checkbox"
+                  checked={item.options.grayscale}
+                  onChange={(e) => updateItemOption('grayscale', e.target.checked)}
+                  className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500"
+                />
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Black & White</span>
               </label>
             </div>
           </div>

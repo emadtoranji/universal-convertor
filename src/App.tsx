@@ -33,6 +33,7 @@ import {
   AlertTriangle,
   UploadCloud,
 } from 'lucide-react';
+import { decodePsdBuffer } from './core/converters/psdConverter';
 import {
   getOrInitEffectiveTheme,
   setThemeCookie,
@@ -43,12 +44,13 @@ import {
 
 const DEFAULT_OPTIONS: ConversionOptions = {
   targetFormat: 'webp',
-  quality: 90,
+  quality: 85,
   resizeMode: 'original',
   resizePercentage: 100,
   maintainAspectRatio: true,
   backgroundColor: '#ffffff',
   stripExif: true,
+  grayscale: false,
   pdfPageSize: 'original',
   pdfOrientation: 'auto',
 };
@@ -177,6 +179,14 @@ export default function App(): React.ReactElement {
         return 'csv';
       case 'tsv':
         return 'tsv';
+      case 'md':
+        return 'md';
+      case 'html':
+        return 'html';
+      case 'txt':
+        return 'txt';
+      case 'xml':
+        return 'xml';
       case 'png':
       default:
         return 'png';
@@ -206,7 +216,7 @@ export default function App(): React.ReactElement {
                 previewUrl: '',
                 status: 'error',
                 progress: 0,
-                errorMessage: `Unsupported file format (.${extCheck.extension || 'unknown'}). Supported: PNG, JPG, WebP, AVIF, SVG, BMP, ICO, GIF, JSON, CSV, TSV.`,
+                errorMessage: `Unsupported file format (.${extCheck.extension || 'unknown'}). Supported: PNG, JPG, JPEG, JFIF, WebP, AVIF, SVG, BMP, ICO, TIFF, PSD, GIF, MD, HTML, TXT, XML, JSON, CSV, TSV.`,
                 options: { ...globalOptions },
               });
               continue;
@@ -229,6 +239,21 @@ export default function App(): React.ReactElement {
                   width = bitmap.width;
                   height = bitmap.height;
                   bitmap.close();
+                } catch {}
+              } else if (sourceFormat === 'psd') {
+                try {
+                  const ab = await file.arrayBuffer();
+                  const psdRes = await decodePsdBuffer(ab);
+                  width = psdRes.width;
+                  height = psdRes.height;
+                  const c = document.createElement('canvas');
+                  c.width = width;
+                  c.height = height;
+                  const cCtx = c.getContext('2d');
+                  if (cCtx) {
+                    cCtx.putImageData(psdRes.imageData, 0, 0);
+                    previewUrl = c.toDataURL('image/png');
+                  }
                 } catch {}
               } else {
                 previewUrl = URL.createObjectURL(file);
@@ -375,6 +400,25 @@ export default function App(): React.ReactElement {
       return [];
     });
     setCurrentPage(1);
+  }, []);
+
+  const handleResetAll = useCallback((): void => {
+    setQueue((prev) =>
+      prev.map((item) => {
+        if (item.result) {
+          URL.revokeObjectURL(item.result.url);
+          if (item.result.previewUrl && item.result.previewUrl !== item.result.url) {
+            URL.revokeObjectURL(item.result.previewUrl);
+          }
+        }
+        return {
+          ...item,
+          status: 'idle',
+          progress: 0,
+          result: undefined,
+        };
+      })
+    );
   }, []);
 
   const convertSingleItem = useCallback(
@@ -738,6 +782,7 @@ export default function App(): React.ReactElement {
                 onDownloadZip={handleDownloadZip}
                 onMergeToPdf={handleMergeToPdf}
                 onClearQueue={handleClearQueue}
+                onResetAll={handleResetAll}
                 isProcessing={isProcessing}
                 totalCount={queue.length}
                 completedCount={completedCount}
@@ -961,7 +1006,7 @@ export default function App(): React.ReactElement {
         </section>
 
         <footer className="pt-4 pb-6 text-center text-xs text-zinc-500 dark:text-zinc-500">
-          <p>© {new Date().getFullYear()} Universal Convertor • 100% Free Client-Side Conversion Engine</p>
+          <p>© {new Date().getFullYear()} Universal Convertor • 100% Free Client-Side File Converter & Compressor</p>
         </footer>
       </main>
 

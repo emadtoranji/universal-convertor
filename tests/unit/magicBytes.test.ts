@@ -166,8 +166,12 @@ describe('validateMagicBytes - Unit Test Suite', () => {
     const unsupportedMp3 = isExtensionSupported('audio.mp3');
     assert.equal(unsupportedMp3.supported, false);
 
-    const unsupportedTiff = isExtensionSupported('scan.tiff');
-    assert.equal(unsupportedTiff.supported, false);
+    const supportedTiff = isExtensionSupported('scan.tiff');
+    assert.equal(supportedTiff.supported, true);
+    assert.equal(supportedTiff.format, 'tiff');
+
+    const unsupportedDng = isExtensionSupported('raw.dng');
+    assert.equal(unsupportedDng.supported, false);
 
     const unsupportedHeic = isExtensionSupported('photo.heic');
     assert.equal(unsupportedHeic.supported, false);

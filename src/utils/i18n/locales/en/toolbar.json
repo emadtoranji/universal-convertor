@@ -2,26 +2,32 @@
   "categories": {
     "all": "All Files",
     "images": "Images",
-    "documents": "Structured Data"
+    "documents": "Documents & Data"
   },
   "targetFormat": {
-    "label": "Convert All To"
+    "label": "Convert All To",
+    "recommendedTip": "Recommended: WebP for images (smallest size), JSON or CSV for documents"
   },
   "formats": {
-    "webp": "WebP (Modern)",
-    "avif": "AVIF (Next-Gen)",
-    "png": "PNG (Lossless)",
-    "jpeg": "JPEG (Universal)",
-    "ico": "ICO (Multi-Res)",
-    "bmp": "BMP (Raster)",
-    "tiff": "TIFF (Print)",
-    "pdf": "PDF (Document)",
-    "json": "JSON (.json)",
-    "csv": "CSV (.csv)",
-    "tsv": "TSV (.tsv)"
+    "webp": "WebP (Recommended for Web • High Compression)",
+    "avif": "AVIF (Next-Gen • Highest Photo Compression)",
+    "png": "PNG (Lossless • Best for Graphics & Icons)",
+    "jpeg": "JPEG (Universal Compatibility • Photos)",
+    "ico": "ICO (Multi-Resolution Windows Icon)",
+    "bmp": "BMP (Uncompressed Raster)",
+    "tiff": "TIFF (Lossless Print & Archive)",
+    "pdf": "PDF (Universal Document)",
+    "json": "JSON (Recommended for Data • Structured)",
+    "csv": "CSV (Universal Spreadsheet • Comma Delimited)",
+    "tsv": "TSV (Tab-Separated Spreadsheet)",
+    "md": "Markdown (.md • Formatted Text)",
+    "html": "HTML (Web-Ready Document)",
+    "txt": "Plain Text (.txt • Universal Clean Text)",
+    "xml": "XML (Hierarchical Structured Markup)"
   },
   "quality": {
-    "label": "Quality",
+    "label": "Quality / Compression",
+    "recommended": "Recommended: 85% — Optimal balance of visual fidelity and file size reduction",
     "losslessNotice": "Lossless format (quality compression disabled)"
   },
   "advancedToggle": {
@@ -29,7 +35,7 @@
     "hide": "Hide Advanced"
   },
   "actions": {
-    "convertAll": "Convert All",
+    "convertAll": "Convert & Compress All",
     "converting": "Converting...",
     "downloadZip": "ZIP",
     "downloadZipTitle": "Download all converted files as ZIP archive",
@@ -39,17 +45,20 @@
     "mergePdfAria": "Merge all converted files into single PDF document",
     "clearQueue": "Clear Queue",
     "clearQueueTitle": "Clear entire queue",
-    "clearQueueAria": "Clear all items from queue"
+    "clearQueueAria": "Clear all items from queue",
+    "resetConversion": "Reset Settings",
+    "resetConversionTitle": "Reset conversion results and show settings again"
   },
   "stats": {
     "queueLabel": "Queue:",
     "completedOfTotal": "{completed} / {total} completed",
     "inputLabel": "Input:",
     "outputLabel": "Output:",
-    "savedLabel": "Saved:"
+    "savedLabel": "Size Reduced:"
   },
   "resize": {
-    "title": "Resize Controls",
+    "title": "Resize & Dimensions",
+    "recommended": "Recommended: Original size unless downscaling for web optimization",
     "modes": {
       "original": "Original",
       "percentage": "Percentage",
@@ -63,13 +72,17 @@
   },
   "backgroundColor": {
     "title": "Canvas Background Fill",
-    "description": "Filled behind transparent backgrounds",
+    "description": "Fills transparent areas (recommended #ffffff for JPEG/BMP)",
     "ariaLabel": "Choose background color"
   },
   "metadata": {
     "title": "Metadata & Privacy",
-    "stripExif": "Strip EXIF metadata for privacy",
+    "stripExif": "Strip EXIF metadata (Recommended for privacy & reduced size)",
     "stripExifTooltip": "Removes GPS location, camera model, timestamps, and device serial numbers"
+  },
+  "colorEffects": {
+    "title": "Color & Visual Style",
+    "grayscale": "Black & White (Monochrome / Grayscale conversion)"
   },
   "documentSettings": {
     "title": "Document & Data Formatting",
@@ -81,22 +94,22 @@
     },
     "jsonIndentLabel": "JSON Formatting",
     "indentations": {
-      "spaces2": "2 Spaces (Readable)",
+      "spaces2": "2 Spaces (Recommended)",
       "spaces4": "4 Spaces (Standard)",
-      "minified": "Minified (Compact)"
+      "minified": "Minified (Smallest Size)"
     }
   },
   "pdfSettings": {
     "title": "PDF Output Settings",
     "pageSizeLabel": "Page Size",
     "pageSizes": {
-      "original": "Original Ratio",
-      "a4": "A4 (Standard)",
+      "original": "Original Ratio (Recommended)",
+      "a4": "A4 (Standard Document)",
       "letter": "US Letter"
     },
     "orientationLabel": "Orientation",
     "orientations": {
-      "auto": "Auto",
+      "auto": "Auto (Recommended)",
       "portrait": "Portrait",
       "landscape": "Landscape"
     }

@@ -34,15 +34,27 @@ const EXTENSION_MAP: Record<string, InputFormat> = {
   png: 'png',
   jpg: 'jpeg',
   jpeg: 'jpeg',
+  jfif: 'jpeg',
   webp: 'webp',
   avif: 'avif',
   svg: 'svg',
   bmp: 'bmp',
   ico: 'ico',
   gif: 'gif',
+  tif: 'tiff',
+  tiff: 'tiff',
+  psd: 'psd',
   json: 'json',
   csv: 'csv',
   tsv: 'tsv',
+  md: 'md',
+  markdown: 'md',
+  html: 'html',
+  htm: 'html',
+  txt: 'txt',
+  text: 'txt',
+  log: 'txt',
+  xml: 'xml',
 };
 
 export function isExtensionSupported(fileName: string): ExtensionCheckResult {
@@ -129,6 +141,24 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
     return { isValid: true, format: 'ico', mimeType: 'image/x-icon', category: 'image' };
   }
 
+  if (
+    bytes.length >= 4 &&
+    ((bytes[0] === 0x49 && bytes[1] === 0x49 && bytes[2] === 0x2a && bytes[3] === 0x00) ||
+      (bytes[0] === 0x4d && bytes[1] === 0x4d && bytes[2] === 0x00 && bytes[3] === 0x2a))
+  ) {
+    return { isValid: true, format: 'tiff', mimeType: 'image/tiff', category: 'image' };
+  }
+
+  if (
+    bytes.length >= 4 &&
+    bytes[0] === 0x38 &&
+    bytes[1] === 0x42 &&
+    bytes[2] === 0x50 &&
+    bytes[3] === 0x53
+  ) {
+    return { isValid: true, format: 'psd', mimeType: 'image/vnd.adobe.photoshop', category: 'image' };
+  }
+
   if (bytes.length >= 12 && bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) {
     const brand = String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]).toLowerCase();
     if (brand === 'avif' || brand === 'avis') {
@@ -149,6 +179,21 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
     return { isValid: true, format: 'svg', mimeType: 'image/svg+xml', category: 'image' };
   }
 
+  if (lowerText.startsWith('<?xml') || (lowerText.includes('<') && lowerText.includes('>') && lowerName.endsWith('.xml'))) {
+    return { isValid: true, format: 'xml', mimeType: 'application/xml', category: 'document' };
+  }
+
+  if (
+    lowerText.includes('<!doctype html') ||
+    lowerText.includes('<html') ||
+    lowerName.endsWith('.html') ||
+    lowerName.endsWith('.htm')
+  ) {
+    if (!hasNullByte) {
+      return { isValid: true, format: 'html', mimeType: 'text/html', category: 'document' };
+    }
+  }
+
   if ((textSample.startsWith('{') || textSample.startsWith('[')) && (lowerName.endsWith('.json') || textSample.includes(':'))) {
     return { isValid: true, format: 'json', mimeType: 'application/json', category: 'document' };
   }
@@ -163,6 +208,14 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
 
   if (lowerName.endsWith('.tsv') && !hasNullByte) {
     return { isValid: true, format: 'tsv', mimeType: 'text/tab-separated-values', category: 'document' };
+  }
+
+  if ((lowerName.endsWith('.md') || lowerName.endsWith('.markdown')) && !hasNullByte) {
+    return { isValid: true, format: 'md', mimeType: 'text/markdown', category: 'document' };
+  }
+
+  if ((lowerName.endsWith('.txt') || lowerName.endsWith('.text') || lowerName.endsWith('.log')) && !hasNullByte) {
+    return { isValid: true, format: 'txt', mimeType: 'text/plain', category: 'document' };
   }
 
   return {
@@ -240,11 +293,23 @@ export function getMimeTypeForFormat(format: InputFormat): string {
       return 'image/x-icon';
     case 'gif':
       return 'image/gif';
+    case 'tiff':
+      return 'image/tiff';
+    case 'psd':
+      return 'image/vnd.adobe.photoshop';
     case 'json':
       return 'application/json';
     case 'csv':
       return 'text/csv';
     case 'tsv':
       return 'text/tab-separated-values';
+    case 'md':
+      return 'text/markdown';
+    case 'html':
+      return 'text/html';
+    case 'txt':
+      return 'text/plain';
+    case 'xml':
+      return 'application/xml';
   }
 }

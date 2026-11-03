@@ -31,7 +31,10 @@ Use this file as the primary search index before running directory scans or grep
 - `src/core/workerPool.ts`: Concurrency-limited Web Worker thread pool with FIFO task queue, progress listeners, Transferable ArrayBuffer dispatching, and lifecycle management.
 - `src/core/zipArchiver.ts`: Ultra-fast client-side ZIP archive generator powered by `fflate` for batch downloads.
 - `src/core/pdfGenerator.ts`: Client-side single and multi-page PDF generation and image merging powered by `pdf-lib`.
-- `src/core/documentConverter.ts`: Client-side universal document converter (PDF text extraction, Markdown, HTML, JSON, CSV, TSV, XML, YAML, Base64, Hex, PNG) with full UTF-8/multilingual encoding support.
+- `src/core/documentConverter.ts`: Re-export barrel for modular document converters.
+- `src/core/converters/documentConverter.ts`: Universal client-side document converter (Markdown, HTML, Plain Text, XML, JSON, CSV, TSV).
+- `src/core/converters/imageConverter.ts`: Hardware-accelerated image conversion routines (BMP, TIFF, ICO encoders, grayscale, dimension calculations).
+- `src/core/converters/psdConverter.ts`: Adobe Photoshop PSD composite decoder using `@webtoon/psd`.
 
 ## Web Workers (`src/workers/`)
 - `src/workers/conversion.worker.ts`: Dedicated worker thread running `OffscreenCanvas`, format encoding/decoding (WebP, AVIF, PNG, JPEG, ICO, BMP, TIFF), aspect-ratio resizing, background color fill, and multi-size ICO binary generation.
