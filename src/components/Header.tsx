@@ -1,5 +1,6 @@
 import React from 'react';
-import { Moon, Sun } from 'lucide-react';
+import Moon from 'lucide-react/icons/moon';
+import Sun from 'lucide-react/icons/sun';
 import { t } from '../utils/i18n';
 
 interface HeaderProps {

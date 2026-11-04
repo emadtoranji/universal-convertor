@@ -1,19 +1,17 @@
 import React, { useState, ChangeEvent } from 'react';
-import {
-  Play,
-  FileArchive,
-  FileText,
-  Trash2,
-  Sliders,
-  Maximize2,
-  Palette,
-  Shield,
-  Lock,
-  Unlock,
-  RotateCcw,
-  CheckCircle2,
-  Sparkles,
-} from 'lucide-react';
+import Play from 'lucide-react/icons/play';
+import FileArchive from 'lucide-react/icons/file-archive';
+import FileText from 'lucide-react/icons/file-text';
+import Trash2 from 'lucide-react/icons/trash';
+import Sliders from 'lucide-react/icons/sliders-vertical';
+import Maximize2 from 'lucide-react/icons/maximize-2';
+import Palette from 'lucide-react/icons/palette';
+import Shield from 'lucide-react/icons/shield';
+import Lock from 'lucide-react/icons/lock';
+import Unlock from 'lucide-react/icons/lock-open';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import Sparkles from 'lucide-react/icons/sparkles';
 import {
   ConversionOptions,
   OutputFormat,
