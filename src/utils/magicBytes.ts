@@ -37,6 +37,8 @@ const EXTENSION_MAP: Record<string, InputFormat> = {
   jfif: 'jpeg',
   webp: 'webp',
   avif: 'avif',
+  heic: 'heic',
+  heif: 'heic',
   svg: 'svg',
   bmp: 'bmp',
   ico: 'ico',
@@ -160,9 +162,15 @@ export function validateMagicBytes(buffer: ArrayBuffer, fileName: string = ''): 
   }
 
   if (bytes.length >= 12 && bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) {
-    const brand = String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]).toLowerCase();
-    if (brand === 'avif' || brand === 'avis') {
+    const brands = [String.fromCharCode(...bytes.slice(8, 12)).toLowerCase()];
+    for (let offset = 16; offset + 4 <= bytes.length; offset += 4) {
+      brands.push(String.fromCharCode(...bytes.slice(offset, offset + 4)).toLowerCase());
+    }
+    if (brands.includes('avif') || brands.includes('avis')) {
       return { isValid: true, format: 'avif', mimeType: 'image/avif', category: 'image' };
+    }
+    if (brands.some((brand) => ['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'].includes(brand))) {
+      return { isValid: true, format: 'heic', mimeType: 'image/heic', category: 'image' };
     }
   }
 
@@ -285,6 +293,8 @@ export function getMimeTypeForFormat(format: InputFormat): string {
       return 'image/webp';
     case 'avif':
       return 'image/avif';
+    case 'heic':
+      return 'image/heic';
     case 'svg':
       return 'image/svg+xml';
     case 'bmp':

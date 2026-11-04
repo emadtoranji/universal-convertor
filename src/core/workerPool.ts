@@ -222,6 +222,35 @@ async function encodeIco(sourceCanvas) {
   return buffer;
 }
 
+async function encodeLossy(canvas, type, requestedQuality, originalSize, reduceIfLarger) {
+  var quality = Math.max(0.01, Math.min(1, requestedQuality));
+  var blob;
+  try {
+    blob = await canvas.convertToBlob({ type: type, quality: quality });
+  } catch (error) {
+    if (type !== 'image/avif') throw error;
+    blob = await canvas.convertToBlob({ type: 'image/webp', quality: quality });
+  }
+  if (type === 'image/avif' && blob.type !== 'image/avif') {
+    blob = await canvas.convertToBlob({ type: 'image/webp', quality: quality });
+  }
+  var effectiveQuality = Math.round(quality * 100);
+  if (reduceIfLarger && blob.size > originalSize) {
+    var candidate = Math.floor(quality * 100) - 10;
+    while (candidate >= 10) {
+      var smallerBlob = await canvas.convertToBlob({ type: blob.type, quality: candidate / 100 });
+      if (smallerBlob.size <= originalSize) {
+        blob = smallerBlob;
+        effectiveQuality = candidate;
+        break;
+      }
+      if (candidate === 10) break;
+      candidate = Math.max(10, candidate - 10);
+    }
+  }
+  return { blob: blob, quality: effectiveQuality };
+}
+
 self.onmessage = async function(event) {
   var message = event.data;
   if (message.type !== 'CONVERT_REQUEST') return;
@@ -229,9 +258,12 @@ self.onmessage = async function(event) {
   var id = payload.id;
   try {
     self.postMessage({ type: 'CONVERT_PROGRESS', payload: { id: id, progress: 20, stage: 'Decoding' } });
-    var blob = payload.sourceFormat === 'svg'
-      ? new Blob([payload.buffer], { type: 'image/svg+xml' })
-      : new Blob([payload.buffer]);
+    var sourceMimeType = payload.sourceFormat === 'svg'
+      ? 'image/svg+xml'
+      : payload.sourceFormat === 'heic'
+        ? 'image/heic'
+        : undefined;
+    var blob = new Blob([payload.buffer], sourceMimeType ? { type: sourceMimeType } : undefined);
     var bitmap = await createImageBitmap(blob);
 
     self.postMessage({ type: 'CONVERT_PROGRESS', payload: { id: id, progress: 50, stage: 'Composing' } });
@@ -250,6 +282,22 @@ self.onmessage = async function(event) {
     ctx.drawImage(bitmap, 0, 0, dims.width, dims.height);
     bitmap.close();
 
+    if (payload.options.grayscale) {
+      var grayscaleData = ctx.getImageData(0, 0, dims.width, dims.height);
+      var pixels = grayscaleData.data;
+      for (var pixelOffset = 0; pixelOffset < pixels.length; pixelOffset += 4) {
+        var gray = Math.round(
+          0.299 * pixels[pixelOffset] +
+          0.587 * pixels[pixelOffset + 1] +
+          0.114 * pixels[pixelOffset + 2]
+        );
+        pixels[pixelOffset] = gray;
+        pixels[pixelOffset + 1] = gray;
+        pixels[pixelOffset + 2] = gray;
+      }
+      ctx.putImageData(grayscaleData, 0, 0);
+    }
+
     self.postMessage({ type: 'CONVERT_PROGRESS', payload: { id: id, progress: 80, stage: 'Encoding' } });
     
     var previewBlob = await canvas.convertToBlob({ type: 'image/png' });
@@ -257,33 +305,47 @@ self.onmessage = async function(event) {
 
     var resultBuffer;
     var mimeType;
+    var effectiveQuality;
+    var reduceIfLarger =
+      payload.options.resizeMode === 'original' &&
+      ['jpeg', 'webp', 'avif', 'heic'].indexOf(payload.sourceFormat) !== -1;
 
     if (payload.targetFormat === 'png') {
       resultBuffer = previewBuffer.slice(0);
       mimeType = 'image/png';
     } else if (payload.targetFormat === 'jpeg') {
-      var q = Math.max(0.01, Math.min(1, payload.options.quality / 100));
-      var b = await canvas.convertToBlob({ type: 'image/jpeg', quality: q });
-      resultBuffer = await b.arrayBuffer();
-      mimeType = 'image/jpeg';
+      var encodedJpeg = await encodeLossy(
+        canvas,
+        'image/jpeg',
+        payload.options.quality / 100,
+        payload.buffer.byteLength,
+        reduceIfLarger
+      );
+      resultBuffer = await encodedJpeg.blob.arrayBuffer();
+      mimeType = encodedJpeg.blob.type;
+      effectiveQuality = encodedJpeg.quality;
     } else if (payload.targetFormat === 'webp') {
-      var q = Math.max(0.01, Math.min(1, payload.options.quality / 100));
-      var b = await canvas.convertToBlob({ type: 'image/webp', quality: q });
-      resultBuffer = await b.arrayBuffer();
-      mimeType = 'image/webp';
+      var encodedWebp = await encodeLossy(
+        canvas,
+        'image/webp',
+        payload.options.quality / 100,
+        payload.buffer.byteLength,
+        reduceIfLarger
+      );
+      resultBuffer = await encodedWebp.blob.arrayBuffer();
+      mimeType = encodedWebp.blob.type;
+      effectiveQuality = encodedWebp.quality;
     } else if (payload.targetFormat === 'avif') {
-      var q = Math.max(0.01, Math.min(1, payload.options.quality / 100));
-      var b;
-      try {
-        b = await canvas.convertToBlob({ type: 'image/avif', quality: q });
-        if (b.type !== 'image/avif') {
-          b = await canvas.convertToBlob({ type: 'image/webp', quality: q });
-        }
-      } catch (e) {
-        b = await canvas.convertToBlob({ type: 'image/webp', quality: q });
-      }
-      resultBuffer = await b.arrayBuffer();
-      mimeType = b.type;
+      var encodedAvif = await encodeLossy(
+        canvas,
+        'image/avif',
+        payload.options.quality / 100,
+        payload.buffer.byteLength,
+        reduceIfLarger
+      );
+      resultBuffer = await encodedAvif.blob.arrayBuffer();
+      mimeType = encodedAvif.blob.type;
+      effectiveQuality = encodedAvif.quality;
     } else if (payload.targetFormat === 'bmp') {
       var imgData = ctx.getImageData(0, 0, dims.width, dims.height);
       resultBuffer = encodeBmp(imgData);
@@ -309,6 +371,9 @@ self.onmessage = async function(event) {
         buffer: resultBuffer,
         previewBuffer: previewBuffer,
         targetFormat: payload.targetFormat,
+        quality: effectiveQuality,
+        qualityAdjusted:
+          effectiveQuality !== undefined && effectiveQuality < payload.options.quality,
         mimeType: mimeType,
         width: dims.width,
         height: dims.height,

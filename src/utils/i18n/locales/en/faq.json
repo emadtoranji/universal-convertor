@@ -21,7 +21,7 @@
     {
       "id": "supported-formats",
       "question": "Which image and document formats are supported?",
-      "answer": "Universal Convertor supports high-fidelity conversions for all standard images and document files. You can convert between PNG, JPG, JPEG, JFIF, WebP, AVIF, SVG, BMP, ICO, TIFF, PSD, and GIF for images, as well as Markdown (.md), HTML, Plain Text (.txt), XML, CSV, TSV, and JSON for documents and data."
+      "answer": "Universal Convertor supports high-fidelity conversions for standard images and document files. You can convert PNG, JPG, JPEG, JFIF, WebP, AVIF, HEIC/HEIF (in browsers with native decoding support), SVG, BMP, ICO, TIFF, PSD, and GIF images, as well as Markdown (.md), HTML, Plain Text (.txt), XML, CSV, TSV, and JSON documents and data."
     },
     {
       "id": "unsupported-formats-policy",

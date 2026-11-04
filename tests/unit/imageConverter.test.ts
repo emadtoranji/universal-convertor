@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  applyGrayscale,
   calculateTargetDimensions,
   encodeBmp,
   encodeTiff,
@@ -73,6 +74,22 @@ describe('imageConverter - Unit Test Suite', () => {
     });
     assert.equal(maxClamped.width, 16384);
     assert.equal(maxClamped.height, 16384);
+  });
+
+  it('converts rendered pixels to grayscale while preserving alpha', () => {
+    const imageData = {
+      width: 2,
+      height: 1,
+      data: new Uint8ClampedArray([255, 0, 0, 255, 0, 0, 255, 128]),
+    } as ImageData;
+    const context = {
+      getImageData: () => imageData,
+      putImageData: () => undefined,
+    } as unknown as OffscreenCanvasRenderingContext2D;
+
+    applyGrayscale(context, imageData.width, imageData.height);
+
+    assert.deepEqual(Array.from(imageData.data), [76, 76, 76, 255, 29, 29, 29, 128]);
   });
 
   it('encodes ImageData into valid 24-bit BMP binary buffer with correct magic bytes', () => {

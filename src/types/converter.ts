@@ -7,6 +7,7 @@ export type ImageInputFormat =
   | 'jpeg'
   | 'webp'
   | 'avif'
+  | 'heic'
   | 'svg'
   | 'bmp'
   | 'ico'
@@ -120,6 +121,8 @@ export interface QueueItem {
     previewUrl?: string;
     size: number;
     format: OutputFormat;
+    quality?: number;
+    qualityAdjusted?: boolean;
     width: number;
     height: number;
     duration?: number;
@@ -133,6 +136,7 @@ export function getMediaCategory(format: InputFormat): MediaCategory {
     case 'jpeg':
     case 'webp':
     case 'avif':
+    case 'heic':
     case 'svg':
     case 'bmp':
     case 'ico':
@@ -225,6 +229,8 @@ export type WorkerOutboundMessage =
         buffer: ArrayBuffer;
         previewBuffer?: ArrayBuffer;
         targetFormat: OutputFormat;
+        quality?: number;
+        qualityAdjusted?: boolean;
         mimeType: string;
         width: number;
         height: number;
