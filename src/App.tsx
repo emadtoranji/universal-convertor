@@ -1,9 +1,12 @@
-import React, {
+import {
+    lazy,
+    Suspense,
     useState,
     useEffect,
     useRef,
     useCallback,
     useMemo,
+    type ReactElement,
 } from 'react';
 import { Header } from './components/Header';
 import { Dropzone } from './components/Dropzone';
@@ -48,17 +51,17 @@ import {
     ThemeMode,
 } from './utils/theme';
 
-const ConversionToolbar = React.lazy(() =>
+const ConversionToolbar = lazy(() =>
     import('./components/ConversionToolbar').then(({ ConversionToolbar }) => ({
         default: ConversionToolbar,
     })),
 );
-const FileQueueItem = React.lazy(() =>
+const FileQueueItem = lazy(() =>
     import('./components/FileQueueItem').then(({ FileQueueItem }) => ({
         default: FileQueueItem,
     })),
 );
-const PreviewModal = React.lazy(() =>
+const PreviewModal = lazy(() =>
     import('./components/PreviewModal').then(({ PreviewModal }) => ({
         default: PreviewModal,
     })),
@@ -80,7 +83,7 @@ const DEFAULT_OPTIONS: ConversionOptions = {
 const PAGE_SIZE = 25;
 const INGESTION_CHUNK_SIZE = 20;
 
-export default function App(): React.ReactElement {
+export default function App(): ReactElement {
     const [queue, setQueue] = useState<QueueItem[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [globalOptions, setGlobalOptions] =
@@ -929,7 +932,7 @@ export default function App(): React.ReactElement {
 
                     {queue.length > 0 && (
                         <div className='space-y-4 pt-2 sm:space-y-6'>
-                            <React.Suspense
+                            <Suspense
                                 fallback={
                                     <div
                                         className='min-h-24'
@@ -953,7 +956,7 @@ export default function App(): React.ReactElement {
                                     canConvertAll={canConvertAll}
                                     canMergeToPdf={canMergeToPdf}
                                 />
-                            </React.Suspense>
+                            </Suspense>
 
                             <div className='space-y-2.5'>
                                 <div className='flex items-center justify-between px-1'>
@@ -1025,7 +1028,7 @@ export default function App(): React.ReactElement {
                                                 containIntrinsicSize: '84px',
                                             }}
                                         >
-                                            <React.Suspense
+                                            <Suspense
                                                 fallback={
                                                     <div
                                                         className='min-h-20'
@@ -1053,7 +1056,7 @@ export default function App(): React.ReactElement {
                                                         handleRegenerate
                                                     }
                                                 />
-                                            </React.Suspense>
+                                            </Suspense>
                                         </div>
                                     ))}
                                 </div>
@@ -1283,13 +1286,13 @@ export default function App(): React.ReactElement {
             </main>
 
             {previewItem && (
-                <React.Suspense fallback={null}>
+                <Suspense fallback={null}>
                     <PreviewModal
                         item={previewItem}
                         onClose={handleClosePreview}
                         onDownload={handleDownloadSingle}
                     />
-                </React.Suspense>
+                </Suspense>
             )}
         </div>
     );
