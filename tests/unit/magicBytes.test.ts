@@ -109,6 +109,34 @@ describe('validateMagicBytes - Unit Test Suite', () => {
     if (avifRes.isValid) assert.equal(avifRes.format, 'avif');
   });
 
+  it('identifies HEIC and HEIF brands from ftyp boxes', () => {
+    const makeFtyp = (brand: string): ArrayBuffer => {
+      const arr = new Uint8Array(24);
+      arr[4] = 0x66;
+      arr[5] = 0x74;
+      arr[6] = 0x79;
+      arr[7] = 0x70;
+      for (let i = 0; i < 4; i++) {
+        arr[8 + i] = brand.charCodeAt(i);
+      }
+      return arr.buffer;
+    };
+
+    const heicResult = validateMagicBytes(makeFtyp('heic'), 'photo.heic');
+    assert.equal(heicResult.isValid, true);
+    if (heicResult.isValid) {
+      assert.equal(heicResult.format, 'heic');
+      assert.equal(heicResult.mimeType, 'image/heic');
+    }
+
+    const heifResult = validateMagicBytes(makeFtyp('mif1'), 'photo.heif');
+    assert.equal(heifResult.isValid, true);
+    if (heifResult.isValid) assert.equal(heifResult.format, 'heic');
+
+    const truncated = validateMagicBytes(createArrayBuffer([0, 0, 0, 0, 0x66, 0x74, 0x79, 0x70]), 'photo.heic');
+    assert.equal(truncated.isValid, false);
+  });
+
   it('identifies SVG, JSON, CSV, and TSV documents', () => {
     const svgBytes = stringToArrayBuffer('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>');
     const svgResult = validateMagicBytes(svgBytes, 'icon.svg');
@@ -173,8 +201,10 @@ describe('validateMagicBytes - Unit Test Suite', () => {
     const unsupportedDng = isExtensionSupported('raw.dng');
     assert.equal(unsupportedDng.supported, false);
 
-    const unsupportedHeic = isExtensionSupported('photo.heic');
-    assert.equal(unsupportedHeic.supported, false);
+    const supportedHeic = isExtensionSupported('photo.heic');
+    assert.equal(supportedHeic.supported, true);
+    assert.equal(supportedHeic.format, 'heic');
+    assert.equal(isExtensionSupported('photo.heif').format, 'heic');
 
     const noExtension = isExtensionSupported('no_extension_file');
     assert.equal(noExtension.supported, false);
@@ -206,10 +236,15 @@ describe('validateMagicBytes - Unit Test Suite', () => {
     const binarySpoofedAsCsv = createArrayBuffer([0x00, 0x01, 0x02, 0x03]);
     const binaryMismatch = verifyContentMatchesFormat(binarySpoofedAsCsv, 'csv', 'malware.csv');
     assert.equal(binaryMismatch.matches, false);
+
+    const heicHeader = new Uint8Array(24);
+    heicHeader.set([0, 0, 0, 0, 0x66, 0x74, 0x79, 0x70, 0x68, 0x65, 0x69, 0x63]);
+    assert.equal(verifyContentMatchesFormat(heicHeader.buffer, 'heic', 'photo.heic').matches, true);
+    assert.equal(verifyContentMatchesFormat(fakePng, 'heic', 'spoofed.heic').matches, false);
   });
 
   it('verifies mime types and format detection functions', () => {
-    const formats: InputFormat[] = ['png', 'jpeg', 'webp', 'avif', 'svg', 'bmp', 'ico', 'gif', 'json', 'csv', 'tsv'];
+    const formats: InputFormat[] = ['png', 'jpeg', 'webp', 'avif', 'heic', 'svg', 'bmp', 'ico', 'gif', 'json', 'csv', 'tsv'];
     for (const fmt of formats) {
       const mime = getMimeTypeForFormat(fmt);
       assert.ok(typeof mime === 'string' && mime.length > 0);

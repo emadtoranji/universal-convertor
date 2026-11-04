@@ -9,7 +9,7 @@
       "badge": "Hardware Accelerated",
       "icon": "Image",
       "description": "High-performance image conversion and size compression powered by multi-threaded Web Workers and OffscreenCanvas with zero GPU memory leaks.",
-      "inputs": ["PNG", "JPG", "JPEG", "JFIF", "WebP", "AVIF", "SVG", "BMP", "ICO", "GIF", "TIFF", "PSD"],
+      "inputs": ["PNG", "JPG", "JPEG", "JFIF", "WebP", "AVIF", "HEIC/HEIF", "SVG", "BMP", "ICO", "GIF", "TIFF", "PSD"],
       "outputs": ["WebP", "AVIF", "PNG", "JPEG", "ICO", "BMP", "TIFF", "PDF"],
       "specs": [
         {

@@ -56,13 +56,13 @@ describe('newFormatsMatrix - Format Matrix Test Suite', () => {
       'deck.pptx',
       'camera.raw',
       'camera.dng',
-      'apple.heic',
     ];
 
     for (const file of forbidden) {
       const res = isExtensionSupported(file);
       assert.equal(res.supported, false);
     }
+    assert.equal(isExtensionSupported('apple.heic').supported, true);
   });
 
   it('validates TIFF and PSD binary magic bytes correctly', () => {

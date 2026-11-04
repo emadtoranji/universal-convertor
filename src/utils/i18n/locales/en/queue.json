@@ -28,7 +28,8 @@
     "converted": "Converted:",
     "dimensions": "{width} × {height}",
     "duration": "Duration: {duration}",
-    "audioSpecs": "{sampleRate}Hz • {channels}"
+    "audioSpecs": "{sampleRate}Hz • {channels}",
+    "autoAdjustedQuality": "Quality adjusted to {quality}% to avoid a larger file"
   },
   "actions": {
     "convertSingle": "Convert",

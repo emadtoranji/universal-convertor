@@ -157,6 +157,14 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                       {savings >= 0 ? `-${savings}%` : `+${Math.abs(savings)}%`}
                     </span>
                   )}
+                  {item.result.qualityAdjusted && item.result.quality !== undefined && (
+                      <span className="text-[10px] font-medium text-cyan-700 dark:text-cyan-400">
+                        {t.queue.meta.autoAdjustedQuality.replace(
+                          '{quality}',
+                          String(item.result.quality)
+                        )}
+                      </span>
+                    )}
                 </>
               )}
             </div>

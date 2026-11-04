@@ -25,7 +25,7 @@
       "icon": "Layers",
       "badge": "Images & Documents",
       "title": "High-Accuracy Media & Document Conversion",
-      "description": "Convert and compress across essential digital assets: modern images (WebP, AVIF, PNG, JPG, JFIF, TIFF, PSD, ICO, SVG, BMP, GIF) and documents (Markdown, HTML, Plain Text, XML, CSV, TSV, JSON, PDF) with 99%+ fidelity."
+      "description": "Convert and compress across essential digital assets: modern images (WebP, AVIF, HEIC/HEIF, PNG, JPG, JFIF, TIFF, PSD, ICO, SVG, BMP, GIF) and documents (Markdown, HTML, Plain Text, XML, CSV, TSV, JSON, PDF) with 99%+ fidelity."
     },
     {
       "id": "packaging",

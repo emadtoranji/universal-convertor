@@ -104,7 +104,7 @@ const DropzoneComponent: React.FC<DropzoneProps> = ({
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml,image/bmp,image/x-icon,image/vnd.microsoft.icon,image/gif,application/json,text/csv,text/tab-separated-values,.png,.jpg,.jpeg,.webp,.avif,.svg,.bmp,.ico,.gif,.json,.csv,.tsv"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/heic,image/heif,image/svg+xml,image/bmp,image/x-icon,image/vnd.microsoft.icon,image/gif,application/json,text/csv,text/tab-separated-values,.png,.jpg,.jpeg,.webp,.avif,.heic,.heif,.svg,.bmp,.ico,.gif,.json,.csv,.tsv"
           onChange={handleFileInputChange}
           className="hidden"
           aria-label={t.dropzone.aria.fileInput}
@@ -137,11 +137,11 @@ const DropzoneComponent: React.FC<DropzoneProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
               <FileImage className="w-3.5 h-3.5 text-cyan-500" />
-              Images (PNG, JPG, WebP, AVIF, SVG, BMP, ICO, GIF)
+              {t.dropzone.supportedFormats.images}
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
               <Table className="w-3.5 h-3.5 text-pink-500" />
-              Data (CSV, TSV, JSON)
+              {t.dropzone.supportedFormats.documents}
             </span>
           </div>
         </div>
