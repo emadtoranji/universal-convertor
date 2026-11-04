@@ -860,7 +860,22 @@ export default function App(): React.ReactElement {
         <section className="text-center max-w-4xl mx-auto space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80">
           <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-full border border-cyan-300 bg-cyan-100 px-2.5 py-1 text-center text-xs font-semibold leading-tight text-cyan-800 shadow-xs dark:border-cyan-800/80 dark:bg-cyan-950/60 dark:text-cyan-400 sm:px-3.5">
             <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-            <span className="break-words [text-wrap:balance]">{t.features.badge}</span>
+            <span className="feature-badge__visual break-words [text-wrap:balance]" aria-hidden="true">
+              {Array.from(t.features.badge).map((character, index) =>
+                character === ' ' ? (
+                  character
+                ) : (
+                  <span
+                    key={`${index}-${character}`}
+                    className="feature-badge__letter"
+                    style={{ '--i': index } as React.CSSProperties}
+                  >
+                    {character}
+                  </span>
+                )
+              )}
+            </span>
+            <span className="sr-only">{t.features.badge}</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
