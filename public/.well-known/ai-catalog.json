@@ -1,0 +1,9 @@
+{
+    "specVersion": "1.0",
+    "host": {
+        "displayName": "Universal Convertor",
+        "identifier": "did:web:convertor.apidevelopers.ir",
+        "documentationUrl": "https://convertor.apidevelopers.ir/"
+    },
+    "entries": []
+}

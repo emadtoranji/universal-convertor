@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {
   getMediaCategory,
   getCompatibleOutputFormats,
-  ConversionOptionsSchema,
   isHomogeneousQueue,
 } from '../../src/types/converter.ts';
 import type { InputFormat, OutputFormat, QueueItem } from '../../src/types/converter.ts';
+import { ConversionOptionsSchema } from '../../src/types/conversionOptionsSchema.ts';
 
 describe('formatMatrix - Formats Test Suite', () => {
   it('maps all standard formats to their correct media categories', () => {

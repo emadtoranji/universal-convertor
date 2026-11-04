@@ -3,7 +3,6 @@ import {
   WorkerInboundMessage,
   WorkerOutboundMessage,
 } from '../types/converter';
-import { generatePdfFromImages } from '../core/pdfGenerator';
 
 export interface WorkerTask {
   payload: ConvertRequestPayload;
@@ -19,6 +18,42 @@ interface ActiveWorkerSlot {
   currentTaskId: string | null;
   timeoutId: ReturnType<typeof setTimeout> | null;
 }
+
+interface TrustedWorkerPolicy {
+  createScriptURL: (value: string) => string;
+}
+
+interface TrustedWorkerTypes {
+  createPolicy: (
+    name: string,
+    rules: { createScriptURL: (value: string) => string }
+  ) => TrustedWorkerPolicy;
+}
+
+declare global {
+  interface Window {
+    trustedTypes?: TrustedWorkerTypes;
+  }
+}
+
+let trustedWorkerPolicy: TrustedWorkerPolicy | null = null;
+
+const getTrustedWorkerUrl = (url: string): string => {
+  const trustedTypes = window.trustedTypes;
+  if (!trustedTypes) return url;
+
+  trustedWorkerPolicy ??= trustedTypes.createPolicy('universal-convertor-worker', {
+    createScriptURL: (value) => {
+      const parsedUrl = new URL(value);
+      if (parsedUrl.protocol !== 'blob:' || parsedUrl.origin !== window.location.origin) {
+        throw new TypeError('Worker scripts must use a same-origin Blob URL');
+      }
+      return value;
+    },
+  });
+
+  return trustedWorkerPolicy.createScriptURL(url);
+};
 
 const INLINE_WORKER_CODE = `
 function calculateTargetDimensions(originalWidth, originalHeight, options) {
@@ -410,7 +445,7 @@ export class ConversionWorkerPool {
   }
 
   private initWorker(): ActiveWorkerSlot {
-    const worker = new Worker(this.getWorkerUrl());
+    const worker = new Worker(getTrustedWorkerUrl(this.getWorkerUrl()));
 
     const slot: ActiveWorkerSlot = {
       worker,
@@ -448,6 +483,7 @@ export class ConversionWorkerPool {
               this.safeResolveSuccess(currentTask, msg.payload);
             } else {
               try {
+                const { generatePdfFromImages } = await import('../core/pdfGenerator');
                 const pdfBytes = await generatePdfFromImages(
                   [
                     {

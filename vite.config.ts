@@ -17,6 +17,7 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     assetsInlineLimit: 0,
+    sourcemap: true,
   },
   worker: {
     format: 'es',

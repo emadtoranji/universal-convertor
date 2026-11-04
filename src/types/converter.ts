@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import type { ConversionOptionsSchema } from './conversionOptionsSchema';
+import type { infer as Infer } from 'zod';
 
 export type MediaCategory = 'image' | 'document';
 
@@ -62,43 +63,7 @@ export type ResizeMode = 'original' | 'percentage' | 'dimensions';
 export type PdfPageSize = 'original' | 'a4' | 'letter';
 export type PdfOrientation = 'portrait' | 'landscape' | 'auto';
 
-export const ConversionOptionsSchema = z.object({
-  targetFormat: z.enum([
-    'png',
-    'jpeg',
-    'webp',
-    'avif',
-    'ico',
-    'bmp',
-    'tiff',
-    'pdf',
-    'json',
-    'csv',
-    'tsv',
-    'md',
-    'html',
-    'txt',
-    'xml',
-  ]),
-  quality: z.number().min(1).max(100).default(90),
-  resizeMode: z.enum(['original', 'percentage', 'dimensions']).default('original'),
-  resizePercentage: z.number().min(5).max(500).default(100),
-  targetWidth: z.number().int().min(1).max(16384).optional(),
-  targetHeight: z.number().int().min(1).max(16384).optional(),
-  maintainAspectRatio: z.boolean().default(true),
-  backgroundColor: z.string().default('#ffffff'),
-  stripExif: z.boolean().default(true),
-  grayscale: z.boolean().default(false),
-  pdfPageSize: z.enum(['original', 'a4', 'letter']).default('original'),
-  pdfOrientation: z.enum(['portrait', 'landscape', 'auto']).default('auto'),
-  documentDelimiter: z.enum([',', '\t', ';']).default(',').optional(),
-  documentWrapLines: z.boolean().default(true).optional(),
-  jsonIndent: z.number().int().min(0).max(8).default(2).optional(),
-  jsonSortKeys: z.boolean().default(false).optional(),
-  htmlWrapDocument: z.boolean().default(true).optional(),
-});
-
-export type ConversionOptions = z.infer<typeof ConversionOptionsSchema>;
+export type ConversionOptions = Infer<typeof ConversionOptionsSchema>;
 
 export interface QueueItem {
   id: string;

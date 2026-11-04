@@ -97,14 +97,17 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/75 backdrop-blur-md"
     >
       <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-5xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="preview-title"
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-5xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[94vh]"
       >
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/60 flex-wrap gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <h3 className="font-semibold text-xs sm:text-sm md:text-base text-zinc-900 dark:text-zinc-100 truncate max-w-[180px] sm:max-w-xs md:max-w-md">
+            <h2 id="preview-title" className="font-semibold text-xs sm:text-sm md:text-base text-zinc-900 dark:text-zinc-100 truncate max-w-[180px] sm:max-w-xs md:max-w-md">
               {item.name}
-            </h3>
+            </h2>
             <span className="text-[10px] sm:text-xs uppercase font-bold px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-cyan-700 dark:text-cyan-400 border border-zinc-300 dark:border-zinc-700">
               {item.sourceFormat} → {item.options.targetFormat}
             </span>
@@ -174,8 +177,8 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
                 <Table className="w-12 h-12" />
               </div>
               <div>
-                <h4 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 mb-1">{item.name}</h4>
-                <p className="text-xs text-zinc-500">{t.preview.media.document.title}</p>
+                <h3 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-100 mb-1">{item.name}</h3>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">{t.preview.media.document.title}</p>
               </div>
               <div className="text-xs text-zinc-600 dark:text-zinc-400 font-mono bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl max-h-60 overflow-auto w-full text-left">
                 Format: {item.sourceFormat.toUpperCase()} → {item.options.targetFormat.toUpperCase()}
@@ -253,7 +256,7 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-zinc-200 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <div>
-              <span className="text-zinc-500 block mb-0.5 text-[11px]">{t.preview.footer.originalFile}</span>
+              <span className="text-zinc-600 dark:text-zinc-400 block mb-0.5 text-[11px]">{t.preview.footer.originalFile}</span>
               <span className="font-semibold text-zinc-900 dark:text-zinc-200">
                 {formatSize(item.originalSize)}{' '}
                 {item.originalWidth > 0 && `(${item.originalWidth} × ${item.originalHeight})`}
@@ -264,7 +267,7 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
               <>
                 <ArrowRight className="w-4 h-4 text-zinc-400 dark:text-zinc-600 hidden sm:block" />
                 <div>
-                  <span className="text-zinc-500 block mb-0.5 text-[11px]">{t.preview.footer.convertedFile}</span>
+                  <span className="text-zinc-600 dark:text-zinc-400 block mb-0.5 text-[11px]">{t.preview.footer.convertedFile}</span>
                   <span className="font-semibold text-cyan-600 dark:text-cyan-300">
                     {formatSize(item.result.size)} ({item.result.width} × {item.result.height})
                   </span>
