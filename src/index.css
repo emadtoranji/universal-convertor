@@ -5,6 +5,7 @@
 .feature-badge__rotator {
   display: inline-grid;
   max-width: 100%;
+  overflow: clip;
 }
 
 .feature-badge__phrase {
@@ -20,53 +21,53 @@
 }
 
 .feature-badge__phrase:nth-child(1) {
-  color: var(--color-teal-700);
+  color: var(--color-teal-800);
   animation-name: feature-badge-phrase-one;
 }
 
 .feature-badge__phrase:nth-child(2) {
-  color: var(--color-emerald-700);
+  color: var(--color-emerald-800);
   animation-name: feature-badge-phrase-two;
 }
 
 .feature-badge__phrase:nth-child(3) {
-  color: var(--color-cyan-800);
+  color: var(--color-cyan-900);
   animation-name: feature-badge-phrase-three;
 }
 
 .dark .feature-badge__phrase:nth-child(1) {
-  color: var(--color-teal-300);
+  color: var(--color-teal-200);
 }
 
 .dark .feature-badge__phrase:nth-child(2) {
-  color: var(--color-emerald-300);
+  color: var(--color-emerald-200);
 }
 
 .dark .feature-badge__phrase:nth-child(3) {
-  color: var(--color-cyan-400);
+  color: var(--color-cyan-200);
 }
 
 @keyframes feature-badge-phrase-one {
   0% {
     transform: translateY(100%);
-    opacity: 0;
+    visibility: hidden;
   }
 
   3%,
   29% {
     transform: translateY(0);
-    opacity: 1;
+    visibility: visible;
   }
 
   33.33% {
     transform: translateY(-100%);
-    opacity: 0;
+    visibility: hidden;
   }
 
   33.34%,
   100% {
     transform: translateY(100%);
-    opacity: 0;
+    visibility: hidden;
   }
 }
 
@@ -74,24 +75,24 @@
   0%,
   33.33% {
     transform: translateY(100%);
-    opacity: 0;
+    visibility: hidden;
   }
 
   36.33%,
   62.66% {
     transform: translateY(0);
-    opacity: 1;
+    visibility: visible;
   }
 
   66.66% {
     transform: translateY(-100%);
-    opacity: 0;
+    visibility: hidden;
   }
 
   66.67%,
   100% {
     transform: translateY(100%);
-    opacity: 0;
+    visibility: hidden;
   }
 }
 
@@ -100,18 +101,18 @@
   66.66%,
   100% {
     transform: translateY(100%);
-    opacity: 0;
+    visibility: hidden;
   }
 
   69.66%,
   95% {
     transform: translateY(0);
-    opacity: 1;
+    visibility: visible;
   }
 
   100% {
     transform: translateY(-100%);
-    opacity: 0;
+    visibility: hidden;
   }
 }
 
@@ -119,7 +120,7 @@
   .feature-badge__phrase {
     animation: none;
     transform: none;
-    opacity: 1;
+    visibility: visible;
   }
 
   .feature-badge__rotator {
