@@ -7,9 +7,6 @@ import React, {
 } from 'react';
 import { Header } from './components/Header';
 import { Dropzone } from './components/Dropzone';
-import { ConversionToolbar } from './components/ConversionToolbar';
-import { FileQueueItem } from './components/FileQueueItem';
-import { PreviewModal } from './components/PreviewModal';
 import {
     ConversionOptions,
     OutputFormat,
@@ -50,6 +47,22 @@ import {
     getThemeCookie,
     ThemeMode,
 } from './utils/theme';
+
+const ConversionToolbar = React.lazy(() =>
+    import('./components/ConversionToolbar').then(({ ConversionToolbar }) => ({
+        default: ConversionToolbar,
+    })),
+);
+const FileQueueItem = React.lazy(() =>
+    import('./components/FileQueueItem').then(({ FileQueueItem }) => ({
+        default: FileQueueItem,
+    })),
+);
+const PreviewModal = React.lazy(() =>
+    import('./components/PreviewModal').then(({ PreviewModal }) => ({
+        default: PreviewModal,
+    })),
+);
 
 const DEFAULT_OPTIONS: ConversionOptions = {
     targetFormat: 'webp',
@@ -916,22 +929,31 @@ export default function App(): React.ReactElement {
 
                     {queue.length > 0 && (
                         <div className='space-y-4 pt-2 sm:space-y-6'>
-                            <ConversionToolbar
-                                globalOptions={globalOptions}
-                                onOptionsChange={handleGlobalOptionsChange}
-                                onConvertAll={handleConvertAll}
-                                onDownloadZip={handleDownloadZip}
-                                onMergeToPdf={handleMergeToPdf}
-                                onClearQueue={handleClearQueue}
-                                onResetAll={handleResetAll}
-                                isProcessing={isProcessing}
-                                totalCount={queue.length}
-                                completedCount={completedCount}
-                                totalOriginalBytes={totalOriginalBytes}
-                                totalConvertedBytes={totalConvertedBytes}
-                                canConvertAll={canConvertAll}
-                                canMergeToPdf={canMergeToPdf}
-                            />
+                            <React.Suspense
+                                fallback={
+                                    <div
+                                        className='min-h-24'
+                                        aria-hidden='true'
+                                    />
+                                }
+                            >
+                                <ConversionToolbar
+                                    globalOptions={globalOptions}
+                                    onOptionsChange={handleGlobalOptionsChange}
+                                    onConvertAll={handleConvertAll}
+                                    onDownloadZip={handleDownloadZip}
+                                    onMergeToPdf={handleMergeToPdf}
+                                    onClearQueue={handleClearQueue}
+                                    onResetAll={handleResetAll}
+                                    isProcessing={isProcessing}
+                                    totalCount={queue.length}
+                                    completedCount={completedCount}
+                                    totalOriginalBytes={totalOriginalBytes}
+                                    totalConvertedBytes={totalConvertedBytes}
+                                    canConvertAll={canConvertAll}
+                                    canMergeToPdf={canMergeToPdf}
+                                />
+                            </React.Suspense>
 
                             <div className='space-y-2.5'>
                                 <div className='flex items-center justify-between px-1'>
@@ -1003,24 +1025,35 @@ export default function App(): React.ReactElement {
                                                 containIntrinsicSize: '84px',
                                             }}
                                         >
-                                            <FileQueueItem
-                                                item={item}
-                                                onRemove={handleRemoveItem}
-                                                onConvertSingle={
-                                                    convertSingleItem
+                                            <React.Suspense
+                                                fallback={
+                                                    <div
+                                                        className='min-h-20'
+                                                        aria-hidden='true'
+                                                    />
                                                 }
-                                                onDownloadSingle={
-                                                    handleDownloadSingle
-                                                }
-                                                onPreview={handleOpenPreview}
-                                                onTargetFormatChange={
-                                                    handleItemFormatChange
-                                                }
-                                                onOptionsChange={
-                                                    handleItemOptionsChange
-                                                }
-                                                onRegenerate={handleRegenerate}
-                                            />
+                                            >
+                                                <FileQueueItem
+                                                    item={item}
+                                                    onRemove={handleRemoveItem}
+                                                    onConvertSingle={
+                                                        convertSingleItem
+                                                    }
+                                                    onDownloadSingle={
+                                                        handleDownloadSingle
+                                                    }
+                                                    onPreview={handleOpenPreview}
+                                                    onTargetFormatChange={
+                                                        handleItemFormatChange
+                                                    }
+                                                    onOptionsChange={
+                                                        handleItemOptionsChange
+                                                    }
+                                                    onRegenerate={
+                                                        handleRegenerate
+                                                    }
+                                                />
+                                            </React.Suspense>
                                         </div>
                                     ))}
                                 </div>
@@ -1249,11 +1282,15 @@ export default function App(): React.ReactElement {
                 </footer>
             </main>
 
-            <PreviewModal
-                item={previewItem}
-                onClose={handleClosePreview}
-                onDownload={handleDownloadSingle}
-            />
+            {previewItem && (
+                <React.Suspense fallback={null}>
+                    <PreviewModal
+                        item={previewItem}
+                        onClose={handleClosePreview}
+                        onDownload={handleDownloadSingle}
+                    />
+                </React.Suspense>
+            )}
         </div>
     );
 }
