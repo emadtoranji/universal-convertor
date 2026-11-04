@@ -26,23 +26,21 @@ import { sanitizeSvgString } from './utils/svgSanitizer';
 import type { ConversionWorkerPool } from './core/workerPool';
 import type { DocumentFormat } from './core/documentConverter';
 import { t } from './utils/i18n';
-import {
-    BadgeCheck,
-    CloudOff,
-    Infinity,
-    Layers,
-    ShieldCheck,
-    Zap,
-    FileCheck,
-    HelpCircle,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    Scale,
-    FileCode,
-    AlertTriangle,
-    UploadCloud,
-} from 'lucide-react';
+import BadgeCheck from 'lucide-react/icons/badge-check';
+import CloudOff from 'lucide-react/icons/cloud-off';
+import Infinity from 'lucide-react/icons/infinity';
+import Layers from 'lucide-react/icons/layers';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Zap from 'lucide-react/icons/zap';
+import FileCheck from 'lucide-react/icons/file-check';
+import HelpCircle from 'lucide-react/icons/circle-question-mark';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import Scale from 'lucide-react/icons/scale';
+import FileCode from 'lucide-react/icons/file-code';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import UploadCloud from 'lucide-react/icons/cloud-upload';
 import {
     getOrInitEffectiveTheme,
     setThemeCookie,

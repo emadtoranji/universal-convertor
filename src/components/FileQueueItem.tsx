@@ -1,22 +1,20 @@
 import React, { useState, ChangeEvent } from 'react';
-import {
-  Download,
-  Trash2,
-  Play,
-  CheckCircle2,
-  AlertCircle,
-  Eye,
-  ArrowRight,
-  Loader2,
-  RotateCcw,
-  Sliders,
-  Lock,
-  Unlock,
-  Shield,
-  FileImage,
-  Table,
-  Sparkles,
-} from 'lucide-react';
+import Download from 'lucide-react/icons/download';
+import Trash2 from 'lucide-react/icons/trash';
+import Play from 'lucide-react/icons/play';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Eye from 'lucide-react/icons/eye';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import Loader2 from 'lucide-react/icons/loader-circle';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Sliders from 'lucide-react/icons/sliders-vertical';
+import Lock from 'lucide-react/icons/lock';
+import Unlock from 'lucide-react/icons/lock-open';
+import Shield from 'lucide-react/icons/shield';
+import FileImage from 'lucide-react/icons/file-image';
+import Table from 'lucide-react/icons/table';
+import Sparkles from 'lucide-react/icons/sparkles';
 import {
   QueueItem,
   OutputFormat,

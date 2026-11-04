@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react';
-import { UploadCloud, FileImage, Table } from 'lucide-react';
+import UploadCloud from 'lucide-react/icons/cloud-upload';
+import FileImage from 'lucide-react/icons/file-image';
+import Table from 'lucide-react/icons/table';
 import { t } from '../utils/i18n';
 
 interface DropzoneProps {

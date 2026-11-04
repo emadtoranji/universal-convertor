@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
-import {
-  X,
-  Download,
-  Columns,
-  SplitSquareVertical,
-  ArrowRight,
-  ShieldCheck,
-  ChevronsLeftRight,
-  Table,
-} from 'lucide-react';
+import X from 'lucide-react/icons/x';
+import Download from 'lucide-react/icons/download';
+import Columns from 'lucide-react/icons/columns-2';
+import SplitSquareVertical from 'lucide-react/icons/square-split-vertical';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ChevronsLeftRight from 'lucide-react/icons/chevrons-left-right';
+import Table from 'lucide-react/icons/table';
 import { QueueItem } from '../types/converter';
 import { t } from '../utils/i18n';
 
