@@ -18,6 +18,9 @@ import type { ConversionWorkerPool } from './core/workerPool';
 import type { DocumentFormat } from './core/documentConverter';
 import { t } from './utils/i18n';
 import {
+  BadgeCheck,
+  CloudOff,
+  Infinity,
   Layers,
   ShieldCheck,
   Zap,
@@ -859,13 +862,16 @@ export default function App(): React.ReactElement {
 
         <section className="text-center max-w-4xl mx-auto space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80">
           <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-full border border-cyan-300 bg-cyan-100 px-2.5 py-1 text-center text-xs font-semibold leading-tight text-cyan-800 shadow-xs dark:border-cyan-800/80 dark:bg-cyan-950/60 dark:text-cyan-400 sm:px-3.5">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span className="feature-badge__rotator" aria-hidden="true">
-              {t.features.badge.split(' • ').map((phrase, index) => (
-                <span key={`${index}-${phrase}`} className="feature-badge__phrase">
-                  {phrase}
-                </span>
-              ))}
+              {t.features.badge.split(' • ').map((phrase, index) => {
+                const Icon = index === 0 ? BadgeCheck : index === 1 ? Infinity : CloudOff;
+                return (
+                  <span key={`${index}-${phrase}`} className="feature-badge__phrase">
+                    <Icon className="feature-badge__icon h-4 w-4 shrink-0" />
+                    {phrase}
+                  </span>
+                );
+              })}
             </span>
             <span className="sr-only">{t.features.badge}</span>
           </div>
