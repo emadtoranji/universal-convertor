@@ -22,6 +22,7 @@ const STATIC_EXTENSIONS = new Set([
   'wasm',
   'json',
   'webmanifest',
+  'map',
   'txt',
   'xml',
 ]);
@@ -58,13 +59,15 @@ const workerEdgeHandler = {
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Frame-Options', 'SAMEORIGIN');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    headers.set('Strict-Transport-Security', 'max-age=31536000');
+    headers.set('Cross-Origin-Opener-Policy', 'same-origin');
     headers.set(
       'Permissions-Policy',
       'camera=(), microphone=(), geolocation=(), browsing-topics=()'
     );
     headers.set(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://buttons.github.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://picsum.photos; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' data: blob: https://api.github.com; frame-src https://ghbtns.com https://buttons.github.io; object-src 'none'; base-uri 'self';"
+      "default-src 'self'; script-src 'self' 'sha256-Zacu7kAZv4D0BiAI2HkmRKLAqsVFhXM3Cr7RwMcPRh8=' 'sha256-BujahvrTXgUvW1t0QPLTEORzB4c59d19a2x0xKNjAxE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; trusted-types universal-convertor-worker; require-trusted-types-for 'script';"
     );
 
     return new Response(response.body, {

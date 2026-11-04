@@ -1,5 +1,5 @@
 import React from 'react';
-import { Moon, Star, Sun } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { t } from '../utils/i18n';
 
 interface HeaderProps {
@@ -24,63 +24,10 @@ interface HeaderActionsProps {
     };
 }
 
-const isRecord = (val: unknown): val is Record<string, unknown> => {
-    return typeof val === 'object' && val !== null;
-};
-
-const parseStargazersCount = (data: unknown): number | null => {
-    if (!isRecord(data)) {
-        return null;
-    }
-    const count = data['stargazers_count'];
-    return typeof count === 'number' ? count : null;
-};
-
-const formatCount = (count: number): string => {
-    return new Intl.NumberFormat('en-US', {
-        notation: 'compact',
-        compactDisplay: 'short',
-        maximumFractionDigits: 1,
-    }).format(count);
-};
-
 const HeaderComponent: React.FC<HeaderProps> = ({
     isDark,
     onToggleTheme,
 }): React.ReactElement => {
-    const [starCount, setStarCount] = React.useState<number | null>(null);
-
-    React.useEffect(() => {
-        let isMounted = true;
-        const controller = new AbortController();
-
-        const fetchStarCount = async (): Promise<void> => {
-            try {
-                const response = await fetch(
-                    'https://api.github.com/repos/emadtoranji/universal-convertor',
-                    { signal: controller.signal },
-                );
-                if (!response.ok) {
-                    return;
-                }
-                const payload: unknown = await response.json();
-                const count = parseStargazersCount(payload);
-                if (isMounted && count !== null) {
-                    setStarCount(count);
-                }
-            } catch {
-                return;
-            }
-        };
-
-        void fetchStarCount();
-
-        return (): void => {
-            isMounted = false;
-            controller.abort();
-        };
-    }, []);
-
     return (
         <header className='sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur-xl transition-colors duration-200 dark:border-zinc-800/80 dark:bg-zinc-950/80'>
             <div className='mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-6 lg:px-8'>
@@ -91,7 +38,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
                                 {t.header.brand.name}
                             </span>
                         </div>
-                        <p className='xs:block hidden truncate text-[10px] text-zinc-500 sm:text-xs dark:text-zinc-400'>
+                        <p className='xs:block hidden truncate text-[10px] text-zinc-600 sm:text-xs dark:text-zinc-400'>
                             {t.header.brand.tagline}
                         </p>
                     </div>
@@ -121,14 +68,6 @@ const HeaderComponent: React.FC<HeaderProps> = ({
                             GitHub
                         </span>
 
-                        <span className='inline-flex items-center gap-1 border-s border-zinc-300 ps-2 dark:border-zinc-700'>
-                            <Star className='h-3.5 w-3.5 fill-amber-400 text-amber-500 transition-transform duration-200 group-hover:scale-110' />
-                            {starCount !== null && (
-                                <span className='font-semibold text-zinc-800 dark:text-zinc-200'>
-                                    {formatCount(starCount)}
-                                </span>
-                            )}
-                        </span>
                     </a>
 
                     <button

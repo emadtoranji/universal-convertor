@@ -45,6 +45,8 @@ Use this file as the primary search index before running directory scans or grep
 
 ## Type Definitions (`src/types/`)
 - `src/types/converter.ts`: Strict TypeScript types for input formats, output formats, queue items, worker payloads, conversion options, and format compatibility matrix.
+- `src/types/conversionOptionsSchema.ts`: Runtime Zod schema for validating conversion options, imported only by validation and tests.
+- `public/.well-known/ai-catalog.json`: AI discovery catalog metadata for the deployed application.
 
 ## Agent Rules & Guidelines (`.agents/rules/`)
 - `.agents/rules/core.md`: Core platform architecture, token preservation, zero code comments rule, verification loop.

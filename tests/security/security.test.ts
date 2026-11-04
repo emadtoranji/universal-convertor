@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { sanitizeSvgString } from '../../src/utils/svgSanitizer.ts';
 import { validateMagicBytes } from '../../src/utils/magicBytes.ts';
-import { ConversionOptionsSchema } from '../../src/types/converter.ts';
+import { ConversionOptionsSchema } from '../../src/types/conversionOptionsSchema.ts';
 
 describe('security - Attack Payload & Protection Test Suite', () => {
   it('prevents prototype pollution when parsing malformed conversion options', () => {

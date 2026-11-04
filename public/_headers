@@ -2,12 +2,18 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-Zacu7kAZv4D0BiAI2HkmRKLAqsVFhXM3Cr7RwMcPRh8=' 'sha256-BujahvrTXgUvW1t0QPLTEORzB4c59d19a2x0xKNjAxE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; trusted-types universal-convertor-worker; require-trusted-types-for 'script';
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
 /manifest.json
+  Cache-Control: public, max-age=2592000, immutable
+
+/.well-known/*
   Cache-Control: public, max-age=2592000, immutable
 
 /robots.txt
@@ -50,4 +56,7 @@
   Cache-Control: public, max-age=2592000, immutable
 
 /*.woff2
+  Cache-Control: public, max-age=2592000, immutable
+
+/*.map
   Cache-Control: public, max-age=2592000, immutable

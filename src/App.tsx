@@ -14,10 +14,8 @@ import {
 } from './types/converter';
 import { isExtensionSupported, verifyContentMatchesFormat } from './utils/magicBytes';
 import { sanitizeSvgString } from './utils/svgSanitizer';
-import { ConversionWorkerPool } from './core/workerPool';
-import { createZipArchive } from './core/zipArchiver';
-import { generatePdfFromImages } from './core/pdfGenerator';
-import { convertDocument, DocumentFormat } from './core/documentConverter';
+import type { ConversionWorkerPool } from './core/workerPool';
+import type { DocumentFormat } from './core/documentConverter';
 import { t } from './utils/i18n';
 import {
   Layers,
@@ -33,7 +31,6 @@ import {
   AlertTriangle,
   UploadCloud,
 } from 'lucide-react';
-import { decodePsdBuffer } from './core/converters/psdConverter';
 import {
   getOrInitEffectiveTheme,
   setThemeCookie,
@@ -75,7 +72,6 @@ export default function App(): React.ReactElement {
   const workerPoolRef = useRef<ConversionWorkerPool | null>(null);
 
   useEffect(() => {
-    workerPoolRef.current = new ConversionWorkerPool();
     applyThemeToDocument(getOrInitEffectiveTheme());
 
     if (typeof window !== 'undefined' && window.location.pathname !== '/') {
@@ -243,6 +239,7 @@ export default function App(): React.ReactElement {
               } else if (sourceFormat === 'psd') {
                 try {
                   const ab = await file.arrayBuffer();
+                  const { decodePsdBuffer } = await import('./core/converters/psdConverter');
                   const psdRes = await decodePsdBuffer(ab);
                   width = psdRes.width;
                   height = psdRes.height;
@@ -454,6 +451,7 @@ export default function App(): React.ReactElement {
         if (item.category === 'document') {
           const inputData = await item.file.text();
           const targetFmt = item.options.targetFormat as DocumentFormat;
+          const { convertDocument } = await import('./core/documentConverter');
           const result = await convertDocument(inputData, {
             sourceFormat: item.sourceFormat as DocumentFormat,
             targetFormat: targetFmt,
@@ -490,8 +488,11 @@ export default function App(): React.ReactElement {
           return true;
         }
 
+        if (!workerPoolRef.current) {
+          const { ConversionWorkerPool } = await import('./core/workerPool');
+          workerPoolRef.current = new ConversionWorkerPool();
+        }
         const pool = workerPoolRef.current;
-        if (!pool) return false;
 
         let fullBuffer: ArrayBuffer;
         if (item.sourceFormat === 'svg') {
@@ -634,6 +635,7 @@ export default function App(): React.ReactElement {
       }
     }
 
+    const { createZipArchive } = await import('./core/zipArchiver');
     const zipBlob = createZipArchive(fileEntries);
     const zipUrl = URL.createObjectURL(zipBlob);
     const anchor = document.createElement('a');
@@ -669,6 +671,7 @@ export default function App(): React.ReactElement {
       })
     );
 
+    const { generatePdfFromImages } = await import('./core/pdfGenerator');
     const pdfBytes = await generatePdfFromImages(pdfInputs, {
       pageSize: globalOptions.pdfPageSize,
       orientation: globalOptions.pdfOrientation,
@@ -803,7 +806,7 @@ export default function App(): React.ReactElement {
                   </h2>
                   {totalPages > 1 && (
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-zinc-500 font-mono text-[11px]">
+                      <span className="text-zinc-600 dark:text-zinc-400 font-mono text-[11px]">
                         {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, queue.length)} / {queue.length}
                       </span>
                       <div className="flex items-center gap-1">
@@ -873,6 +876,7 @@ export default function App(): React.ReactElement {
         </section>
 
         <section aria-label="Key Features" className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-zinc-600 dark:text-zinc-400 text-xs">
+          <h2 className="sr-only">Key Features</h2>
           {t.features.cards.slice(0, 3).map((card) => (
             <div key={card.id} className="flex items-start gap-3.5 p-4 sm:p-5 rounded-2xl bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/90 shadow-xs">
               <div className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex-shrink-0">
@@ -905,21 +909,21 @@ export default function App(): React.ReactElement {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             {Object.values(t.matrix.categories).map((cat) => (
               <div key={cat.id} className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800/80 space-y-2">
-                <h4 className="font-semibold text-zinc-900 dark:text-zinc-200 flex items-center gap-1.5">
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-200 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-cyan-500" />
                   {cat.title}
-                </h4>
+                </h3>
                 <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-[11px]">
                   {cat.description}
                 </p>
                 <div className="pt-1 space-y-1 text-[11px]">
                   <div>
                     <span className="font-semibold text-zinc-700 dark:text-zinc-300">Inputs: </span>
-                    <span className="text-zinc-500">{cat.inputs.join(', ')}</span>
+                    <span className="text-zinc-600 dark:text-zinc-400">{cat.inputs.join(', ')}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-cyan-700 dark:text-cyan-400">Outputs: </span>
-                    <span className="text-zinc-500">{cat.outputs.join(', ')}</span>
+                    <span className="text-zinc-600 dark:text-zinc-400">{cat.outputs.join(', ')}</span>
                   </div>
                 </div>
               </div>
@@ -950,7 +954,7 @@ export default function App(): React.ReactElement {
                 >
                   <span>{faqItem.question}</span>
                   <ChevronDown
-                    className={`w-4 h-4 text-zinc-500 transition-transform duration-200 flex-shrink-0 ${
+                    className={`w-4 h-4 text-zinc-600 dark:text-zinc-400 transition-transform duration-200 flex-shrink-0 ${
                       openFaqIndex === idx ? 'rotate-180 text-cyan-500' : ''
                     }`}
                   />
@@ -1009,7 +1013,7 @@ export default function App(): React.ReactElement {
           </div>
         </section>
 
-        <footer className="pt-4 pb-6 text-center text-xs text-zinc-500 dark:text-zinc-500">
+        <footer className="pt-4 pb-6 text-center text-xs text-zinc-600 dark:text-zinc-400">
           <p>© {new Date().getFullYear()} Universal Convertor • 100% Free Client-Side File Converter & Compressor</p>
         </footer>
       </main>

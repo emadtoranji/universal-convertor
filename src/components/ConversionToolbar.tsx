@@ -283,7 +283,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
             <button
               type="button"
               onClick={onClearQueue}
-              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer"
+              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer"
               title={t.toolbar.actions.clearQueueTitle}
               aria-label={t.toolbar.actions.clearQueueAria}
             >
@@ -423,7 +423,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 type="button"
                 onClick={onClearQueue}
                 disabled={isProcessing}
-                className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer disabled:opacity-40"
+                className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer disabled:opacity-40"
                 title={t.toolbar.actions.clearQueueTitle}
                 aria-label={t.toolbar.actions.clearQueueAria}
               >
@@ -591,7 +591,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 <span className="text-zinc-800 dark:text-zinc-300 font-mono">
                   {globalOptions.backgroundColor || '#ffffff'}
                 </span>
-                <span className="text-[11px] text-zinc-500">{t.toolbar.backgroundColor.description}</span>
+                <span className="text-[11px] text-zinc-600 dark:text-zinc-400">{t.toolbar.backgroundColor.description}</span>
               </div>
             </div>
 
@@ -609,7 +609,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
             </div>
 
             <div className="pt-1 space-y-1">
-              <span className="text-[11px] text-zinc-500 block">Quality Preset:</span>
+              <span className="text-[11px] text-zinc-600 dark:text-zinc-400 block">Quality Preset:</span>
               <div className="text-[11px] text-cyan-600 dark:text-cyan-400 font-medium">
                 {t.toolbar.quality.recommended}
               </div>
@@ -623,7 +623,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.toolbar.pdfSettings.pageSizeLabel}</label>
+                <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.toolbar.pdfSettings.pageSizeLabel}</label>
                 <select
                   value={globalOptions.pdfPageSize}
                   onChange={handlePdfPageSizeChange}
@@ -635,7 +635,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.toolbar.pdfSettings.orientationLabel}</label>
+                <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.toolbar.pdfSettings.orientationLabel}</label>
                 <select
                   value={globalOptions.pdfOrientation}
                   onChange={handlePdfOrientationChange}
@@ -654,7 +654,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
               </span>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[10px] text-zinc-500 mb-0.5">
+                  <label className="block text-[10px] text-zinc-600 dark:text-zinc-400 mb-0.5">
                     {t.toolbar.documentSettings.jsonIndentLabel}
                   </label>
                   <select
@@ -668,7 +668,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] text-zinc-500 mb-0.5">
+                  <label className="block text-[10px] text-zinc-600 dark:text-zinc-400 mb-0.5">
                     {t.toolbar.documentSettings.delimiterLabel}
                   </label>
                   <select

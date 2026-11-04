@@ -1,5 +1,4 @@
 import type { ConversionOptions, ImageOutputFormat } from '../../types/converter.ts';
-import { generatePdfFromImages } from '../pdfGenerator.ts';
 
 export interface RawImageData {
   width: number;
@@ -308,6 +307,7 @@ export async function convertCanvasToTarget(
   }
 
   if (targetFormat === 'pdf') {
+    const { generatePdfFromImages } = await import('../pdfGenerator.ts');
     const pdfBytes = await generatePdfFromImages(
       [
         {

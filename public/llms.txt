@@ -1,48 +1,14 @@
-# Universal Convertor (llms.txt)
+# Universal Convertor
 
-> **Universal Convertor** is a 100% free, private, client-side image and structured data conversion engine. All decoders, encoders, resizers, and archivers run locally inside the user's browser memory via Web Workers, OffscreenCanvas, and native TypeScript algorithms. Zero bytes are uploaded to external servers.
+> Universal Convertor is a free, private browser-based converter for images and documents. Files are processed locally and are never uploaded.
 
----
+The application converts PNG, JPEG, WebP, AVIF, HEIC, SVG, BMP, ICO, GIF, TIFF, PSD, JSON, CSV, TSV, Markdown, HTML, XML, and plain text. Image processing uses browser APIs and Web Workers. ZIP archives and merged PDFs are generated on the user's device.
 
-## Key Architectural Principles
+The converter validates file content, sanitizes SVG input, and keeps file data in browser memory. No account is required.
 
-1. **Zero Cloud Uploads & 100% Privacy:**
-   - All conversions occur locally in-memory on the client device.
-   - Files, image buffers, base64 data, and file metadata are never transmitted to any third-party API or server.
-2. **Hardware Concurrency & Web Workers:**
-   - Multi-threaded processing pool bounded dynamically by `navigator.hardwareConcurrency` (2 to 8 threads).
-   - Zero main-thread blocking; 60fps UI responsiveness during bulk batch conversions.
-3. **Memory Safety & Transferables:**
-   - Large ArrayBuffers are passed as Transferables across thread boundaries.
-   - Bitmaps are closed (`bitmap.close()`) and Object URLs revoked (`URL.revokeObjectURL()`) immediately upon task cleanup.
-4. **Two-Stage Validation Protocol:**
-   - Stage 1: File extension registry lookup on drag/drop to instantly isolate unsupported formats.
-   - Stage 2: Deep Magic Bytes binary signature and syntax verification prior to conversion execution.
+## Resources
 
----
-
-## Supported Input & Output Formats
-
-### 1. Images
-- **Input Formats:** PNG, JPEG, WebP, AVIF, SVG, BMP, ICO, GIF
-- **Output Formats:** WebP (Modern lossy/lossless), AVIF (Next-gen), PNG (Lossless), JPEG (Universal), ICO (Multi-resolution 16/32/48px), BMP (Raster), TIFF (Print), PDF (Single or merged)
-- **Features:** SVG vector sanitization against XSS/XXE, canvas hardware acceleration, EXIF metadata stripping, dimension scaling, aspect ratio preservation, solid background color filling.
-
-### 2. Structured Data & Tables
-- **Input Formats:** CSV (.csv), TSV (.tsv), JSON (.json)
-- **Output Formats:** CSV (.csv), TSV (.tsv), JSON (.json)
-- **Features:** RFC 4180 deterministic serialization, bidirectional table-to-JSON and JSON-to-table conversion, automated delimiter detection, custom JSON indentation, key sorting, and minification.
-
----
-
-## Batch Processing & Archiving
-- **Homogeneous Batch Conversion:** "Convert All" allows one-click batch transformation when queued files share the same category.
-- **ZIP Export:** Instant client-side ZIP packaging via `fflate` with multi-threaded DEFLATE compression.
-- **Merge to PDF:** Combine multiple converted images into a single multi-page PDF document with custom page sizes and orientations.
-
----
-
-## URL & Deployment
-- Production Domain: https://convertor.apidevelopers.ir/
-- Repository: https://github.com/emadtoranji/universal-convertor
-- License: The Unlicense (Public Domain Dedication, 100% Free for all commercial and personal use)
+- [Universal Convertor website](https://convertor.apidevelopers.ir/): Open the browser-based converter.
+- [Source repository](https://github.com/emadtoranji/universal-convertor): Browse the source code and project documentation.
+- [Project README](https://github.com/emadtoranji/universal-convertor/blob/main/README.md): Read setup and application details.
+- [License](https://github.com/emadtoranji/universal-convertor/blob/main/LICENSE): Review reuse and redistribution terms.

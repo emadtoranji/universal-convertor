@@ -174,7 +174,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
         <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-100 dark:border-zinc-800/80">
           {item.status !== 'completed' && item.status !== 'error' && compatibleFormats.length > 0 ? (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-zinc-500 uppercase font-semibold">{t.queue.meta.to}</span>
+              <span className="text-xs text-zinc-600 dark:text-zinc-400 uppercase font-semibold">{t.queue.meta.to}</span>
               <select
                 value={item.options.targetFormat}
                 onChange={handleFormatChange}
@@ -409,7 +409,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
           {item.options.targetFormat === 'pdf' && (
             <div className="space-y-1.5 col-span-full border-t border-zinc-200/50 dark:border-zinc-800/50 pt-2 grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.queue.advanced.pdfPageSize}</label>
+                <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.queue.advanced.pdfPageSize}</label>
                 <select
                   value={item.options.pdfPageSize}
                   onChange={(e) => updateItemOption('pdfPageSize', e.target.value as PdfPageSize)}
@@ -421,7 +421,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] text-zinc-500 mb-1">{t.queue.advanced.pdfOrientation}</label>
+                <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.queue.advanced.pdfOrientation}</label>
                 <select
                   value={item.options.pdfOrientation}
                   onChange={(e) => updateItemOption('pdfOrientation', e.target.value as PdfOrientation)}
