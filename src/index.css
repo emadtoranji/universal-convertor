@@ -8,6 +8,9 @@
 }
 
 .feature-badge__phrase {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
   grid-area: 1 / 1;
   max-width: 100%;
   overflow-wrap: anywhere;
