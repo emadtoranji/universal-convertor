@@ -5,10 +5,10 @@
 ### 100% Free &bull; Zero Server Uploads &bull; Client-Side Concurrency &bull; Total Privacy
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg?style=for-the-badge)](https://unlicense.org/)
-[![React 19+](https://img.shields.io/badge/React-19-61dafb.svg?style=for-the-badge&logo=react)](https://react.dev/)
-[![TypeScript 7+](https://img.shields.io/badge/TypeScript-5.x-3178c6.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Vite 8+](https://img.shields.io/badge/Vite-6.x-646cff.svg?style=for-the-badge&logo=vite)](https://vitejs.dev/)
-[![Tailwind CSS 4+](https://img.shields.io/badge/Tailwind-CSS_v4-38bdf8.svg?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![React 19.3.1](https://img.shields.io/badge/React-19.3.1-61dafb.svg?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript 7.0.2](https://img.shields.io/badge/TypeScript-7.0.2-3178c6.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Vite 8.3.5](https://img.shields.io/badge/Vite-8.3.5-646cff.svg?style=for-the-badge&logo=vite)](https://vitejs.dev/)
+[![Tailwind CSS 4.3.3](https://img.shields.io/badge/Tailwind_CSS-4.3.3-38bdf8.svg?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 [![Zero Uploads](https://img.shields.io/badge/Privacy-Zero_Uploads-10b981.svg?style=for-the-badge)](https://github.com/)
 
 <p align="center">
