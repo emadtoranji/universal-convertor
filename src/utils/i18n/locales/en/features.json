@@ -1,45 +1,44 @@
 {
-  "sectionTitle": "Key Capabilities",
-  "sectionSubtitle": "Built for maximum speed, absolute privacy, and universal file conversion and compression without server costs.",
-  "badge": "100% Free • Unlimited Conversions • Zero Cloud Uploads",
-  "heroTitle": "Universal Convertor",
-  "heroTitleAccent": "& Compressor",
-  "heroSubtitle": "A completely free, 100% private client-side file converter and compressor. Transform images and documents or reduce file size instantly inside local browser memory using high-speed multi-threaded Web Workers. Zero server uploads, zero subscriptions, and unlimited batch processing.",
-  "cards": [
-    {
-      "id": "privacy",
-      "icon": "ShieldCheck",
-      "badge": "Zero Cloud Uploads",
-      "title": "100% Client-Side Privacy",
-      "description": "Your files never leave your device. All decoding, compression, and encoding execute entirely inside local browser memory with zero network requests or third-party telemetry."
-    },
-    {
-      "id": "performance",
-      "icon": "Zap",
-      "badge": "Multi-Threaded Pool",
-      "title": "High-Performance Web Workers",
-      "description": "Leverage your multi-core processor with a hardware-concurrency Web Worker pool and Transferable ArrayBuffers for rapid parallel conversions and compression with zero main-thread UI lag."
-    },
-    {
-      "id": "universal",
-      "icon": "Layers",
-      "badge": "Images & Documents",
-      "title": "High-Accuracy Media & Document Conversion",
-      "description": "Convert and compress across essential digital assets: modern images (WebP, AVIF, HEIC/HEIF, PNG, JPG, JFIF, TIFF, PSD, ICO, SVG, BMP, GIF) and documents (Markdown, HTML, Plain Text, XML, CSV, TSV, JSON, PDF) with 99%+ fidelity."
-    },
-    {
-      "id": "packaging",
-      "icon": "FileArchive",
-      "badge": "In-Memory Packaging",
-      "title": "Instant ZIP & PDF Merging",
-      "description": "Bundle batch conversions into compressed ZIP archives in memory with fflate, or assemble multi-image albums into single, publication-ready multi-page PDF documents."
-    },
-    {
-      "id": "tuning",
-      "icon": "Sliders",
-      "badge": "Precision Controls",
-      "title": "Advanced Tuning & Compression Controls",
-      "description": "Customize your output with granular controls: quality compression sliders, black & white monochrome mode, dimension resizing, transparent background replacement, and EXIF metadata stripping."
-    }
-  ]
+    "sectionTitle": "Key Capabilities",
+    "sectionSubtitle": "Built for maximum speed, absolute privacy, and universal file conversion and compression without server costs.",
+    "badge": "100% Free • Unlimited Conversions • Zero Cloud Uploads",
+    "heroTitle": "Convertor & Compressor",
+    "heroSubtitle": "A completely free, 100% private client-side file converter and compressor. Transform images and documents or reduce file size instantly inside local browser memory using high-speed multi-threaded Web Workers. Zero server uploads, zero subscriptions, and unlimited batch processing.",
+    "cards": [
+        {
+            "id": "privacy",
+            "icon": "ShieldCheck",
+            "badge": "Zero Cloud Uploads",
+            "title": "100% Client-Side Privacy",
+            "description": "Your files never leave your device. All decoding, compression, and encoding execute entirely inside local browser memory with zero network requests or third-party telemetry."
+        },
+        {
+            "id": "performance",
+            "icon": "Zap",
+            "badge": "Multi-Threaded Pool",
+            "title": "High-Performance Web Workers",
+            "description": "Leverage your multi-core processor with a hardware-concurrency Web Worker pool and Transferable ArrayBuffers for rapid parallel conversions and compression with zero main-thread UI lag."
+        },
+        {
+            "id": "universal",
+            "icon": "Layers",
+            "badge": "Images & Documents",
+            "title": "High-Accuracy Media & Document Conversion",
+            "description": "Convert and compress across essential digital assets: modern images (WebP, AVIF, HEIC/HEIF, PNG, JPG, JFIF, TIFF, PSD, ICO, SVG, BMP, GIF) and documents (Markdown, HTML, Plain Text, XML, CSV, TSV, JSON, PDF) with 99%+ fidelity."
+        },
+        {
+            "id": "packaging",
+            "icon": "FileArchive",
+            "badge": "In-Memory Packaging",
+            "title": "Instant ZIP & PDF Merging",
+            "description": "Bundle batch conversions into compressed ZIP archives in memory with fflate, or assemble multi-image albums into single, publication-ready multi-page PDF documents."
+        },
+        {
+            "id": "tuning",
+            "icon": "Sliders",
+            "badge": "Precision Controls",
+            "title": "Advanced Tuning & Compression Controls",
+            "description": "Customize your output with granular controls: quality compression sliders, black & white monochrome mode, dimension resizing, transparent background replacement, and EXIF metadata stripping."
+        }
+    ]
 }

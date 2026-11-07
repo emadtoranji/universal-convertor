@@ -1,6 +1,6 @@
 # Universal Convertor
 
-> Universal Convertor is a free, private browser-based converter for images and documents. Files are processed locally and are never uploaded.
+> Universal Convertor is a free, private browser-based converter for images, documents and date. Files are processed locally and are never uploaded.
 
 The application converts PNG, JPEG, WebP, AVIF, HEIC, SVG, BMP, ICO, GIF, TIFF, PSD, JSON, CSV, TSV, Markdown, HTML, XML, and plain text. Image processing uses browser APIs and Web Workers. ZIP archives and merged PDFs are generated on the user's device.
 

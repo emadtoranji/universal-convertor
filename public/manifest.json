@@ -1,26 +1,26 @@
 {
-  "name": "Universal Convertor",
-  "short_name": "Universal Convertor",
-  "description": "100% Free Client-Side Image, Audio, Video & Document Converter",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#06b6d4",
-  "icons": [
-    {
-      "src": "/images/logo/128x128.webp",
-      "sizes": "128x128",
-      "type": "image/webp"
-    },
-    {
-      "src": "/images/logo/256x256.webp",
-      "sizes": "256x256",
-      "type": "image/webp"
-    },
-    {
-      "src": "/images/logo/512x512.webp",
-      "sizes": "512x512",
-      "type": "image/webp"
-    }
-  ]
+    "name": "Universal Convertor",
+    "short_name": "Universal Convertor",
+    "description": "100% Free Client-Side Image, Audio, Video, Document and Date Converter",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#09090b",
+    "theme_color": "#06b6d4",
+    "icons": [
+        {
+            "src": "/images/logo/128x128.webp",
+            "sizes": "128x128",
+            "type": "image/webp"
+        },
+        {
+            "src": "/images/logo/256x256.webp",
+            "sizes": "256x256",
+            "type": "image/webp"
+        },
+        {
+            "src": "/images/logo/512x512.webp",
+            "sizes": "512x512",
+            "type": "image/webp"
+        }
+    ]
 }

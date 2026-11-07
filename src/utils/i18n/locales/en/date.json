@@ -1,0 +1,195 @@
+{
+    "title": "Universal Date & Calendar Converter",
+    "subtitle": "Instant three-way synchronization across Solar Hijri, Gregorian, and Lunar Hijri calendars.",
+    "todayButton": "Today",
+    "labels": {
+        "year": "Year",
+        "month": "Month",
+        "day": "Day",
+        "leapYear": "Leap Year",
+        "standardYear": "Standard Year",
+        "daysInMonth": "{count} days in this month",
+        "copy": "Copy Text",
+        "copied": "Copied"
+    },
+    "calendars": {
+        "jalali": {
+            "title": "Solar Hijri (Jalali)",
+            "increaseYear": "Increase Jalali year",
+            "decreaseYear": "Decrease Jalali year",
+            "yearAria": "Jalali Year",
+            "monthAria": "Jalali Month",
+            "dayAria": "Jalali Day"
+        },
+        "gregorian": {
+            "title": "Gregorian",
+            "increaseYear": "Increase Gregorian year",
+            "decreaseYear": "Decrease Gregorian year",
+            "yearAria": "Gregorian Year",
+            "monthAria": "Gregorian Month",
+            "dayAria": "Gregorian Day"
+        },
+        "hijri": {
+            "title": "Lunar Hijri",
+            "increaseYear": "Increase Hijri year",
+            "decreaseYear": "Decrease Hijri year",
+            "yearAria": "Hijri Year",
+            "monthAria": "Hijri Month",
+            "dayAria": "Hijri Day"
+        }
+    },
+    "metrics": {
+        "title": "Rich Date Formats & System Metrics",
+        "weekday": "Weekday",
+        "weekdaySubtitle": "Current Day of the Week",
+        "isoGregorian": "ISO 8601 (Gregorian)",
+        "isoGregorianSubtitle": "Standard Date String",
+        "isoJalali": "Jalali ISO String",
+        "isoJalaliSubtitle": "YYYY-MM-DD (Solar Hijri)",
+        "unixTimestamp": "Unix Epoch Timestamp",
+        "unixTimestampSubtitle": "Seconds since 1970-01-01 UTC"
+    },
+    "overview": {
+        "badge": "100% Client-Side Date Engine",
+        "badgePhrases": [
+            "100% Client-Side Date Engine",
+            "3-Way Instant Calendar Sync",
+            "Astronomical Precision Leap Rules"
+        ],
+        "heroTitle": "Universal Date Converter",
+        "heroTitleAccent": "Free & Client-Side",
+        "heroSubtitle": "Convert dates instantaneously between Solar Hijri (Jalali), Gregorian, and Lunar Hijri calendars with 100% mathematical precision. All calculations execute locally inside your browser memory with zero tracking, zero server queries, and complete offline capability.",
+        "cards": [
+            {
+                "id": "privacy",
+                "title": "100% Private & Local",
+                "description": "Your calendar calculations remain 100% confined to your device browser memory. Zero queries, timestamps, or IP metadata are ever transmitted to any cloud backend."
+            },
+            {
+                "id": "sync",
+                "title": "Real-Time 3-Way Sync",
+                "description": "Altering year, month, or day in any calendar triggers an instant, deterministic recalculation of all three calendars via optimized Julian Day Number (JDN) algorithms."
+            },
+            {
+                "id": "accuracy",
+                "title": "Astronomical Leap Accuracy",
+                "description": "Full support for the official 33-year astronomical leap cycle for Solar Hijri, Gregorian leap rules, and Lunar Hijri Umm al-Qura standard calculations."
+            }
+        ]
+    },
+    "specifications": {
+        "title": "Supported Calendars & Specifications",
+        "items": [
+            {
+                "id": "jalali",
+                "title": "Solar Hijri (Jalali)",
+                "description": "Official astronomical solar calendar of Iran and Afghanistan based on the vernal equinox.",
+                "monthsLabel": "Months:",
+                "monthsValue": "Farvardin – Esfand (12 months)",
+                "lengthLabel": "Year Length:",
+                "lengthValue": "365 or 366 days (Kabiseh)"
+            },
+            {
+                "id": "gregorian",
+                "title": "Gregorian Calendar",
+                "description": "Internationally accepted civil calendar standard adhering to ISO 8601 specifications.",
+                "monthsLabel": "Months:",
+                "monthsValue": "January – December (12 months)",
+                "lengthLabel": "Year Length:",
+                "lengthValue": "365 or 366 days (Leap Year)"
+            },
+            {
+                "id": "hijri",
+                "title": "Lunar Hijri Calendar",
+                "description": "Pure lunar calendar based on the synodic lunar cycle and Umm al-Qura astronomical standard.",
+                "monthsLabel": "Months:",
+                "monthsValue": "Muharram – Dhu al-Hijjah (12 months)",
+                "lengthLabel": "Year Length:",
+                "lengthValue": "354 or 355 days (Kabisa)"
+            }
+        ]
+    },
+    "faq": {
+        "title": "Calendar Converter FAQ",
+        "subtitle": "Direct, factual answers regarding astronomical algorithms, client-side date synchronization, and multi-calendar standards.",
+        "badge": "Instant Answers",
+        "items": [
+            {
+                "id": "date-privacy",
+                "question": "Is the date conversion performed entirely in my browser?",
+                "answer": "Yes, 100%. The date converter uses deterministic astronomical algorithms and standard client-side browser Intl APIs. Zero date queries, location metrics, or timestamps are ever transmitted to any remote server or external API."
+            },
+            {
+                "id": "date-accuracy",
+                "question": "How accurate are the Solar Hijri (Jalali) and Lunar Hijri conversions?",
+                "answer": "The Jalali calendar engine implements the official astronomical 33-year leap cycle algorithm with 100% precision for historical, present, and future dates. The Lunar Hijri calendar adheres to the Umm al-Qura standard via high-precision client-side astronomical calculation."
+            },
+            {
+                "id": "date-leap-detection",
+                "question": "How does the converter calculate and display leap years?",
+                "answer": "Leap years are dynamically calculated in real time across all three calendars simultaneously. When an active year is a leap year (kabiseh in Jalali / leap in Gregorian / kabisa in Hijri), a dedicated badge appears instantly on the respective card and in the detailed metrics section."
+            },
+            {
+                "id": "date-shortcuts",
+                "question": "Can I step dates forwards and backwards with one click?",
+                "answer": "Yes. Each calendar panel includes stepper controls for incrementing and decrementing days, quick-select dropdown menus for months and days, direct numeric year editing, and a universal Today reset button."
+            }
+        ]
+    },
+    "months": {
+        "jalali": [
+            "Farvardin",
+            "Ordibehesht",
+            "Khordad",
+            "Tir",
+            "Mordad",
+            "Shahrivar",
+            "Mehr",
+            "Aban",
+            "Azar",
+            "Dey",
+            "Bahman",
+            "Esfand"
+        ],
+        "gregorian": [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ],
+        "hijri": [
+            "Muharram",
+            "Safar",
+            "Rabi al-Awwal",
+            "Rabi al-Thani",
+            "Jumada al-Awwal",
+            "Jumada al-Thani",
+            "Rajab",
+            "Shaban",
+            "Ramadan",
+            "Shawwal",
+            "Dhu al-Qadah",
+            "Dhu al-Hijjah"
+        ]
+    },
+    "weekdays": [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+    ],
+    "footer": {
+        "copyright": "© {year} Universal Convertor • 100% Free Client-Side Converter"
+    }
+}
