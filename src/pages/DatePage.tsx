@@ -214,7 +214,7 @@ export function DatePage(): React.ReactElement {
                     </div>
 
                     <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
-                        <div className='flex flex-col justify-between rounded-2xl border border-cyan-200/80 bg-gradient-to-b from-cyan-50/50 to-white p-4 shadow-xs dark:border-cyan-900/40 dark:from-cyan-950/20 dark:to-zinc-900/60 sm:p-5'>
+                        <div className='flex flex-col justify-between rounded-2xl border border-cyan-200/80 bg-gradient-to-b from-cyan-50/50 to-white p-4 shadow-xs sm:p-5 dark:border-cyan-900/40 dark:from-cyan-950/20 dark:to-zinc-900/60'>
                             <div className='space-y-4'>
                                 <div className='flex items-center justify-between'>
                                     <div className='flex items-center gap-2'>
@@ -249,36 +249,57 @@ export function DatePage(): React.ReactElement {
                                     <div className='grid grid-cols-3 gap-2 text-xs'>
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.year}</span>
+                                                <span>
+                                                    {t.date.labels.year}
+                                                </span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <input
                                                     type='number'
                                                     min={1}
                                                     max={3000}
-                                                    value={calendarInfo.jalali.year}
+                                                    value={
+                                                        calendarInfo.jalali.year
+                                                    }
                                                     onChange={(e) => {
-                                                        const val = Number(e.target.value);
+                                                        const val = Number(
+                                                            e.target.value,
+                                                        );
                                                         if (val > 0) {
                                                             handleJalaliChange(
                                                                 val,
-                                                                calendarInfo.jalali.month,
-                                                                calendarInfo.jalali.day,
+                                                                calendarInfo
+                                                                    .jalali
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .jalali.day,
                                                             );
                                                         }
                                                     }}
-                                                    aria-label={t.date.calendars.jalali.yearAria}
-                                                    className='w-full bg-transparent py-2 pl-2 pr-6 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars.jalali
+                                                            .yearAria
+                                                    }
+                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
                                                 />
                                                 <div className='absolute right-1 flex flex-col'>
                                                     <button
                                                         type='button'
-                                                        aria-label={t.date.calendars.jalali.increaseYear}
+                                                        aria-label={
+                                                            t.date.calendars
+                                                                .jalali
+                                                                .increaseYear
+                                                        }
                                                         onClick={() =>
                                                             handleJalaliChange(
-                                                                calendarInfo.jalali.year + 1,
-                                                                calendarInfo.jalali.month,
-                                                                calendarInfo.jalali.day,
+                                                                calendarInfo
+                                                                    .jalali
+                                                                    .year + 1,
+                                                                calendarInfo
+                                                                    .jalali
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .jalali.day,
                                                             )
                                                         }
                                                         className='cursor-pointer text-zinc-400 hover:text-cyan-600 dark:hover:text-cyan-400'
@@ -287,12 +308,25 @@ export function DatePage(): React.ReactElement {
                                                     </button>
                                                     <button
                                                         type='button'
-                                                        aria-label={t.date.calendars.jalali.decreaseYear}
+                                                        aria-label={
+                                                            t.date.calendars
+                                                                .jalali
+                                                                .decreaseYear
+                                                        }
                                                         onClick={() =>
                                                             handleJalaliChange(
-                                                                Math.max(1, calendarInfo.jalali.year - 1),
-                                                                calendarInfo.jalali.month,
-                                                                calendarInfo.jalali.day,
+                                                                Math.max(
+                                                                    1,
+                                                                    calendarInfo
+                                                                        .jalali
+                                                                        .year -
+                                                                        1,
+                                                                ),
+                                                                calendarInfo
+                                                                    .jalali
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .jalali.day,
                                                             )
                                                         }
                                                         className='cursor-pointer text-zinc-400 hover:text-cyan-600 dark:hover:text-cyan-400'
@@ -305,32 +339,47 @@ export function DatePage(): React.ReactElement {
 
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.month}</span>
+                                                <span>
+                                                    {t.date.labels.month}
+                                                </span>
                                             </div>
                                             <div className='relative'>
                                                 <select
-                                                    value={calendarInfo.jalali.month}
+                                                    value={
+                                                        calendarInfo.jalali
+                                                            .month
+                                                    }
                                                     onChange={(e) =>
                                                         handleJalaliChange(
-                                                            calendarInfo.jalali.year,
-                                                            Number(e.target.value),
-                                                            calendarInfo.jalali.day,
+                                                            calendarInfo.jalali
+                                                                .year,
+                                                            Number(
+                                                                e.target.value,
+                                                            ),
+                                                            calendarInfo.jalali
+                                                                .day,
                                                         )
                                                     }
-                                                    aria-label={t.date.calendars.jalali.monthAria}
-                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars.jalali
+                                                            .monthAria
+                                                    }
+                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
                                                 >
-                                                    {jalaliMonths.map((name, idx) => (
-                                                        <option
-                                                            key={name}
-                                                            value={idx + 1}
-                                                            className='bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100'
-                                                        >
-                                                            {idx + 1} - {name}
-                                                        </option>
-                                                    ))}
+                                                    {jalaliMonths.map(
+                                                        (name, idx) => (
+                                                            <option
+                                                                key={name}
+                                                                value={idx + 1}
+                                                                className='bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100'
+                                                            >
+                                                                {idx + 1} -{' '}
+                                                                {name}
+                                                            </option>
+                                                        ),
+                                                    )}
                                                 </select>
-                                                <ChevronDown className='pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
+                                                <ChevronDown className='pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
                                             </div>
                                         </div>
 
@@ -340,19 +389,30 @@ export function DatePage(): React.ReactElement {
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <select
-                                                    value={calendarInfo.jalali.day}
+                                                    value={
+                                                        calendarInfo.jalali.day
+                                                    }
                                                     onChange={(e) =>
                                                         handleJalaliChange(
-                                                            calendarInfo.jalali.year,
-                                                            calendarInfo.jalali.month,
-                                                            Number(e.target.value),
+                                                            calendarInfo.jalali
+                                                                .year,
+                                                            calendarInfo.jalali
+                                                                .month,
+                                                            Number(
+                                                                e.target.value,
+                                                            ),
                                                         )
                                                     }
-                                                    aria-label={t.date.calendars.jalali.dayAria}
-                                                    className='w-full appearance-none bg-transparent py-2 pl-2 pr-6 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars.jalali
+                                                            .dayAria
+                                                    }
+                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
                                                 >
                                                     {Array.from(
-                                                        { length: jalaliDaysCount },
+                                                        {
+                                                            length: jalaliDaysCount,
+                                                        },
                                                         (_, i) => i + 1,
                                                     ).map((d) => (
                                                         <option
@@ -364,14 +424,14 @@ export function DatePage(): React.ReactElement {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown className='pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
+                                                <ChevronDown className='pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className='mt-4 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between'>
+                            <div className='mt-4 flex items-center justify-between border-t border-zinc-200/60 pt-3 dark:border-zinc-800/60'>
                                 <span className='text-[11px] text-zinc-500 dark:text-zinc-400'>
                                     {jalaliDaysLabel}
                                 </span>
@@ -400,7 +460,7 @@ export function DatePage(): React.ReactElement {
                             </div>
                         </div>
 
-                        <div className='flex flex-col justify-between rounded-2xl border border-indigo-200/80 bg-gradient-to-b from-indigo-50/50 to-white p-4 shadow-xs dark:border-indigo-900/40 dark:from-indigo-950/20 dark:to-zinc-900/60 sm:p-5'>
+                        <div className='flex flex-col justify-between rounded-2xl border border-indigo-200/80 bg-gradient-to-b from-indigo-50/50 to-white p-4 shadow-xs sm:p-5 dark:border-indigo-900/40 dark:from-indigo-950/20 dark:to-zinc-900/60'>
                             <div className='space-y-4'>
                                 <div className='flex items-center justify-between'>
                                     <div className='flex items-center gap-2'>
@@ -435,36 +495,60 @@ export function DatePage(): React.ReactElement {
                                     <div className='grid grid-cols-3 gap-2 text-xs'>
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.year}</span>
+                                                <span>
+                                                    {t.date.labels.year}
+                                                </span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <input
                                                     type='number'
                                                     min={1}
                                                     max={3000}
-                                                    value={calendarInfo.gregorian.year}
+                                                    value={
+                                                        calendarInfo.gregorian
+                                                            .year
+                                                    }
                                                     onChange={(e) => {
-                                                        const val = Number(e.target.value);
+                                                        const val = Number(
+                                                            e.target.value,
+                                                        );
                                                         if (val > 0) {
                                                             handleGregorianChange(
                                                                 val,
-                                                                calendarInfo.gregorian.month,
-                                                                calendarInfo.gregorian.day,
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .day,
                                                             );
                                                         }
                                                     }}
-                                                    aria-label={t.date.calendars.gregorian.yearAria}
-                                                    className='w-full bg-transparent py-2 pl-2 pr-6 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars
+                                                            .gregorian.yearAria
+                                                    }
+                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
                                                 />
                                                 <div className='absolute right-1 flex flex-col'>
                                                     <button
                                                         type='button'
-                                                        aria-label={t.date.calendars.gregorian.increaseYear}
+                                                        aria-label={
+                                                            t.date.calendars
+                                                                .gregorian
+                                                                .increaseYear
+                                                        }
                                                         onClick={() =>
                                                             handleGregorianChange(
-                                                                calendarInfo.gregorian.year + 1,
-                                                                calendarInfo.gregorian.month,
-                                                                calendarInfo.gregorian.day,
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .year + 1,
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .day,
                                                             )
                                                         }
                                                         className='cursor-pointer text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400'
@@ -473,12 +557,26 @@ export function DatePage(): React.ReactElement {
                                                     </button>
                                                     <button
                                                         type='button'
-                                                        aria-label={t.date.calendars.gregorian.decreaseYear}
+                                                        aria-label={
+                                                            t.date.calendars
+                                                                .gregorian
+                                                                .decreaseYear
+                                                        }
                                                         onClick={() =>
                                                             handleGregorianChange(
-                                                                Math.max(1, calendarInfo.gregorian.year - 1),
-                                                                calendarInfo.gregorian.month,
-                                                                calendarInfo.gregorian.day,
+                                                                Math.max(
+                                                                    1,
+                                                                    calendarInfo
+                                                                        .gregorian
+                                                                        .year -
+                                                                        1,
+                                                                ),
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .gregorian
+                                                                    .day,
                                                             )
                                                         }
                                                         className='cursor-pointer text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400'
@@ -491,32 +589,47 @@ export function DatePage(): React.ReactElement {
 
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.month}</span>
+                                                <span>
+                                                    {t.date.labels.month}
+                                                </span>
                                             </div>
                                             <div className='relative'>
                                                 <select
-                                                    value={calendarInfo.gregorian.month}
+                                                    value={
+                                                        calendarInfo.gregorian
+                                                            .month
+                                                    }
                                                     onChange={(e) =>
                                                         handleGregorianChange(
-                                                            calendarInfo.gregorian.year,
-                                                            Number(e.target.value),
-                                                            calendarInfo.gregorian.day,
+                                                            calendarInfo
+                                                                .gregorian.year,
+                                                            Number(
+                                                                e.target.value,
+                                                            ),
+                                                            calendarInfo
+                                                                .gregorian.day,
                                                         )
                                                     }
-                                                    aria-label={t.date.calendars.gregorian.monthAria}
-                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars
+                                                            .gregorian.monthAria
+                                                    }
+                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
                                                 >
-                                                    {gregorianMonths.map((name, idx) => (
-                                                        <option
-                                                            key={name}
-                                                            value={idx + 1}
-                                                            className='bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100'
-                                                        >
-                                                            {idx + 1} - {name}
-                                                        </option>
-                                                    ))}
+                                                    {gregorianMonths.map(
+                                                        (name, idx) => (
+                                                            <option
+                                                                key={name}
+                                                                value={idx + 1}
+                                                                className='bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100'
+                                                            >
+                                                                {idx + 1} -{' '}
+                                                                {name}
+                                                            </option>
+                                                        ),
+                                                    )}
                                                 </select>
-                                                <ChevronDown className='pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
+                                                <ChevronDown className='pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
                                             </div>
                                         </div>
 
@@ -526,19 +639,32 @@ export function DatePage(): React.ReactElement {
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <select
-                                                    value={calendarInfo.gregorian.day}
+                                                    value={
+                                                        calendarInfo.gregorian
+                                                            .day
+                                                    }
                                                     onChange={(e) =>
                                                         handleGregorianChange(
-                                                            calendarInfo.gregorian.year,
-                                                            calendarInfo.gregorian.month,
-                                                            Number(e.target.value),
+                                                            calendarInfo
+                                                                .gregorian.year,
+                                                            calendarInfo
+                                                                .gregorian
+                                                                .month,
+                                                            Number(
+                                                                e.target.value,
+                                                            ),
                                                         )
                                                     }
-                                                    aria-label={t.date.calendars.gregorian.dayAria}
-                                                    className='w-full appearance-none bg-transparent py-2 pl-2 pr-6 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars
+                                                            .gregorian.dayAria
+                                                    }
+                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
                                                 >
                                                     {Array.from(
-                                                        { length: gregorianDaysCount },
+                                                        {
+                                                            length: gregorianDaysCount,
+                                                        },
                                                         (_, i) => i + 1,
                                                     ).map((d) => (
                                                         <option
@@ -550,14 +676,14 @@ export function DatePage(): React.ReactElement {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown className='pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
+                                                <ChevronDown className='pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className='mt-4 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between'>
+                            <div className='mt-4 flex items-center justify-between border-t border-zinc-200/60 pt-3 dark:border-zinc-800/60'>
                                 <span className='text-[11px] text-zinc-500 dark:text-zinc-400'>
                                     {gregorianDaysLabel}
                                 </span>
@@ -565,7 +691,8 @@ export function DatePage(): React.ReactElement {
                                     type='button'
                                     onClick={() =>
                                         handleCopy(
-                                            calendarInfo.formatted.gregorianFull,
+                                            calendarInfo.formatted
+                                                .gregorianFull,
                                             'gregorian',
                                         )
                                     }
@@ -586,7 +713,7 @@ export function DatePage(): React.ReactElement {
                             </div>
                         </div>
 
-                        <div className='flex flex-col justify-between rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-emerald-50/50 to-white p-4 shadow-xs dark:border-emerald-900/40 dark:from-emerald-950/20 dark:to-zinc-900/60 sm:p-5'>
+                        <div className='flex flex-col justify-between rounded-2xl border border-emerald-200/80 bg-gradient-to-b from-emerald-50/50 to-white p-4 shadow-xs sm:p-5 dark:border-emerald-900/40 dark:from-emerald-950/20 dark:to-zinc-900/60'>
                             <div className='space-y-4'>
                                 <div className='flex items-center justify-between'>
                                     <div className='flex items-center gap-2'>
@@ -621,36 +748,57 @@ export function DatePage(): React.ReactElement {
                                     <div className='grid grid-cols-3 gap-2 text-xs'>
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.year}</span>
+                                                <span>
+                                                    {t.date.labels.year}
+                                                </span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <input
                                                     type='number'
                                                     min={1}
                                                     max={2500}
-                                                    value={calendarInfo.hijri.year}
+                                                    value={
+                                                        calendarInfo.hijri.year
+                                                    }
                                                     onChange={(e) => {
-                                                        const val = Number(e.target.value);
+                                                        const val = Number(
+                                                            e.target.value,
+                                                        );
                                                         if (val > 0) {
                                                             handleHijriChange(
                                                                 val,
-                                                                calendarInfo.hijri.month,
-                                                                calendarInfo.hijri.day,
+                                                                calendarInfo
+                                                                    .hijri
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .hijri.day,
                                                             );
                                                         }
                                                     }}
-                                                    aria-label={t.date.calendars.hijri.yearAria}
-                                                    className='w-full bg-transparent py-2 pl-2 pr-6 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars.hijri
+                                                            .yearAria
+                                                    }
+                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
                                                 />
                                                 <div className='absolute right-1 flex flex-col'>
                                                     <button
                                                         type='button'
-                                                        aria-label={t.date.calendars.hijri.increaseYear}
+                                                        aria-label={
+                                                            t.date.calendars
+                                                                .hijri
+                                                                .increaseYear
+                                                        }
                                                         onClick={() =>
                                                             handleHijriChange(
-                                                                calendarInfo.hijri.year + 1,
-                                                                calendarInfo.hijri.month,
-                                                                calendarInfo.hijri.day,
+                                                                calendarInfo
+                                                                    .hijri
+                                                                    .year + 1,
+                                                                calendarInfo
+                                                                    .hijri
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .hijri.day,
                                                             )
                                                         }
                                                         className='cursor-pointer text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400'
@@ -659,12 +807,25 @@ export function DatePage(): React.ReactElement {
                                                     </button>
                                                     <button
                                                         type='button'
-                                                        aria-label={t.date.calendars.hijri.decreaseYear}
+                                                        aria-label={
+                                                            t.date.calendars
+                                                                .hijri
+                                                                .decreaseYear
+                                                        }
                                                         onClick={() =>
                                                             handleHijriChange(
-                                                                Math.max(1, calendarInfo.hijri.year - 1),
-                                                                calendarInfo.hijri.month,
-                                                                calendarInfo.hijri.day,
+                                                                Math.max(
+                                                                    1,
+                                                                    calendarInfo
+                                                                        .hijri
+                                                                        .year -
+                                                                        1,
+                                                                ),
+                                                                calendarInfo
+                                                                    .hijri
+                                                                    .month,
+                                                                calendarInfo
+                                                                    .hijri.day,
                                                             )
                                                         }
                                                         className='cursor-pointer text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400'
@@ -677,32 +838,46 @@ export function DatePage(): React.ReactElement {
 
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.month}</span>
+                                                <span>
+                                                    {t.date.labels.month}
+                                                </span>
                                             </div>
                                             <div className='relative'>
                                                 <select
-                                                    value={calendarInfo.hijri.month}
+                                                    value={
+                                                        calendarInfo.hijri.month
+                                                    }
                                                     onChange={(e) =>
                                                         handleHijriChange(
-                                                            calendarInfo.hijri.year,
-                                                            Number(e.target.value),
-                                                            calendarInfo.hijri.day,
+                                                            calendarInfo.hijri
+                                                                .year,
+                                                            Number(
+                                                                e.target.value,
+                                                            ),
+                                                            calendarInfo.hijri
+                                                                .day,
                                                         )
                                                     }
-                                                    aria-label={t.date.calendars.hijri.monthAria}
-                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars.hijri
+                                                            .monthAria
+                                                    }
+                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
                                                 >
-                                                    {hijriMonths.map((name, idx) => (
-                                                        <option
-                                                            key={name}
-                                                            value={idx + 1}
-                                                            className='bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100'
-                                                        >
-                                                            {idx + 1} - {name}
-                                                        </option>
-                                                    ))}
+                                                    {hijriMonths.map(
+                                                        (name, idx) => (
+                                                            <option
+                                                                key={name}
+                                                                value={idx + 1}
+                                                                className='bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100'
+                                                            >
+                                                                {idx + 1} -{' '}
+                                                                {name}
+                                                            </option>
+                                                        ),
+                                                    )}
                                                 </select>
-                                                <ChevronDown className='pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
+                                                <ChevronDown className='pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
                                             </div>
                                         </div>
 
@@ -712,19 +887,30 @@ export function DatePage(): React.ReactElement {
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <select
-                                                    value={calendarInfo.hijri.day}
+                                                    value={
+                                                        calendarInfo.hijri.day
+                                                    }
                                                     onChange={(e) =>
                                                         handleHijriChange(
-                                                            calendarInfo.hijri.year,
-                                                            calendarInfo.hijri.month,
-                                                            Number(e.target.value),
+                                                            calendarInfo.hijri
+                                                                .year,
+                                                            calendarInfo.hijri
+                                                                .month,
+                                                            Number(
+                                                                e.target.value,
+                                                            ),
                                                         )
                                                     }
-                                                    aria-label={t.date.calendars.hijri.dayAria}
-                                                    className='w-full appearance-none bg-transparent py-2 pl-2 pr-6 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    aria-label={
+                                                        t.date.calendars.hijri
+                                                            .dayAria
+                                                    }
+                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
                                                 >
                                                     {Array.from(
-                                                        { length: hijriDaysCount },
+                                                        {
+                                                            length: hijriDaysCount,
+                                                        },
                                                         (_, i) => i + 1,
                                                     ).map((d) => (
                                                         <option
@@ -736,14 +922,14 @@ export function DatePage(): React.ReactElement {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown className='pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
+                                                <ChevronDown className='pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400' />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className='mt-4 pt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between'>
+                            <div className='mt-4 flex items-center justify-between border-t border-zinc-200/60 pt-3 dark:border-zinc-800/60'>
                                 <span className='text-[11px] text-zinc-500 dark:text-zinc-400'>
                                     {hijriDaysLabel}
                                 </span>
@@ -779,10 +965,12 @@ export function DatePage(): React.ReactElement {
                             <span>{t.date.metrics.title}</span>
                         </div>
 
-                        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs'>
+                        <div className='grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4'>
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
-                                    <span className='font-medium'>{t.date.metrics.weekday}</span>
+                                    <span className='font-medium'>
+                                        {t.date.metrics.weekday}
+                                    </span>
                                     <ArrowRightLeft className='h-3.5 w-3.5 text-cyan-500' />
                                 </div>
                                 <div className='font-bold text-zinc-900 dark:text-zinc-100'>
@@ -795,12 +983,15 @@ export function DatePage(): React.ReactElement {
 
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
-                                    <span className='font-medium'>{t.date.metrics.isoGregorian}</span>
+                                    <span className='font-medium'>
+                                        {t.date.metrics.isoGregorian}
+                                    </span>
                                     <button
                                         type='button'
                                         onClick={() =>
                                             handleCopy(
-                                                calendarInfo.formatted.gregorianIso,
+                                                calendarInfo.formatted
+                                                    .gregorianIso,
                                                 'isoG',
                                             )
                                         }
@@ -824,12 +1015,15 @@ export function DatePage(): React.ReactElement {
 
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
-                                    <span className='font-medium'>{t.date.metrics.isoJalali}</span>
+                                    <span className='font-medium'>
+                                        {t.date.metrics.isoJalali}
+                                    </span>
                                     <button
                                         type='button'
                                         onClick={() =>
                                             handleCopy(
-                                                calendarInfo.formatted.jalaliIso,
+                                                calendarInfo.formatted
+                                                    .jalaliIso,
                                                 'isoJ',
                                             )
                                         }
@@ -853,12 +1047,16 @@ export function DatePage(): React.ReactElement {
 
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
-                                    <span className='font-medium'>{t.date.metrics.unixTimestamp}</span>
+                                    <span className='font-medium'>
+                                        {t.date.metrics.unixTimestamp}
+                                    </span>
                                     <button
                                         type='button'
                                         onClick={() =>
                                             handleCopy(
-                                                String(calendarInfo.unixTimestamp),
+                                                String(
+                                                    calendarInfo.unixTimestamp,
+                                                ),
                                                 'unix',
                                             )
                                         }
@@ -898,7 +1096,7 @@ export function DatePage(): React.ReactElement {
                                 return (
                                     <span
                                         key={phraseObj.text}
-                                        className={`feature-badge__phrase ${phraseObj.color}`}
+                                        className={`feature-badge__phrase mx-auto text-center ${phraseObj.color}`}
                                     >
                                         <Icon className='feature-badge__icon h-4 w-4 shrink-0' />
                                         {phraseObj.text}
@@ -906,9 +1104,7 @@ export function DatePage(): React.ReactElement {
                                 );
                             })}
                         </span>
-                        <span className='sr-only'>
-                            {t.date.overview.badge}
-                        </span>
+                        <span className='sr-only'>{t.date.overview.badge}</span>
                     </div>
 
                     <h2 className='text-2xl leading-tight font-black tracking-tight text-zinc-900 sm:text-4xl md:text-5xl dark:text-white'>
