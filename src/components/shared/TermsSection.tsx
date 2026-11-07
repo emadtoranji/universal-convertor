@@ -44,7 +44,7 @@ const TermsSectionComponent: React.FC<TermsSectionProps> = ({
                     </h2>
                 </div>
                 {effectiveBadge && (
-                    <div className='inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400'>
+                    <div className='inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-nowrap text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400'>
                         <FileCode className='h-3 w-3 text-cyan-500' />
                         <span>{effectiveBadge}</span>
                     </div>
@@ -64,7 +64,8 @@ const TermsSectionComponent: React.FC<TermsSectionProps> = ({
                         className='space-y-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 p-3.5 dark:border-zinc-800/80 dark:bg-zinc-950/60'
                     >
                         <div className='flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-200'>
-                            {item.id === 'warranty' || item.id === 'liability' ? (
+                            {item.id === 'warranty' ||
+                            item.id === 'liability' ? (
                                 <AlertTriangle className='h-3.5 w-3.5 flex-shrink-0 text-amber-500' />
                             ) : item.id === 'privacy' ? (
                                 <ShieldCheck className='h-3.5 w-3.5 flex-shrink-0 text-emerald-500' />
@@ -84,4 +85,3 @@ const TermsSectionComponent: React.FC<TermsSectionProps> = ({
 };
 
 export const TermsSection = React.memo(TermsSectionComponent);
-

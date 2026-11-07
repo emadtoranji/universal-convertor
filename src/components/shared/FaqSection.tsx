@@ -82,7 +82,7 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
 
                 <div className='flex items-center gap-2'>
                     {effectiveBadge && (
-                        <div className='hidden sm:inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium text-indigo-700 dark:border-indigo-900/60 dark:bg-indigo-950/50 dark:text-indigo-300'>
+                        <div className='hidden items-center rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium text-nowrap text-indigo-700 sm:inline-flex dark:border-indigo-900/60 dark:bg-indigo-950/50 dark:text-indigo-300'>
                             {effectiveBadge}
                         </div>
                     )}
@@ -99,7 +99,7 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder='Search questions, answers, and capabilities...'
                     aria-label='Search frequently asked questions'
-                    className='w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pr-9 pl-9 text-xs text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-cyan-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-cyan-500 dark:focus:bg-zinc-900'
+                    className='w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pr-9 pl-9 text-xs text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-cyan-500 focus:bg-white focus:ring-1 focus:ring-cyan-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-cyan-500 dark:focus:bg-zinc-900'
                 />
                 {searchQuery.length > 0 && (
                     <button
@@ -116,7 +116,8 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
             <div className='space-y-2.5 transition-all duration-200'>
                 {filteredItems.length === 0 ? (
                     <div className='rounded-xl border border-dashed border-zinc-300 p-6 text-center text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400'>
-                        No questions matching "{searchQuery}" found. Try another query or clear the filter.
+                        No questions matching "{searchQuery}" found. Try another
+                        query or clear the filter.
                     </div>
                 ) : (
                     filteredItems.map((faqItem, idx) => {
@@ -155,4 +156,3 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
 };
 
 export const FaqSection = React.memo(FaqSectionComponent);
-
