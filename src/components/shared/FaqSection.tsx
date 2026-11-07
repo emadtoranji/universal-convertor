@@ -134,18 +134,26 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
                                 >
                                     <span>{faqItem.question}</span>
                                     <ChevronDown
-                                        className={`h-4 w-4 flex-shrink-0 text-zinc-600 transition-transform duration-200 dark:text-zinc-400 ${
+                                        className={`h-4 w-4 flex-shrink-0 text-zinc-600 transition-transform duration-300 ease-out dark:text-zinc-400 ${
                                             isOpen
                                                 ? 'rotate-180 text-cyan-500'
                                                 : ''
                                         }`}
                                     />
                                 </button>
-                                {isOpen && (
-                                    <div className='border-t border-zinc-200/50 px-4 pt-2 pb-3.5 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800/50 dark:text-zinc-400'>
-                                        {faqItem.answer}
+                                <div
+                                    className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+                                        isOpen
+                                            ? 'grid-rows-[1fr] opacity-100'
+                                            : 'grid-rows-[0fr] opacity-0'
+                                    }`}
+                                >
+                                    <div className='overflow-hidden'>
+                                        <div className='border-t border-zinc-200/50 px-4 pt-2 pb-3.5 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800/50 dark:text-zinc-400'>
+                                            {faqItem.answer}
+                                        </div>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         );
                     })
