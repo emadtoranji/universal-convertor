@@ -12,6 +12,7 @@ import Unlock from 'lucide-react/icons/lock-open';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Sparkles from 'lucide-react/icons/sparkles';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import {
   ConversionOptions,
   OutputFormat,
@@ -83,6 +84,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
   canMergeToPdf = true,
 }): React.ReactElement => {
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
+  const [showMoreControls, setShowMoreControls] = useState<boolean>(false);
   const [manualShowSettings, setManualShowSettings] = useState<boolean>(false);
 
   const isAllCompleted = totalCount > 0 && completedCount === totalCount;
@@ -281,7 +283,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
             <button
               type="button"
               onClick={onClearQueue}
-              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer"
+              className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 transition-all cursor-pointer"
               title={t.toolbar.actions.clearQueueTitle}
               aria-label={t.toolbar.actions.clearQueueAria}
             >
@@ -421,7 +423,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                 type="button"
                 onClick={onClearQueue}
                 disabled={isProcessing}
-                className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950/40 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-300 transition-all cursor-pointer disabled:opacity-40"
+                className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 transition-all cursor-pointer disabled:opacity-40"
                 title={t.toolbar.actions.clearQueueTitle}
                 aria-label={t.toolbar.actions.clearQueueAria}
               >
@@ -478,176 +480,210 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
       )}
 
       {showAdvanced && !isSettingsHidden && (
-        <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2 font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              <Maximize2 className="w-4 h-4 text-cyan-500" />
-              <span>{t.toolbar.resize.title}</span>
-            </div>
-            <div className="flex gap-2">
-              {(['original', 'percentage', 'dimensions'] as ResizeMode[]).map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => handleResizeModeChange(mode)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all cursor-pointer ${
-                    globalOptions.resizeMode === mode
-                      ? 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/40'
-                      : 'bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
-                  }`}
-                >
-                  {t.toolbar.resize.modes[mode]}
-                </button>
-              ))}
-            </div>
-
-            {globalOptions.resizeMode === 'percentage' && (
-              <div className="space-y-1">
-                <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
-                  <span>{t.toolbar.resize.scaleFactor}</span>
-                  <span className="font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
-                    {globalOptions.resizePercentage}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="10"
-                  max="300"
-                  value={globalOptions.resizePercentage}
-                  onChange={handlePercentageChange}
-                  className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-2"
-                />
-              </div>
-            )}
-
-            {globalOptions.resizeMode === 'dimensions' && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    placeholder={t.toolbar.resize.widthPlaceholder}
-                    value={globalOptions.targetWidth ?? ''}
-                    onChange={handleWidthChange}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-cyan-500"
-                  />
-                  <span className="text-zinc-400">×</span>
-                  <input
-                    type="number"
-                    placeholder={t.toolbar.resize.heightPlaceholder}
-                    value={globalOptions.targetHeight ?? ''}
-                    onChange={handleHeightChange}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-cyan-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAspectRatioToggle}
-                    className="p-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-pointer"
-                    title={
-                      globalOptions.maintainAspectRatio
-                        ? t.toolbar.resize.lockAspectRatio
-                        : t.toolbar.resize.unlockAspectRatio
-                    }
-                  >
-                    {globalOptions.maintainAspectRatio ? (
-                      <Lock className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                    ) : (
-                      <Unlock className="w-3.5 h-3.5 text-zinc-400" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="pt-2">
-              <label className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={globalOptions.grayscale}
-                  onChange={handleGrayscaleToggle}
-                  className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500 bg-white dark:bg-zinc-950"
-                />
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>{t.toolbar.colorEffects.grayscale}</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2 font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              <Palette className="w-4 h-4 text-teal-500" />
-              <span>{t.toolbar.backgroundColor.title}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={globalOptions.backgroundColor || '#ffffff'}
-                onChange={handleBgColorChange}
-                className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border border-zinc-300 dark:border-zinc-700"
-                aria-label={t.toolbar.backgroundColor.ariaLabel}
+        <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 space-y-4 text-xs">
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowMoreControls((prev) => !prev)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-cyan-700 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 transition-colors cursor-pointer"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span>More Options</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                  showMoreControls ? 'rotate-180' : ''
+                }`}
               />
-              <div className="flex flex-col">
-                <span className="text-zinc-800 dark:text-zinc-300 font-mono">
-                  {globalOptions.backgroundColor || '#ffffff'}
-                </span>
-                <span className="text-[11px] text-zinc-600 dark:text-zinc-400">{t.toolbar.backgroundColor.description}</span>
-              </div>
-            </div>
+            </button>
 
-            <div className="pt-1">
-              <label className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={globalOptions.stripExif}
-                  onChange={handleStripExifToggle}
-                  className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500 bg-white dark:bg-zinc-950"
-                />
-                <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{t.toolbar.metadata.stripExif}</span>
-              </label>
-            </div>
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                showMoreControls ? 'max-h-[1000px] opacity-100 mt-3 pt-1' : 'max-h-0 opacity-0'
+              }`}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-3.5 rounded-2xl bg-zinc-50/70 dark:bg-zinc-950/40 border border-zinc-200/80 dark:border-zinc-800/80">
+                <div className="space-y-2 p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-2 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Maximize2 className="w-4 h-4 text-cyan-500" />
+                    <span>{t.toolbar.resize.title}</span>
+                  </div>
+                  <div className="flex gap-1.5">
+                    {(['original', 'percentage', 'dimensions'] as ResizeMode[]).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => handleResizeModeChange(mode)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-all cursor-pointer ${
+                          globalOptions.resizeMode === mode
+                            ? 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/40'
+                            : 'bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                      >
+                        {t.toolbar.resize.modes[mode]}
+                      </button>
+                    ))}
+                  </div>
 
-            <div className="pt-1 space-y-1">
-              <span className="text-[11px] text-zinc-600 dark:text-zinc-400 block">Quality Preset:</span>
-              <div className="text-[11px] text-cyan-600 dark:text-cyan-400 font-medium">
-                {t.toolbar.quality.recommended}
+                  {globalOptions.resizeMode === 'percentage' && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-zinc-500 dark:text-zinc-400">
+                        <span>{t.toolbar.resize.scaleFactor}</span>
+                        <span className="font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
+                          {globalOptions.resizePercentage}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="300"
+                        value={globalOptions.resizePercentage}
+                        onChange={handlePercentageChange}
+                        className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-1.5"
+                      />
+                    </div>
+                  )}
+
+                  {globalOptions.resizeMode === 'dimensions' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          placeholder={t.toolbar.resize.widthPlaceholder}
+                          value={globalOptions.targetWidth ?? ''}
+                          onChange={handleWidthChange}
+                          className="w-full px-2 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-cyan-500 text-xs"
+                        />
+                        <span className="text-zinc-400">×</span>
+                        <input
+                          type="number"
+                          placeholder={t.toolbar.resize.heightPlaceholder}
+                          value={globalOptions.targetHeight ?? ''}
+                          onChange={handleHeightChange}
+                          className="w-full px-2 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-cyan-500 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAspectRatioToggle}
+                          className="p-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-pointer"
+                          title={
+                            globalOptions.maintainAspectRatio
+                              ? t.toolbar.resize.lockAspectRatio
+                              : t.toolbar.resize.unlockAspectRatio
+                          }
+                        >
+                          {globalOptions.maintainAspectRatio ? (
+                            <Lock className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                          ) : (
+                            <Unlock className="w-3.5 h-3.5 text-zinc-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Resize and scale images by percentage or custom resolution.
+                  </p>
+                </div>
+
+                <div className="space-y-2 p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-2 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Palette className="w-4 h-4 text-teal-500" />
+                    <span>{t.toolbar.backgroundColor.title}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="color"
+                      value={globalOptions.backgroundColor || '#ffffff'}
+                      onChange={handleBgColorChange}
+                      className="w-7 h-7 rounded-lg cursor-pointer bg-transparent border border-zinc-300 dark:border-zinc-700"
+                      aria-label={t.toolbar.backgroundColor.ariaLabel}
+                    />
+                    <span className="text-zinc-800 dark:text-zinc-300 font-mono text-xs">
+                      {globalOptions.backgroundColor || '#ffffff'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Fill transparent or padded background areas with chosen color.
+                  </p>
+                </div>
+
+                <div className="space-y-2 p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-2 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>Black & White</span>
+                  </div>
+                  <label className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 cursor-pointer pt-0.5">
+                    <input
+                      type="checkbox"
+                      checked={globalOptions.grayscale}
+                      onChange={handleGrayscaleToggle}
+                      className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500 bg-white dark:bg-zinc-950"
+                    />
+                    <span>{t.toolbar.colorEffects.grayscale}</span>
+                  </label>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Transform all color channels into monochrome grayscale.
+                  </p>
+                </div>
+
+                <div className="space-y-2 p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-2 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Shield className="w-4 h-4 text-emerald-500" />
+                    <span>Metadata Privacy</span>
+                  </div>
+                  <label className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 cursor-pointer pt-0.5">
+                    <input
+                      type="checkbox"
+                      checked={globalOptions.stripExif}
+                      onChange={handleStripExifToggle}
+                      className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500 bg-white dark:bg-zinc-950"
+                    />
+                    <span>{t.toolbar.metadata.stripExif}</span>
+                  </label>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Safely strip camera, GPS, and private EXIF tags from files.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2 font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              <FileText className="w-4 h-4 text-pink-500" />
-              <span>{t.toolbar.pdfSettings.title}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.toolbar.pdfSettings.pageSizeLabel}</label>
-                <select
-                  value={globalOptions.pdfPageSize}
-                  onChange={handlePdfPageSizeChange}
-                  className="w-full px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"
-                >
-                  <option value="original">{t.toolbar.pdfSettings.pageSizes.original}</option>
-                  <option value="a4">{t.toolbar.pdfSettings.pageSizes.a4}</option>
-                  <option value="letter">{t.toolbar.pdfSettings.pageSizes.letter}</option>
-                </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                <FileText className="w-4 h-4 text-pink-500" />
+                <span>{t.toolbar.pdfSettings.title}</span>
               </div>
-              <div>
-                <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.toolbar.pdfSettings.orientationLabel}</label>
-                <select
-                  value={globalOptions.pdfOrientation}
-                  onChange={handlePdfOrientationChange}
-                  className="w-full px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"
-                >
-                  <option value="auto">{t.toolbar.pdfSettings.orientations.auto}</option>
-                  <option value="portrait">{t.toolbar.pdfSettings.orientations.portrait}</option>
-                  <option value="landscape">{t.toolbar.pdfSettings.orientations.landscape}</option>
-                </select>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.toolbar.pdfSettings.pageSizeLabel}</label>
+                  <select
+                    value={globalOptions.pdfPageSize}
+                    onChange={handlePdfPageSizeChange}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"
+                  >
+                    <option value="original">{t.toolbar.pdfSettings.pageSizes.original}</option>
+                    <option value="a4">{t.toolbar.pdfSettings.pageSizes.a4}</option>
+                    <option value="letter">{t.toolbar.pdfSettings.pageSizes.letter}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] text-zinc-600 dark:text-zinc-400 mb-1">{t.toolbar.pdfSettings.orientationLabel}</label>
+                  <select
+                    value={globalOptions.pdfOrientation}
+                    onChange={handlePdfOrientationChange}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"
+                  >
+                    <option value="auto">{t.toolbar.pdfSettings.orientations.auto}</option>
+                    <option value="portrait">{t.toolbar.pdfSettings.orientations.portrait}</option>
+                    <option value="landscape">{t.toolbar.pdfSettings.orientations.landscape}</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
-              <span className="block font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-[11px] mb-1.5">
+            <div className="space-y-2">
+              <span className="block font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 text-[11px]">
                 {t.toolbar.documentSettings.title}
               </span>
               <div className="grid grid-cols-2 gap-2">

@@ -26,7 +26,7 @@ describe('formatMatrix - Formats Test Suite', () => {
     assert.ok(pngOutputs.includes('webp'));
     assert.ok(pngOutputs.includes('jpeg'));
     assert.ok(pngOutputs.includes('avif'));
-    assert.ok(!pngOutputs.includes('png'));
+    assert.ok(pngOutputs.includes('png'));
 
     const jsonOutputs = getCompatibleOutputFormats('json');
     assert.ok(jsonOutputs.includes('json'));

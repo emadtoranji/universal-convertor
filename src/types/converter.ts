@@ -136,7 +136,7 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
         'tiff',
         'pdf',
       ];
-      return allImageOutputs.filter((fmt) => fmt !== sourceFormat);
+      return allImageOutputs;
     }
     case 'document': {
       switch (sourceFormat) {
@@ -164,10 +164,9 @@ export function getCompatibleOutputFormats(sourceFormat: InputFormat): OutputFor
 }
 
 export function isHomogeneousQueue(items: QueueItem[]): boolean {
-  const pending = items.filter((item) => item.status !== 'completed' && item.status !== 'error');
-  if (pending.length <= 1) return true;
-  const firstCategory = pending[0].category;
-  return pending.every((item) => item.category === firstCategory);
+  if (items.length <= 1) return true;
+  const firstCategory = items[0].category;
+  return items.every((item) => item.category === firstCategory);
 }
 
 export interface ConvertRequestPayload {

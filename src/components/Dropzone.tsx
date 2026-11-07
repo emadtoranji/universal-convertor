@@ -123,20 +123,20 @@ const DropzoneComponent: React.FC<DropzoneProps> = ({
             <UploadCloud className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9" />
           </div>
 
-          <h2 className="text-base sm:text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mb-1.5">
+          <h2 className="text-base sm:text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2 leading-relaxed sm:leading-loose">
             {t.dropzone.title}{' '}
             <span className="text-cyan-600 dark:text-cyan-400 underline decoration-cyan-500/40 underline-offset-4">
               {t.dropzone.browse}
             </span>
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mb-4 sm:mb-5">
+          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mb-4 sm:mb-6 leading-relaxed">
             {t.dropzone.subtitle}{' '}
             <kbd className="px-1.5 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 font-mono text-xs">
               {t.dropzone.pasteKey}
             </kbd>
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg">
+          <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg leading-relaxed">
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-zinc-100 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
               <FileImage className="w-3.5 h-3.5 text-cyan-500" />
               {t.dropzone.supportedFormats.images}

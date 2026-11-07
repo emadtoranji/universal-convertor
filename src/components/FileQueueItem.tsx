@@ -15,6 +15,9 @@ import Shield from 'lucide-react/icons/shield';
 import FileImage from 'lucide-react/icons/file-image';
 import Table from 'lucide-react/icons/table';
 import Sparkles from 'lucide-react/icons/sparkles';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import Maximize2 from 'lucide-react/icons/maximize-2';
+import Palette from 'lucide-react/icons/palette';
 import {
   QueueItem,
   OutputFormat,
@@ -48,6 +51,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
   onRegenerate,
 }): React.ReactElement => {
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
+  const [showMoreControls, setShowMoreControls] = useState<boolean>(false);
 
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -269,7 +273,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
               type="button"
               onClick={() => onRemove(item.id)}
               disabled={item.status === 'processing'}
-              className="p-2 rounded-lg bg-zinc-100 hover:bg-rose-100 dark:bg-zinc-950/60 dark:hover:bg-rose-950/40 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer disabled:opacity-40"
+              className="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer disabled:opacity-40"
               title={t.queue.actions.removeTitle}
               aria-label={t.queue.actions.removeAria}
             >
@@ -280,9 +284,9 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
       </div>
 
       {showAdvanced && item.status === 'idle' && (
-        <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs bg-zinc-50 dark:bg-zinc-950/50 p-3 rounded-xl">
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-zinc-600 dark:text-zinc-400 font-medium">
+        <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800/80 space-y-3 bg-zinc-50 dark:bg-zinc-950/50 p-3.5 rounded-xl">
+          <div className="space-y-1.5 max-w-sm">
+            <div className="flex justify-between text-zinc-600 dark:text-zinc-400 font-medium text-xs">
               <span>{t.queue.advanced.quality}</span>
               <span className="font-mono text-cyan-600 dark:text-cyan-400 font-bold">{item.options.quality}%</span>
             </div>
@@ -306,101 +310,153 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
             />
           </div>
 
-          <div className="space-y-1.5">
-            <span className="text-zinc-600 dark:text-zinc-400 font-medium block">{t.queue.advanced.resize}</span>
-            <div className="flex gap-1.5">
-              {(['original', 'percentage', 'dimensions'] as ResizeMode[]).map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => updateItemOption('resizeMode', mode)}
-                  className={`px-2 py-1 rounded-md text-[11px] font-medium capitalize transition-all cursor-pointer ${
-                    item.options.resizeMode === mode
-                      ? 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/40'
-                      : 'bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
-                  }`}
-                >
-                  {mode}
-                </button>
-              ))}
-            </div>
-
-            {item.options.resizeMode === 'percentage' && (
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="range"
-                  min="10"
-                  max="300"
-                  value={item.options.resizePercentage}
-                  onChange={(e) => updateItemOption('resizePercentage', Number(e.target.value))}
-                  className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-1.5"
-                />
-                <span className="font-mono text-xs text-cyan-600 dark:text-cyan-400 font-semibold min-w-[36px]">
-                  {item.options.resizePercentage}%
-                </span>
-              </div>
-            )}
-
-            {item.options.resizeMode === 'dimensions' && (
-              <div className="flex items-center gap-1.5 pt-1">
-                <input
-                  type="number"
-                  placeholder="W"
-                  value={item.options.targetWidth ?? ''}
-                  onChange={(e) => updateItemOption('targetWidth', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-16 px-1.5 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
-                />
-                <span>×</span>
-                <input
-                  type="number"
-                  placeholder="H"
-                  value={item.options.targetHeight ?? ''}
-                  onChange={(e) => updateItemOption('targetHeight', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-16 px-1.5 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => updateItemOption('maintainAspectRatio', !item.options.maintainAspectRatio)}
-                  className="p-1 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
-                >
-                  {item.options.maintainAspectRatio ? <Lock className="w-3 h-3 text-cyan-500" /> : <Unlock className="w-3 h-3 text-zinc-400" />}
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <span className="text-zinc-600 dark:text-zinc-400 font-medium block">{t.queue.advanced.backgroundColor}</span>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={item.options.backgroundColor || '#ffffff'}
-                onChange={(e) => updateItemOption('backgroundColor', e.target.value)}
-                className="w-7 h-7 rounded-md cursor-pointer bg-transparent border border-zinc-300 dark:border-zinc-700"
+          <div className="border-t border-zinc-200/70 dark:border-zinc-800/70 pt-2.5">
+            <button
+              type="button"
+              onClick={() => setShowMoreControls((prev) => !prev)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-cyan-700 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 transition-colors cursor-pointer"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span>More Options</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                  showMoreControls ? 'rotate-180' : ''
+                }`}
               />
-              <span className="font-mono text-xs text-zinc-700 dark:text-zinc-300">{item.options.backgroundColor || '#ffffff'}</span>
-              <label className="flex items-center gap-1.5 ml-auto text-zinc-600 dark:text-zinc-400 cursor-pointer text-[11px]">
-                <input
-                  type="checkbox"
-                  checked={item.options.stripExif}
-                  onChange={(e) => updateItemOption('stripExif', e.target.checked)}
-                  className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500"
-                />
-                <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                <span>EXIF</span>
-              </label>
-            </div>
-            <div className="pt-1">
-              <label className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 cursor-pointer text-[11px]">
-                <input
-                  type="checkbox"
-                  checked={item.options.grayscale}
-                  onChange={(e) => updateItemOption('grayscale', e.target.checked)}
-                  className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500"
-                />
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>Black & White</span>
-              </label>
+            </button>
+
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                showMoreControls ? 'max-h-[800px] opacity-100 mt-3 pt-1' : 'max-h-0 opacity-0'
+              }`}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+                <div className="space-y-1.5 p-2.5 rounded-lg bg-white/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Maximize2 className="w-3.5 h-3.5 text-cyan-500" />
+                    <span>{t.queue.advanced.resize}</span>
+                  </div>
+                  <div className="flex gap-1.5">
+                    {(['original', 'percentage', 'dimensions'] as ResizeMode[]).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => updateItemOption('resizeMode', mode)}
+                        className={`px-2 py-1 rounded-md text-[11px] font-medium capitalize transition-all cursor-pointer ${
+                          item.options.resizeMode === mode
+                            ? 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/40'
+                            : 'bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                      >
+                        {mode}
+                      </button>
+                    ))}
+                  </div>
+
+                  {item.options.resizeMode === 'percentage' && (
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="range"
+                        min="10"
+                        max="300"
+                        value={item.options.resizePercentage}
+                        onChange={(e) => updateItemOption('resizePercentage', Number(e.target.value))}
+                        className="w-full accent-cyan-500 bg-zinc-200 dark:bg-zinc-800 rounded-lg cursor-pointer h-1.5"
+                      />
+                      <span className="font-mono text-xs text-cyan-600 dark:text-cyan-400 font-semibold min-w-[36px]">
+                        {item.options.resizePercentage}%
+                      </span>
+                    </div>
+                  )}
+
+                  {item.options.resizeMode === 'dimensions' && (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <input
+                        type="number"
+                        placeholder="W"
+                        value={item.options.targetWidth ?? ''}
+                        onChange={(e) => updateItemOption('targetWidth', e.target.value ? Number(e.target.value) : undefined)}
+                        className="w-14 px-1.5 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
+                      />
+                      <span>×</span>
+                      <input
+                        type="number"
+                        placeholder="H"
+                        value={item.options.targetHeight ?? ''}
+                        onChange={(e) => updateItemOption('targetHeight', e.target.value ? Number(e.target.value) : undefined)}
+                        className="w-14 px-1.5 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateItemOption('maintainAspectRatio', !item.options.maintainAspectRatio)}
+                        className="p-1 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                      >
+                        {item.options.maintainAspectRatio ? <Lock className="w-3 h-3 text-cyan-500" /> : <Unlock className="w-3 h-3 text-zinc-400" />}
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Scale image dimensions by percentage or target pixels.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 p-2.5 rounded-lg bg-white/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Palette className="w-3.5 h-3.5 text-teal-500" />
+                    <span>{t.queue.advanced.backgroundColor}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={item.options.backgroundColor || '#ffffff'}
+                      onChange={(e) => updateItemOption('backgroundColor', e.target.value)}
+                      className="w-7 h-7 rounded-md cursor-pointer bg-transparent border border-zinc-300 dark:border-zinc-700"
+                    />
+                    <span className="font-mono text-xs text-zinc-700 dark:text-zinc-300">{item.options.backgroundColor || '#ffffff'}</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Fill transparent or padded background areas with solid color.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 p-2.5 rounded-lg bg-white/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Black & White</span>
+                  </div>
+                  <label className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 cursor-pointer text-xs pt-1">
+                    <input
+                      type="checkbox"
+                      checked={item.options.grayscale}
+                      onChange={(e) => updateItemOption('grayscale', e.target.checked)}
+                      className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500"
+                    />
+                    <span>Enable monochrome</span>
+                  </label>
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Converts RGB channels to clean high-contrast grayscale monochrome.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 p-2.5 rounded-lg bg-white/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80">
+                  <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300">
+                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>EXIF Removal</span>
+                  </div>
+                  <label className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 cursor-pointer text-xs pt-1">
+                    <input
+                      type="checkbox"
+                      checked={item.options.stripExif}
+                      onChange={(e) => updateItemOption('stripExif', e.target.checked)}
+                      className="rounded border-zinc-300 dark:border-zinc-700 text-cyan-600 focus:ring-cyan-500"
+                    />
+                    <span>Strip metadata</span>
+                  </label>
+                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 opacity-85 leading-tight pt-1">
+                    Removes camera model, GPS coordinates, and private EXIF tags.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 

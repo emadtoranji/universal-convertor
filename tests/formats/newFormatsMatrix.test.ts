@@ -125,7 +125,7 @@ describe('newFormatsMatrix - Format Matrix Test Suite', () => {
     assert.ok(tiffOutputs.includes('webp'));
     assert.ok(tiffOutputs.includes('png'));
     assert.ok(tiffOutputs.includes('jpeg'));
-    assert.ok(!tiffOutputs.includes('tiff'));
+    assert.ok(tiffOutputs.includes('tiff'));
 
     const psdOutputs = getCompatibleOutputFormats('psd');
     assert.ok(psdOutputs.includes('webp'));
