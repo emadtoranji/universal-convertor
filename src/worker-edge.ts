@@ -30,6 +30,8 @@ const STATIC_EXTENSIONS = new Set([
 const ALLOWED_EXACT_PATHS = new Set([
   '/',
   '/index.html',
+  '/date',
+  '/date/',
   '/robots.txt',
   '/sitemap.xml',
   '/llms.txt',

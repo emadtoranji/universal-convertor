@@ -8,8 +8,10 @@ import {
     useMemo,
     type ReactElement,
 } from 'react';
-import { Header } from './components/Header';
+import { Header } from './components/layout/Header';
 import { Dropzone } from './components/Dropzone';
+import { FaqSection } from './components/shared/FaqSection';
+import { TermsSection } from './components/shared/TermsSection';
 import {
     ConversionOptions,
     OutputFormat,
@@ -33,13 +35,8 @@ import Layers from 'lucide-react/icons/layers';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Zap from 'lucide-react/icons/zap';
 import FileCheck from 'lucide-react/icons/file-check';
-import HelpCircle from 'lucide-react/icons/circle-question-mark';
-import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import Scale from 'lucide-react/icons/scale';
-import FileCode from 'lucide-react/icons/file-code';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import UploadCloud from 'lucide-react/icons/cloud-upload';
 import {
     getOrInitEffectiveTheme,
@@ -91,7 +88,6 @@ export default function App(): ReactElement {
     const [isDark, setIsDark] = useState<boolean>(
         () => getOrInitEffectiveTheme() === 'dark',
     );
-    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
     const [isWindowDragOver, setIsWindowDragOver] = useState<boolean>(false);
     const [isBoxDragOver, setIsBoxDragOver] = useState<boolean>(false);
     const dragCounterRef = useRef<number>(0);
@@ -849,10 +845,6 @@ export default function App(): ReactElement {
         setPreviewItem(null);
     }, []);
 
-    const toggleFaq = useCallback((index: number): void => {
-        setOpenFaqIndex((prev) => (prev === index ? null : index));
-    }, []);
-
     const completedCount = useMemo(
         () => queue.filter((i) => i.status === 'completed').length,
         [queue],
@@ -916,6 +908,7 @@ export default function App(): ReactElement {
             <Header
                 isDark={isDark}
                 onToggleTheme={handleToggleTheme}
+                currentPath='/'
             />
 
             <main className='mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-3 py-3 sm:gap-8 sm:px-6 sm:py-6 lg:px-8'>
@@ -1043,7 +1036,9 @@ export default function App(): ReactElement {
                                                     onDownloadSingle={
                                                         handleDownloadSingle
                                                     }
-                                                    onPreview={handleOpenPreview}
+                                                    onPreview={
+                                                        handleOpenPreview
+                                                    }
                                                     onTargetFormatChange={
                                                         handleItemFormatChange
                                                     }
@@ -1184,101 +1179,14 @@ export default function App(): ReactElement {
                     </div>
                 </section>
 
-                <section
-                    aria-label='Frequently Asked Questions'
-                    className='space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs sm:rounded-3xl sm:p-7 dark:border-zinc-800/90 dark:bg-zinc-900/40'
-                >
-                    <div className='flex items-center gap-2.5'>
-                        <div className='rounded-lg bg-indigo-100 p-1.5 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-400'>
-                            <HelpCircle className='h-4 w-4' />
-                        </div>
-                        <h2 className='text-base font-bold text-zinc-900 sm:text-lg dark:text-zinc-100'>
-                            {t.faq.title}
-                        </h2>
-                    </div>
+                <FaqSection />
 
-                    <div className='space-y-2.5'>
-                        {t.faq.items.map((faqItem, idx) => (
-                            <div
-                                key={faqItem.id}
-                                className='overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-50 dark:border-zinc-800/80 dark:bg-zinc-950/50'
-                            >
-                                <button
-                                    type='button'
-                                    onClick={() => toggleFaq(idx)}
-                                    className='flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left text-xs font-semibold text-zinc-900 sm:text-sm dark:text-zinc-100'
-                                >
-                                    <span>{faqItem.question}</span>
-                                    <ChevronDown
-                                        className={`h-4 w-4 flex-shrink-0 text-zinc-600 transition-transform duration-200 dark:text-zinc-400 ${
-                                            openFaqIndex === idx
-                                                ? 'rotate-180 text-cyan-500'
-                                                : ''
-                                        }`}
-                                    />
-                                </button>
-                                {openFaqIndex === idx && (
-                                    <div className='border-t border-zinc-200/50 px-4 pt-2 pb-3.5 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800/50 dark:text-zinc-400'>
-                                        {faqItem.answer}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section
-                    aria-label='Terms of Service & Disclaimer'
-                    className='space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs sm:rounded-3xl sm:p-7 dark:border-zinc-800/90 dark:bg-zinc-900/40'
-                >
-                    <div className='flex flex-wrap items-center justify-between gap-2'>
-                        <div className='flex items-center gap-2.5'>
-                            <div className='rounded-lg bg-emerald-100 p-1.5 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400'>
-                                <Scale className='h-4 w-4' />
-                            </div>
-                            <h2 className='text-base font-bold text-zinc-900 sm:text-lg dark:text-zinc-100'>
-                                {t.terms.title}
-                            </h2>
-                        </div>
-                        <div className='inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400'>
-                            <FileCode className='h-3 w-3 text-cyan-500' />
-                            <span>{t.terms.badge}</span>
-                        </div>
-                    </div>
-
-                    <p className='text-xs leading-relaxed text-zinc-500 dark:text-zinc-400'>
-                        {t.terms.subtitle}
-                    </p>
-
-                    <div className='grid grid-cols-1 gap-3.5 text-xs md:grid-cols-2'>
-                        {t.terms.items.map((item) => (
-                            <div
-                                key={item.id}
-                                className='space-y-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50 p-3.5 dark:border-zinc-800/80 dark:bg-zinc-950/60'
-                            >
-                                <div className='flex items-center gap-2 font-semibold text-zinc-900 dark:text-zinc-200'>
-                                    {item.id === 'warranty' ||
-                                    item.id === 'liability' ? (
-                                        <AlertTriangle className='h-3.5 w-3.5 flex-shrink-0 text-amber-500' />
-                                    ) : item.id === 'privacy' ? (
-                                        <ShieldCheck className='h-3.5 w-3.5 flex-shrink-0 text-emerald-500' />
-                                    ) : (
-                                        <FileCode className='h-3.5 w-3.5 flex-shrink-0 text-cyan-500' />
-                                    )}
-                                    <span>{item.title}</span>
-                                </div>
-                                <p className='text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400'>
-                                    {item.description}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                <TermsSection />
 
                 <footer className='pt-4 pb-6 text-center text-xs text-zinc-600 dark:text-zinc-400'>
                     <p>
                         © {new Date().getFullYear()} Universal Convertor • 100%
-                        Free Client-Side File Converter & Compressor
+                        Free Client-Side Converter & Compressor
                     </p>
                 </footer>
             </main>
