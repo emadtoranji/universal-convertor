@@ -31,7 +31,13 @@ import {
     applyThemeToDocument,
     ThemeMode,
 } from '../utils/theme';
-import { t } from '../utils/i18n';
+import dateCopy from '../utils/i18n/locales/en/date.json';
+
+function fillDate(template: string, params: Record<string, string | number>): string {
+    return template.replace(/\{(\w+)\}/g, (_, token: string) =>
+        token in params ? String(params[token]) : `{${token}}`,
+    );
+}
 
 export function DatePage(): React.ReactElement {
     const [isDark, setIsDark] = useState<boolean>(
@@ -43,13 +49,16 @@ export function DatePage(): React.ReactElement {
     const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
     useEffect(() => {
-        const theme: ThemeMode = isDark ? 'dark' : 'light';
-        applyThemeToDocument(theme);
-        setThemeCookie(theme);
+        applyThemeToDocument(isDark ? 'dark' : 'light');
     }, [isDark]);
 
     const handleToggleTheme = useCallback(() => {
-        setIsDark((prev) => !prev);
+        setIsDark((prev) => {
+            const nextMode: ThemeMode = prev ? 'light' : 'dark';
+            setThemeCookie(nextMode);
+            applyThemeToDocument(nextMode);
+            return !prev;
+        });
     }, []);
 
     const handleResetToday = useCallback(() => {
@@ -116,24 +125,24 @@ export function DatePage(): React.ReactElement {
         [calendarInfo.hijri.year, calendarInfo.hijri.month],
     );
 
-    const jalaliMonths = useMemo(() => t.date.months.jalali, []);
-    const gregorianMonths = useMemo(() => t.date.months.gregorian, []);
-    const hijriMonths = useMemo(() => t.date.months.hijri, []);
+    const jalaliMonths = useMemo(() => dateCopy.months.jalali, []);
+    const gregorianMonths = useMemo(() => dateCopy.months.gregorian, []);
+    const hijriMonths = useMemo(() => dateCopy.months.hijri, []);
 
     const featureBadgePhrases = useMemo(
         () => [
             {
-                text: t.date.overview.badgePhrases[0],
+                text: dateCopy.overview.badgePhrases[0],
                 icon: ShieldCheck,
                 color: 'text-teal-800 dark:text-teal-200',
             },
             {
-                text: t.date.overview.badgePhrases[1],
+                text: dateCopy.overview.badgePhrases[1],
                 icon: Zap,
                 color: 'text-emerald-800 dark:text-emerald-200',
             },
             {
-                text: t.date.overview.badgePhrases[2],
+                text: dateCopy.overview.badgePhrases[2],
                 icon: Layers,
                 color: 'text-cyan-900 dark:text-cyan-200',
             },
@@ -143,7 +152,7 @@ export function DatePage(): React.ReactElement {
 
     const jalaliDaysLabel = useMemo(
         () =>
-            t('date.labels.daysInMonth', {
+            fillDate(dateCopy.labels.daysInMonth, {
                 count: jalaliDaysCount,
             }),
         [jalaliDaysCount],
@@ -151,7 +160,7 @@ export function DatePage(): React.ReactElement {
 
     const gregorianDaysLabel = useMemo(
         () =>
-            t('date.labels.daysInMonth', {
+            fillDate(dateCopy.labels.daysInMonth, {
                 count: gregorianDaysCount,
             }),
         [gregorianDaysCount],
@@ -159,7 +168,7 @@ export function DatePage(): React.ReactElement {
 
     const hijriDaysLabel = useMemo(
         () =>
-            t('date.labels.daysInMonth', {
+            fillDate(dateCopy.labels.daysInMonth, {
                 count: hijriDaysCount,
             }),
         [hijriDaysCount],
@@ -167,7 +176,7 @@ export function DatePage(): React.ReactElement {
 
     const footerText = useMemo(
         () =>
-            t('date.footer.copyright', {
+            fillDate(dateCopy.footer.copyright, {
                 year: new Date().getFullYear(),
             }),
         [],
@@ -193,11 +202,11 @@ export function DatePage(): React.ReactElement {
                                     <Calendar className='h-5 w-5' />
                                 </div>
                                 <h1 className='text-lg font-bold tracking-tight text-zinc-900 sm:text-2xl dark:text-zinc-100'>
-                                    {t.date.title}
+                                    {dateCopy.title}
                                 </h1>
                             </div>
                             <p className='text-xs leading-relaxed text-zinc-600 sm:text-sm dark:text-zinc-400'>
-                                {t.date.subtitle}
+                                {dateCopy.subtitle}
                             </p>
                         </div>
 
@@ -208,7 +217,7 @@ export function DatePage(): React.ReactElement {
                                 className='inline-flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-100 px-3.5 py-2 text-xs font-semibold text-zinc-800 transition-colors hover:border-zinc-300 hover:bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-800'
                             >
                                 <RotateCcw className='h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400' />
-                                <span>{t.date.todayButton}</span>
+                                <span>{dateCopy.todayButton}</span>
                             </button>
                         </div>
                     </div>
@@ -220,7 +229,7 @@ export function DatePage(): React.ReactElement {
                                     <div className='flex items-center gap-2'>
                                         <span className='h-2.5 w-2.5 rounded-full bg-cyan-500' />
                                         <h2 className='text-sm font-bold text-zinc-900 sm:text-base dark:text-zinc-100'>
-                                            {t.date.calendars.jalali.title}
+                                            {dateCopy.calendars.jalali.title}
                                         </h2>
                                     </div>
                                     <span
@@ -231,8 +240,8 @@ export function DatePage(): React.ReactElement {
                                         }`}
                                     >
                                         {calendarInfo.isJalaliLeap
-                                            ? t.date.labels.leapYear
-                                            : t.date.labels.standardYear}
+                                            ? dateCopy.labels.leapYear
+                                            : dateCopy.labels.standardYear}
                                     </span>
                                 </div>
 
@@ -250,7 +259,7 @@ export function DatePage(): React.ReactElement {
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
                                                 <span>
-                                                    {t.date.labels.year}
+                                                    {dateCopy.labels.year}
                                                 </span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 dark:border-zinc-800 dark:bg-zinc-900'>
@@ -277,16 +286,16 @@ export function DatePage(): React.ReactElement {
                                                         }
                                                     }}
                                                     aria-label={
-                                                        t.date.calendars.jalali
+                                                        dateCopy.calendars.jalali
                                                             .yearAria
                                                     }
-                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:text-zinc-100'
                                                 />
                                                 <div className='absolute right-1 flex flex-col'>
                                                     <button
                                                         type='button'
                                                         aria-label={
-                                                            t.date.calendars
+                                                            dateCopy.calendars
                                                                 .jalali
                                                                 .increaseYear
                                                         }
@@ -309,7 +318,7 @@ export function DatePage(): React.ReactElement {
                                                     <button
                                                         type='button'
                                                         aria-label={
-                                                            t.date.calendars
+                                                            dateCopy.calendars
                                                                 .jalali
                                                                 .decreaseYear
                                                         }
@@ -340,7 +349,7 @@ export function DatePage(): React.ReactElement {
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
                                                 <span>
-                                                    {t.date.labels.month}
+                                                    {dateCopy.labels.month}
                                                 </span>
                                             </div>
                                             <div className='relative'>
@@ -361,10 +370,10 @@ export function DatePage(): React.ReactElement {
                                                         )
                                                     }
                                                     aria-label={
-                                                        t.date.calendars.jalali
+                                                        dateCopy.calendars.jalali
                                                             .monthAria
                                                     }
-                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
+                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
                                                 >
                                                     {jalaliMonths.map(
                                                         (name, idx) => (
@@ -385,7 +394,7 @@ export function DatePage(): React.ReactElement {
 
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.day}</span>
+                                                <span>{dateCopy.labels.day}</span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <select
@@ -404,10 +413,10 @@ export function DatePage(): React.ReactElement {
                                                         )
                                                     }
                                                     aria-label={
-                                                        t.date.calendars.jalali
+                                                        dateCopy.calendars.jalali
                                                             .dayAria
                                                     }
-                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:text-zinc-100'
                                                 >
                                                     {Array.from(
                                                         {
@@ -448,12 +457,12 @@ export function DatePage(): React.ReactElement {
                                     {copiedKey === 'jalali' ? (
                                         <>
                                             <Check className='h-3 w-3 text-emerald-600' />
-                                            <span>{t.date.labels.copied}</span>
+                                            <span>{dateCopy.labels.copied}</span>
                                         </>
                                     ) : (
                                         <>
                                             <Copy className='h-3 w-3' />
-                                            <span>{t.date.labels.copy}</span>
+                                            <span>{dateCopy.labels.copy}</span>
                                         </>
                                     )}
                                 </button>
@@ -466,7 +475,7 @@ export function DatePage(): React.ReactElement {
                                     <div className='flex items-center gap-2'>
                                         <span className='h-2.5 w-2.5 rounded-full bg-indigo-500' />
                                         <h2 className='text-sm font-bold text-zinc-900 sm:text-base dark:text-zinc-100'>
-                                            {t.date.calendars.gregorian.title}
+                                            {dateCopy.calendars.gregorian.title}
                                         </h2>
                                     </div>
                                     <span
@@ -477,8 +486,8 @@ export function DatePage(): React.ReactElement {
                                         }`}
                                     >
                                         {calendarInfo.isGregorianLeap
-                                            ? t.date.labels.leapYear
-                                            : t.date.labels.standardYear}
+                                            ? dateCopy.labels.leapYear
+                                            : dateCopy.labels.standardYear}
                                     </span>
                                 </div>
 
@@ -496,7 +505,7 @@ export function DatePage(): React.ReactElement {
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
                                                 <span>
-                                                    {t.date.labels.year}
+                                                    {dateCopy.labels.year}
                                                 </span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 dark:border-zinc-800 dark:bg-zinc-900'>
@@ -525,16 +534,16 @@ export function DatePage(): React.ReactElement {
                                                         }
                                                     }}
                                                     aria-label={
-                                                        t.date.calendars
+                                                        dateCopy.calendars
                                                             .gregorian.yearAria
                                                     }
-                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:text-zinc-100'
                                                 />
                                                 <div className='absolute right-1 flex flex-col'>
                                                     <button
                                                         type='button'
                                                         aria-label={
-                                                            t.date.calendars
+                                                            dateCopy.calendars
                                                                 .gregorian
                                                                 .increaseYear
                                                         }
@@ -558,7 +567,7 @@ export function DatePage(): React.ReactElement {
                                                     <button
                                                         type='button'
                                                         aria-label={
-                                                            t.date.calendars
+                                                            dateCopy.calendars
                                                                 .gregorian
                                                                 .decreaseYear
                                                         }
@@ -590,7 +599,7 @@ export function DatePage(): React.ReactElement {
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
                                                 <span>
-                                                    {t.date.labels.month}
+                                                    {dateCopy.labels.month}
                                                 </span>
                                             </div>
                                             <div className='relative'>
@@ -611,10 +620,10 @@ export function DatePage(): React.ReactElement {
                                                         )
                                                     }
                                                     aria-label={
-                                                        t.date.calendars
+                                                        dateCopy.calendars
                                                             .gregorian.monthAria
                                                     }
-                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
+                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
                                                 >
                                                     {gregorianMonths.map(
                                                         (name, idx) => (
@@ -635,7 +644,7 @@ export function DatePage(): React.ReactElement {
 
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.day}</span>
+                                                <span>{dateCopy.labels.day}</span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <select
@@ -656,10 +665,10 @@ export function DatePage(): React.ReactElement {
                                                         )
                                                     }
                                                     aria-label={
-                                                        t.date.calendars
+                                                        dateCopy.calendars
                                                             .gregorian.dayAria
                                                     }
-                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:text-zinc-100'
                                                 >
                                                     {Array.from(
                                                         {
@@ -701,12 +710,12 @@ export function DatePage(): React.ReactElement {
                                     {copiedKey === 'gregorian' ? (
                                         <>
                                             <Check className='h-3 w-3 text-emerald-600' />
-                                            <span>{t.date.labels.copied}</span>
+                                            <span>{dateCopy.labels.copied}</span>
                                         </>
                                     ) : (
                                         <>
                                             <Copy className='h-3 w-3' />
-                                            <span>{t.date.labels.copy}</span>
+                                            <span>{dateCopy.labels.copy}</span>
                                         </>
                                     )}
                                 </button>
@@ -719,7 +728,7 @@ export function DatePage(): React.ReactElement {
                                     <div className='flex items-center gap-2'>
                                         <span className='h-2.5 w-2.5 rounded-full bg-emerald-500' />
                                         <h2 className='text-sm font-bold text-zinc-900 sm:text-base dark:text-zinc-100'>
-                                            {t.date.calendars.hijri.title}
+                                            {dateCopy.calendars.hijri.title}
                                         </h2>
                                     </div>
                                     <span
@@ -730,8 +739,8 @@ export function DatePage(): React.ReactElement {
                                         }`}
                                     >
                                         {calendarInfo.isHijriLeap
-                                            ? t.date.labels.leapYear
-                                            : t.date.labels.standardYear}
+                                            ? dateCopy.labels.leapYear
+                                            : dateCopy.labels.standardYear}
                                     </span>
                                 </div>
 
@@ -749,7 +758,7 @@ export function DatePage(): React.ReactElement {
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
                                                 <span>
-                                                    {t.date.labels.year}
+                                                    {dateCopy.labels.year}
                                                 </span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900'>
@@ -776,16 +785,16 @@ export function DatePage(): React.ReactElement {
                                                         }
                                                     }}
                                                     aria-label={
-                                                        t.date.calendars.hijri
+                                                        dateCopy.calendars.hijri
                                                             .yearAria
                                                     }
-                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    className='w-full bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:text-zinc-100'
                                                 />
                                                 <div className='absolute right-1 flex flex-col'>
                                                     <button
                                                         type='button'
                                                         aria-label={
-                                                            t.date.calendars
+                                                            dateCopy.calendars
                                                                 .hijri
                                                                 .increaseYear
                                                         }
@@ -808,7 +817,7 @@ export function DatePage(): React.ReactElement {
                                                     <button
                                                         type='button'
                                                         aria-label={
-                                                            t.date.calendars
+                                                            dateCopy.calendars
                                                                 .hijri
                                                                 .decreaseYear
                                                         }
@@ -839,7 +848,7 @@ export function DatePage(): React.ReactElement {
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
                                                 <span>
-                                                    {t.date.labels.month}
+                                                    {dateCopy.labels.month}
                                                 </span>
                                             </div>
                                             <div className='relative'>
@@ -859,10 +868,10 @@ export function DatePage(): React.ReactElement {
                                                         )
                                                     }
                                                     aria-label={
-                                                        t.date.calendars.hijri
+                                                        dateCopy.calendars.hijri
                                                             .monthAria
                                                     }
-                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
+                                                    className='w-full appearance-none rounded-xl border border-zinc-200 bg-white py-2 pr-6 pl-2 text-center text-xs font-semibold text-zinc-900 shadow-xs transition-colors focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'
                                                 >
                                                     {hijriMonths.map(
                                                         (name, idx) => (
@@ -883,7 +892,7 @@ export function DatePage(): React.ReactElement {
 
                                         <div className='space-y-1.5'>
                                             <div className='flex items-center justify-between text-[11px] font-medium text-zinc-600 dark:text-zinc-400'>
-                                                <span>{t.date.labels.day}</span>
+                                                <span>{dateCopy.labels.day}</span>
                                             </div>
                                             <div className='relative flex items-center rounded-xl border border-zinc-200 bg-white shadow-xs transition-colors focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900'>
                                                 <select
@@ -902,10 +911,10 @@ export function DatePage(): React.ReactElement {
                                                         )
                                                     }
                                                     aria-label={
-                                                        t.date.calendars.hijri
+                                                        dateCopy.calendars.hijri
                                                             .dayAria
                                                     }
-                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100'
+                                                    className='w-full appearance-none bg-transparent py-2 pr-6 pl-2 text-center font-mono text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:text-zinc-100'
                                                 >
                                                     {Array.from(
                                                         {
@@ -946,12 +955,12 @@ export function DatePage(): React.ReactElement {
                                     {copiedKey === 'hijri' ? (
                                         <>
                                             <Check className='h-3 w-3 text-emerald-600' />
-                                            <span>{t.date.labels.copied}</span>
+                                            <span>{dateCopy.labels.copied}</span>
                                         </>
                                     ) : (
                                         <>
                                             <Copy className='h-3 w-3' />
-                                            <span>{t.date.labels.copy}</span>
+                                            <span>{dateCopy.labels.copy}</span>
                                         </>
                                     )}
                                 </button>
@@ -962,14 +971,14 @@ export function DatePage(): React.ReactElement {
                     <div className='rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-zinc-950/40'>
                         <div className='mb-3 flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-200'>
                             <Sparkles className='h-4 w-4 text-cyan-500' />
-                            <span>{t.date.metrics.title}</span>
+                            <span>{dateCopy.metrics.title}</span>
                         </div>
 
                         <div className='grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4'>
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
                                     <span className='font-medium'>
-                                        {t.date.metrics.weekday}
+                                        {dateCopy.metrics.weekday}
                                     </span>
                                     <ArrowRightLeft className='h-3.5 w-3.5 text-cyan-500' />
                                 </div>
@@ -977,14 +986,14 @@ export function DatePage(): React.ReactElement {
                                     {calendarInfo.formatted.weekdayEn}
                                 </div>
                                 <div className='text-[11px] text-zinc-500 dark:text-zinc-400'>
-                                    {t.date.metrics.weekdaySubtitle}
+                                    {dateCopy.metrics.weekdaySubtitle}
                                 </div>
                             </div>
 
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
                                     <span className='font-medium'>
-                                        {t.date.metrics.isoGregorian}
+                                        {dateCopy.metrics.isoGregorian}
                                     </span>
                                     <button
                                         type='button'
@@ -1009,14 +1018,14 @@ export function DatePage(): React.ReactElement {
                                     {calendarInfo.formatted.gregorianIso}
                                 </div>
                                 <div className='text-[11px] text-zinc-500 dark:text-zinc-400'>
-                                    {t.date.metrics.isoGregorianSubtitle}
+                                    {dateCopy.metrics.isoGregorianSubtitle}
                                 </div>
                             </div>
 
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
                                     <span className='font-medium'>
-                                        {t.date.metrics.isoJalali}
+                                        {dateCopy.metrics.isoJalali}
                                     </span>
                                     <button
                                         type='button'
@@ -1041,14 +1050,14 @@ export function DatePage(): React.ReactElement {
                                     {calendarInfo.formatted.jalaliIso}
                                 </div>
                                 <div className='text-[11px] text-zinc-500 dark:text-zinc-400'>
-                                    {t.date.metrics.isoJalaliSubtitle}
+                                    {dateCopy.metrics.isoJalaliSubtitle}
                                 </div>
                             </div>
 
                             <div className='space-y-1 rounded-xl border border-zinc-200/60 bg-white p-3 dark:border-zinc-800/60 dark:bg-zinc-900/60'>
                                 <div className='flex items-center justify-between text-zinc-500 dark:text-zinc-400'>
                                     <span className='font-medium'>
-                                        {t.date.metrics.unixTimestamp}
+                                        {dateCopy.metrics.unixTimestamp}
                                     </span>
                                     <button
                                         type='button'
@@ -1075,7 +1084,7 @@ export function DatePage(): React.ReactElement {
                                     <span>{calendarInfo.unixTimestamp}</span>
                                 </div>
                                 <div className='text-[11px] text-zinc-500 dark:text-zinc-400'>
-                                    {t.date.metrics.unixTimestampSubtitle}
+                                    {dateCopy.metrics.unixTimestampSubtitle}
                                 </div>
                             </div>
                         </div>
@@ -1104,18 +1113,18 @@ export function DatePage(): React.ReactElement {
                                 );
                             })}
                         </span>
-                        <span className='sr-only'>{t.date.overview.badge}</span>
+                        <span className='sr-only'>{dateCopy.overview.badge}</span>
                     </div>
 
                     <h2 className='text-2xl leading-tight font-black tracking-tight text-zinc-900 sm:text-4xl md:text-5xl dark:text-white'>
-                        {t.date.overview.heroTitle}{' '}
+                        {dateCopy.overview.heroTitle}{' '}
                         <span className='bg-gradient-to-r from-cyan-600 via-teal-500 to-indigo-600 bg-clip-text text-transparent dark:from-cyan-400 dark:via-teal-300 dark:to-indigo-400'>
-                            {t.date.overview.heroTitleAccent}
+                            {dateCopy.overview.heroTitleAccent}
                         </span>
                     </h2>
 
                     <p className='mx-auto max-w-3xl text-xs leading-relaxed text-zinc-600 sm:text-sm md:text-base dark:text-zinc-400'>
-                        {t.date.overview.heroSubtitle}
+                        {dateCopy.overview.heroSubtitle}
                     </p>
                 </section>
 
@@ -1123,8 +1132,8 @@ export function DatePage(): React.ReactElement {
                     aria-label='Key Capabilities'
                     className='grid grid-cols-1 gap-4 text-xs text-zinc-600 sm:grid-cols-3 sm:gap-6 dark:text-zinc-400'
                 >
-                    <h3 className='sr-only'>{t.date.overview.heroTitle}</h3>
-                    {t.date.overview.cards.map((card) => (
+                    <h3 className='sr-only'>{dateCopy.overview.heroTitle}</h3>
+                    {dateCopy.overview.cards.map((card) => (
                         <div
                             key={card.id}
                             className='flex items-start gap-3.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs sm:p-5 dark:border-zinc-800/90 dark:bg-zinc-900/40'
@@ -1159,12 +1168,12 @@ export function DatePage(): React.ReactElement {
                             <FileCheck className='h-4 w-4' />
                         </div>
                         <h3 className='text-base font-bold text-zinc-900 sm:text-lg dark:text-zinc-100'>
-                            {t.date.specifications.title}
+                            {dateCopy.specifications.title}
                         </h3>
                     </div>
 
                     <div className='grid grid-cols-1 gap-4 text-xs md:grid-cols-3'>
-                        {t.date.specifications.items.map((spec) => (
+                        {dateCopy.specifications.items.map((spec) => (
                             <div
                                 key={spec.id}
                                 className='space-y-2 rounded-xl border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/60'
@@ -1216,10 +1225,10 @@ export function DatePage(): React.ReactElement {
                 </section>
 
                 <FaqSection
-                    items={t.date.faq.items}
-                    title={t.date.faq.title}
-                    subtitle={t.date.faq.subtitle}
-                    badge={t.date.faq.badge}
+                    items={dateCopy.faq.items}
+                    title={dateCopy.faq.title}
+                    subtitle={dateCopy.faq.subtitle}
+                    badge={dateCopy.faq.badge}
                 />
 
                 <TermsSection />

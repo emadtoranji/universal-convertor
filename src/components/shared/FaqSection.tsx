@@ -97,15 +97,15 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
                     type='text'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder='Search questions, answers, and capabilities...'
-                    aria-label='Search frequently asked questions'
-                    className='w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pr-9 pl-9 text-xs text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-cyan-500 focus:bg-white focus:ring-1 focus:ring-cyan-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-cyan-500 dark:focus:bg-zinc-900'
+                    placeholder={t.faq.searchPlaceholder}
+                    aria-label={t.faq.searchPlaceholder}
+                    className='w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pr-9 pl-9 text-xs text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-cyan-500 focus:bg-white focus:ring-1 focus:ring-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-cyan-500 dark:focus:bg-zinc-900'
                 />
                 {searchQuery.length > 0 && (
                     <button
                         type='button'
                         onClick={handleClearSearch}
-                        aria-label='Clear search'
+                        aria-label={t.faq.clearSearch}
                         className='absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
                     >
                         <X className='h-3.5 w-3.5' />
@@ -116,8 +116,7 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
             <div className='space-y-2.5 transition-all duration-200'>
                 {filteredItems.length === 0 ? (
                     <div className='rounded-xl border border-dashed border-zinc-300 p-6 text-center text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400'>
-                        No questions matching "{searchQuery}" found. Try another
-                        query or clear the filter.
+                        {t('faq.empty', { query: searchQuery })}
                     </div>
                 ) : (
                     filteredItems.map((faqItem, idx) => {
@@ -130,7 +129,9 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
                                 <button
                                     type='button'
                                     onClick={() => handleToggle(idx)}
-                                    className='flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left text-xs font-semibold text-zinc-900 sm:text-sm dark:text-zinc-100'
+                                    aria-expanded={isOpen}
+                                    aria-controls={`faq-panel-${faqItem.id}`}
+                                    className='flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left text-xs font-semibold text-zinc-900 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none sm:text-sm dark:text-zinc-100'
                                 >
                                     <span>{faqItem.question}</span>
                                     <ChevronDown
@@ -148,7 +149,11 @@ const FaqSectionComponent: React.FC<FaqSectionProps> = ({
                                             : 'grid-rows-[0fr] opacity-0'
                                     }`}
                                 >
-                                    <div className='overflow-hidden'>
+                                    <div
+                                        id={`faq-panel-${faqItem.id}`}
+                                        role='region'
+                                        className='overflow-hidden'
+                                    >
                                         <div className='border-t border-zinc-200/50 px-4 pt-2 pb-3.5 text-xs leading-relaxed text-zinc-600 dark:border-zinc-800/50 dark:text-zinc-400'>
                                             {faqItem.answer}
                                         </div>

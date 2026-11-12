@@ -6,6 +6,7 @@ import './index.css';
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
+  rootElement.replaceChildren();
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>

@@ -20,9 +20,14 @@ const PAGE_DIMENSIONS: Record<Exclude<PdfPageSize, 'original'>, { width: number;
   letter: { width: 612, height: 792 },
 };
 
-async function convertToPngBuffer(input: PdfImageInput): Promise<Uint8Array> {
-  if (input.mimeType === 'image/png' || input.mimeType === 'image/jpeg') {
-    return new Uint8Array(input.buffer);
+async function prepareEmbeddedImage(
+  input: PdfImageInput,
+): Promise<{ bytes: Uint8Array; kind: 'jpg' | 'png' }> {
+  if (input.mimeType === 'image/jpeg') {
+    return { bytes: new Uint8Array(input.buffer), kind: 'jpg' };
+  }
+  if (input.mimeType === 'image/png') {
+    return { bytes: new Uint8Array(input.buffer), kind: 'png' };
   }
 
   const blob = new Blob([input.buffer], { type: input.mimeType });
@@ -34,11 +39,22 @@ async function convertToPngBuffer(input: PdfImageInput): Promise<Uint8Array> {
     throw new Error('Canvas 2D context unavailable');
   }
 
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, bitmap.width, bitmap.height);
   ctx.drawImage(bitmap, 0, 0);
   bitmap.close();
+
+  try {
+    const jpegBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.85 });
+    if (jpegBlob.type === 'image/jpeg') {
+      return { bytes: new Uint8Array(await jpegBlob.arrayBuffer()), kind: 'jpg' };
+    }
+  } catch {
+    // Fall through to PNG when JPEG encoding is unavailable.
+  }
+
   const pngBlob = await canvas.convertToBlob({ type: 'image/png' });
-  const arrayBuffer = await pngBlob.arrayBuffer();
-  return new Uint8Array(arrayBuffer);
+  return { bytes: new Uint8Array(await pngBlob.arrayBuffer()), kind: 'png' };
 }
 
 export async function generatePdfFromImages(
@@ -68,9 +84,11 @@ export async function generatePdfFromImages(
       continue;
     }
 
-    const rawBytes = await convertToPngBuffer(img);
+    const prepared = await prepareEmbeddedImage(img);
     const embeddedImage =
-      img.mimeType === 'image/jpeg' ? await doc.embedJpg(rawBytes) : await doc.embedPng(rawBytes);
+      prepared.kind === 'jpg'
+        ? await doc.embedJpg(prepared.bytes)
+        : await doc.embedPng(prepared.bytes);
 
     const naturalWidth = embeddedImage.width;
     const naturalHeight = embeddedImage.height;

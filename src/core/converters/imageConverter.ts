@@ -243,91 +243,165 @@ export async function encodeIco(sourceCanvas: OffscreenCanvas): Promise<ArrayBuf
   return buffer;
 }
 
+const PASSTHROUGH_FORMATS = new Set<ImageOutputFormat>([
+  'png',
+  'jpeg',
+  'webp',
+  'avif',
+  'bmp',
+  'tiff',
+  'ico',
+]);
+
+const LOSSY_QUALITY_FLOOR = 40;
+
+export interface EncodedImage {
+  buffer: ArrayBuffer;
+  mimeType: string;
+  quality?: number;
+  qualityAdjusted?: boolean;
+}
+
+export function shouldPassthroughSource(
+  sourceFormat: string,
+  targetFormat: string,
+  options: ConversionOptions,
+): boolean {
+  if (sourceFormat !== targetFormat) return false;
+  if (!PASSTHROUGH_FORMATS.has(targetFormat as ImageOutputFormat)) return false;
+  if (options.grayscale) return false;
+  if (options.resizeMode === 'dimensions') return false;
+  if (options.resizeMode === 'percentage' && options.resizePercentage !== 100) return false;
+
+  const background = (options.backgroundColor || '#ffffff').trim().toLowerCase();
+  if (background !== '#ffffff' && background !== 'transparent') return false;
+
+  if (
+    (targetFormat === 'jpeg' || targetFormat === 'webp' || targetFormat === 'avif') &&
+    options.quality < 85
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+async function encodeAtQuality(
+  canvas: OffscreenCanvas,
+  mimeType: string,
+  quality: number,
+): Promise<Blob> {
+  const decimal = Math.max(0.01, Math.min(1, quality / 100));
+  try {
+    const blob = await canvas.convertToBlob({ type: mimeType, quality: decimal });
+    if (mimeType === 'image/avif' && blob.type !== 'image/avif') {
+      return canvas.convertToBlob({ type: 'image/webp', quality: decimal });
+    }
+    return blob;
+  } catch (error) {
+    if (mimeType !== 'image/avif') throw error;
+    return canvas.convertToBlob({ type: 'image/webp', quality: decimal });
+  }
+}
+
+export async function encodeLossyCanvas(
+  canvas: OffscreenCanvas,
+  mimeType: 'image/jpeg' | 'image/webp' | 'image/avif',
+  requestedQuality: number,
+  originalSize: number,
+): Promise<{ blob: Blob; mimeType: string; quality: number; qualityAdjusted: boolean }> {
+  const requested = Math.max(1, Math.min(100, Math.round(requestedQuality)));
+  let blob = await encodeAtQuality(canvas, mimeType, requested);
+  let bestBlob = blob;
+  let bestQuality = requested;
+
+  if (blob.size <= originalSize) {
+    return {
+      blob,
+      mimeType: blob.type || mimeType,
+      quality: requested,
+      qualityAdjusted: false,
+    };
+  }
+
+  const floor = Math.min(LOSSY_QUALITY_FLOOR, requested);
+  for (let quality = requested - 5; quality >= floor; quality -= 5) {
+    const next = await encodeAtQuality(canvas, blob.type || mimeType, quality);
+    if (next.size < bestBlob.size) {
+      bestBlob = next;
+      bestQuality = quality;
+    }
+    if (next.size <= originalSize) {
+      bestBlob = next;
+      bestQuality = quality;
+      break;
+    }
+  }
+
+  return {
+    blob: bestBlob,
+    mimeType: bestBlob.type || mimeType,
+    quality: bestQuality,
+    qualityAdjusted: bestQuality < requested,
+  };
+}
+
 export async function convertCanvasToTarget(
   canvas: OffscreenCanvas,
   ctx: OffscreenCanvasRenderingContext2D,
   targetFormat: ImageOutputFormat,
   options: ConversionOptions,
-  fileName: string,
-  previewBuffer: ArrayBuffer,
+  originalSize: number,
   targetWidth: number,
-  targetHeight: number
-): Promise<{ buffer: ArrayBuffer; mimeType: string }> {
+  targetHeight: number,
+): Promise<EncodedImage> {
   if (targetFormat === 'png') {
+    const blob = await canvas.convertToBlob({ type: 'image/png' });
+    return { buffer: await blob.arrayBuffer(), mimeType: 'image/png' };
+  }
+
+  if (targetFormat === 'jpeg' || targetFormat === 'pdf') {
+    const encoded = await encodeLossyCanvas(canvas, 'image/jpeg', options.quality, originalSize);
     return {
-      buffer: previewBuffer.slice(0),
-      mimeType: 'image/png',
+      buffer: await encoded.blob.arrayBuffer(),
+      mimeType: 'image/jpeg',
+      quality: encoded.quality,
+      qualityAdjusted: encoded.qualityAdjusted,
     };
   }
 
-  if (targetFormat === 'jpeg') {
-    const qualityDecimal = Math.max(0.01, Math.min(1, options.quality / 100));
-    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: qualityDecimal });
-    const ab = await blob.arrayBuffer();
-    return { buffer: ab, mimeType: 'image/jpeg' };
-  }
-
   if (targetFormat === 'webp') {
-    const qualityDecimal = Math.max(0.01, Math.min(1, options.quality / 100));
-    const blob = await canvas.convertToBlob({ type: 'image/webp', quality: qualityDecimal });
-    const ab = await blob.arrayBuffer();
-    return { buffer: ab, mimeType: 'image/webp' };
+    const encoded = await encodeLossyCanvas(canvas, 'image/webp', options.quality, originalSize);
+    return {
+      buffer: await encoded.blob.arrayBuffer(),
+      mimeType: encoded.mimeType || 'image/webp',
+      quality: encoded.quality,
+      qualityAdjusted: encoded.qualityAdjusted,
+    };
   }
 
   if (targetFormat === 'avif') {
-    const qualityDecimal = Math.max(0.01, Math.min(1, options.quality / 100));
-    let blob: Blob;
-    try {
-      blob = await canvas.convertToBlob({ type: 'image/avif', quality: qualityDecimal });
-      if (blob.type !== 'image/avif') {
-        blob = await canvas.convertToBlob({ type: 'image/webp', quality: qualityDecimal });
-      }
-    } catch {
-      blob = await canvas.convertToBlob({ type: 'image/webp', quality: qualityDecimal });
-    }
-    const ab = await blob.arrayBuffer();
-    return { buffer: ab, mimeType: blob.type };
+    const encoded = await encodeLossyCanvas(canvas, 'image/avif', options.quality, originalSize);
+    return {
+      buffer: await encoded.blob.arrayBuffer(),
+      mimeType: encoded.mimeType || 'image/avif',
+      quality: encoded.quality,
+      qualityAdjusted: encoded.qualityAdjusted,
+    };
   }
 
   if (targetFormat === 'bmp') {
     const imgData = ctx.getImageData(0, 0, targetWidth, targetHeight);
-    const ab = encodeBmp(imgData);
-    return { buffer: ab, mimeType: 'image/bmp' };
+    return { buffer: encodeBmp(imgData), mimeType: 'image/bmp' };
   }
 
   if (targetFormat === 'tiff') {
     const imgData = ctx.getImageData(0, 0, targetWidth, targetHeight);
-    const ab = encodeTiff(imgData);
-    return { buffer: ab, mimeType: 'image/tiff' };
+    return { buffer: encodeTiff(imgData), mimeType: 'image/tiff' };
   }
 
   if (targetFormat === 'ico') {
-    const ab = await encodeIco(canvas);
-    return { buffer: ab, mimeType: 'image/x-icon' };
-  }
-
-  if (targetFormat === 'pdf') {
-    const { generatePdfFromImages } = await import('../pdfGenerator.ts');
-    const pdfBytes = await generatePdfFromImages(
-      [
-        {
-          buffer: previewBuffer.slice(0),
-          mimeType: 'image/png',
-          name: fileName,
-          width: targetWidth,
-          height: targetHeight,
-        },
-      ],
-      {
-        pageSize: options.pdfPageSize,
-        orientation: options.pdfOrientation,
-      }
-    );
-    const pdfBufferCopy = pdfBytes.buffer.slice(
-      pdfBytes.byteOffset,
-      pdfBytes.byteOffset + pdfBytes.byteLength
-    );
-    return { buffer: pdfBufferCopy as ArrayBuffer, mimeType: 'application/pdf' };
+    return { buffer: await encodeIco(canvas), mimeType: 'image/x-icon' };
   }
 
   throw new Error(`Unsupported target output format: ${targetFormat}`);

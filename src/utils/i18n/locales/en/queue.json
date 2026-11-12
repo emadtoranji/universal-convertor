@@ -2,6 +2,8 @@
   "header": {
     "title": "Processing Queue",
     "countBadge": "({count})",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
     "clearAll": "Clear All"
   },
   "emptyState": {

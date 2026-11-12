@@ -181,7 +181,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                 value={item.options.targetFormat}
                 onChange={handleFormatChange}
                 disabled={item.status === 'processing'}
-                className="px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-200 uppercase font-semibold focus:outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer disabled:opacity-50"
+                className="px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-200 uppercase font-semibold focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer disabled:opacity-50"
               >
                 {compatibleFormats.map((fmt) => (
                   <option key={fmt} value={fmt}>

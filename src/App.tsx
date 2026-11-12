@@ -35,6 +35,8 @@ import Layers from 'lucide-react/icons/layers';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Zap from 'lucide-react/icons/zap';
 import FileCheck from 'lucide-react/icons/file-check';
+import FileArchive from 'lucide-react/icons/file-archive';
+import Sliders from 'lucide-react/icons/sliders-vertical';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import UploadCloud from 'lucide-react/icons/cloud-upload';
@@ -97,6 +99,8 @@ export default function App(): ReactElement {
     );
 
     const workerPoolRef = useRef<ConversionWorkerPool | null>(null);
+    const queueRef = useRef<QueueItem[]>([]);
+    queueRef.current = queue;
 
     useEffect(() => {
         applyThemeToDocument(getOrInitEffectiveTheme());
@@ -511,7 +515,7 @@ export default function App(): ReactElement {
 
     const convertSingleItem = useCallback(
         async (id: string): Promise<boolean> => {
-            const item = queue.find((i) => i.id === id);
+            const item = queueRef.current.find((i) => i.id === id);
             if (!item) return false;
 
             setQueue((prev) =>
@@ -602,6 +606,7 @@ export default function App(): ReactElement {
                 const pool = workerPoolRef.current;
 
                 let fullBuffer: ArrayBuffer;
+                let workerSourceFormat = item.sourceFormat;
                 if (item.sourceFormat === 'svg') {
                     const text = await item.file.text();
                     const cleanSvg = sanitizeSvgString(text);
@@ -610,6 +615,26 @@ export default function App(): ReactElement {
                         encoded.byteOffset,
                         encoded.byteOffset + encoded.byteLength,
                     ) as ArrayBuffer;
+                } else if (item.sourceFormat === 'psd') {
+                    const { decodePsdBuffer } =
+                        await import('./core/converters/psdConverter');
+                    const psdRes = await decodePsdBuffer(
+                        await item.file.arrayBuffer(),
+                    );
+                    const canvas = new OffscreenCanvas(
+                        psdRes.width,
+                        psdRes.height,
+                    );
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        throw new Error('Unable to draw PSD composite');
+                    }
+                    ctx.putImageData(psdRes.imageData, 0, 0);
+                    const pngBlob = await canvas.convertToBlob({
+                        type: 'image/png',
+                    });
+                    fullBuffer = await pngBlob.arrayBuffer();
+                    workerSourceFormat = 'png';
                 } else {
                     fullBuffer = await item.file.arrayBuffer();
                 }
@@ -619,12 +644,13 @@ export default function App(): ReactElement {
                         payload: {
                             id: item.id,
                             buffer: fullBuffer,
-                            sourceFormat: item.sourceFormat,
+                            sourceFormat: workerSourceFormat,
                             targetFormat: item.options.targetFormat,
                             options: item.options,
                             originalWidth: item.originalWidth,
                             originalHeight: item.originalHeight,
                             fileName: item.name,
+                            originalByteLength: item.originalSize,
                         },
                         transferables: [fullBuffer],
                         onProgress: (progress) => {
@@ -716,24 +742,33 @@ export default function App(): ReactElement {
                 return false;
             }
         },
-        [queue],
+        [],
     );
 
     const handleConvertAll = useCallback(async (): Promise<void> => {
         if (isProcessing) return;
         setIsProcessing(true);
         abortProcessingRef.current = false;
-        const idleIds = queue
+        const idleIds = queueRef.current
             .filter((i) => i.status === 'idle')
             .map((i) => i.id);
+        const limit = Math.min(2, idleIds.length);
+        let cursor = 0;
 
-        for (const id of idleIds) {
-            if (abortProcessingRef.current) break;
-            await convertSingleItem(id);
-            await new Promise((resolve) => setTimeout(resolve, 16));
+        const runNext = async (): Promise<void> => {
+            while (!abortProcessingRef.current) {
+                const index = cursor;
+                cursor += 1;
+                if (index >= idleIds.length) return;
+                await convertSingleItem(idleIds[index]);
+            }
+        };
+
+        if (limit > 0) {
+            await Promise.all(Array.from({ length: limit }, () => runNext()));
         }
         setIsProcessing(false);
-    }, [queue, convertSingleItem, isProcessing]);
+    }, [convertSingleItem, isProcessing]);
 
     const handleDownloadSingle = useCallback(
         (item: QueueItem): void => {
@@ -899,7 +934,7 @@ export default function App(): ReactElement {
                     <div className='flex h-full w-full animate-pulse items-center justify-center rounded-3xl border-4 border-dashed border-cyan-500/80 dark:border-cyan-400/90'>
                         <div className='flex items-center gap-3 rounded-2xl border border-cyan-500/40 bg-white/95 px-6 py-3.5 text-sm font-bold text-cyan-600 shadow-2xl sm:text-base dark:bg-zinc-900/95 dark:text-cyan-400'>
                             <UploadCloud className='h-6 w-6 animate-bounce' />
-                            <span>Drop files anywhere to upload</span>
+                            <span>{t.dropzone.windowDrop}</span>
                         </div>
                     </div>
                 </div>
@@ -979,7 +1014,7 @@ export default function App(): ReactElement {
                                                         )
                                                     }
                                                     className='cursor-pointer rounded-lg border border-zinc-200 bg-white p-1 text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                                                    aria-label='Previous Page'
+                                                    aria-label={t.queue.header.previousPage}
                                                 >
                                                     <ChevronLeft className='h-3.5 w-3.5' />
                                                 </button>
@@ -1001,7 +1036,7 @@ export default function App(): ReactElement {
                                                         )
                                                     }
                                                     className='cursor-pointer rounded-lg border border-zinc-200 bg-white p-1 text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                                                    aria-label='Next Page'
+                                                    aria-label={t.queue.header.nextPage}
                                                 >
                                                     <ChevronRight className='h-3.5 w-3.5' />
                                                 </button>
@@ -1098,12 +1133,10 @@ export default function App(): ReactElement {
                     </p>
                 </section>
 
-                <section
-                    aria-label='Key Features'
-                    className='grid grid-cols-1 gap-4 text-xs text-zinc-600 sm:grid-cols-3 sm:gap-6 dark:text-zinc-400'
-                >
-                    <h2 className='sr-only'>Key Features</h2>
-                    {t.features.cards.slice(0, 3).map((card) => (
+                <section aria-label={t.features.sectionTitle}>
+                    <h2 className='sr-only'>{t.features.sectionTitle}</h2>
+                    <div className='grid grid-cols-1 gap-4 text-xs text-zinc-600 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 dark:text-zinc-400'>
+                    {t.features.cards.map((card) => (
                         <div
                             key={card.id}
                             className='flex items-start gap-3.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-xs sm:p-5 dark:border-zinc-800/90 dark:bg-zinc-900/40'
@@ -1113,6 +1146,10 @@ export default function App(): ReactElement {
                                     <ShieldCheck className='h-5 w-5 text-emerald-500' />
                                 ) : card.id === 'performance' ? (
                                     <Zap className='h-5 w-5 text-cyan-500' />
+                                ) : card.id === 'packaging' ? (
+                                    <FileArchive className='h-5 w-5 text-cyan-600' />
+                                ) : card.id === 'tuning' ? (
+                                    <Sliders className='h-5 w-5 text-teal-600' />
                                 ) : (
                                     <Layers className='h-5 w-5 text-indigo-500' />
                                 )}
@@ -1127,6 +1164,7 @@ export default function App(): ReactElement {
                             </div>
                         </div>
                     ))}
+                    </div>
                 </section>
 
                 <section

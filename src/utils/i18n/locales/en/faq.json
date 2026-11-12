@@ -2,6 +2,9 @@
   "title": "Frequently Asked Questions",
   "subtitle": "Direct, factual answers regarding privacy, client-side performance, format support, compression, and offline capabilities.",
   "badge": "Direct Answers",
+  "searchPlaceholder": "Search questions, answers, and capabilities...",
+  "clearSearch": "Clear search",
+  "empty": "No questions matching \"{query}\" found. Try another query or clear the filter.",
   "items": [
     {
       "id": "free-pricing",

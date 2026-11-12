@@ -8,25 +8,74 @@ import {
   calculateTargetDimensions,
   applyGrayscale,
   convertCanvasToTarget,
+  shouldPassthroughSource,
 } from '../core/converters/imageConverter';
-import { decodePsdBuffer } from '../core/converters/psdConverter';
+
+const PNG_PREVIEW_FORMATS = new Set<ImageOutputFormat>(['bmp', 'tiff', 'ico', 'pdf']);
+
+const MIME_BY_FORMAT: Record<string, string> = {
+  png: 'image/png',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+  avif: 'image/avif',
+  bmp: 'image/bmp',
+  tiff: 'image/tiff',
+  ico: 'image/x-icon',
+  heic: 'image/heic',
+  gif: 'image/gif',
+  svg: 'image/svg+xml',
+};
+
+function postProgress(id: string, progress: number, stage: string): void {
+  const msg: WorkerOutboundMessage = {
+    type: 'CONVERT_PROGRESS',
+    payload: { id, progress, stage },
+  };
+  self.postMessage(msg);
+}
+
+function postSuccess(
+  payload: Extract<WorkerOutboundMessage, { type: 'CONVERT_SUCCESS' }>['payload'],
+  transfer: Transferable[],
+): void {
+  const successMessage: WorkerOutboundMessage = {
+    type: 'CONVERT_SUCCESS',
+    payload,
+  };
+  self.postMessage(successMessage, { transfer });
+}
 
 async function processConversion(payload: ConvertRequestPayload): Promise<void> {
-  const { id, buffer, sourceFormat, targetFormat, options, originalWidth, originalHeight, fileName } =
-    payload;
+  const { id, buffer, sourceFormat, targetFormat, options, originalWidth, originalHeight } = payload;
+  const originalByteLength = payload.originalByteLength || buffer.byteLength;
+
+  if (shouldPassthroughSource(sourceFormat, targetFormat, options)) {
+    postProgress(id, 100, 'Using original bytes');
+    postSuccess(
+      {
+        id,
+        buffer,
+        targetFormat,
+        mimeType: MIME_BY_FORMAT[targetFormat] || 'application/octet-stream',
+        width: originalWidth,
+        height: originalHeight,
+        size: buffer.byteLength,
+      },
+      [buffer],
+    );
+    return;
+  }
 
   postProgress(id, 15, 'Decoding image stream');
 
   let bitmap: ImageBitmap;
-  if (sourceFormat === 'psd') {
-    const psdResult = await decodePsdBuffer(buffer);
-    bitmap = await createImageBitmap(psdResult.imageData);
-  } else if (sourceFormat === 'svg') {
-    const svgBlob = new Blob([buffer], { type: 'image/svg+xml' });
-    bitmap = await createImageBitmap(svgBlob);
+  if (sourceFormat === 'svg') {
+    bitmap = await createImageBitmap(new Blob([buffer], { type: 'image/svg+xml' }));
   } else {
-    const blob = new Blob([buffer]);
-    bitmap = await createImageBitmap(blob);
+    const sourceMime = MIME_BY_FORMAT[sourceFormat];
+    bitmap = await createImageBitmap(
+      sourceMime ? new Blob([buffer], { type: sourceMime }) : new Blob([buffer]),
+    );
   }
 
   postProgress(id, 40, 'Resizing and composing canvas');
@@ -34,7 +83,7 @@ async function processConversion(payload: ConvertRequestPayload): Promise<void> 
   const { width: targetWidth, height: targetHeight } = calculateTargetDimensions(
     originalWidth || bitmap.width,
     originalHeight || bitmap.height,
-    options
+    options,
   );
 
   const canvas = new OffscreenCanvas(targetWidth, targetHeight);
@@ -44,7 +93,7 @@ async function processConversion(payload: ConvertRequestPayload): Promise<void> 
     throw new Error('Unable to obtain OffscreenCanvas 2D context');
   }
 
-  const isOpaqueTarget = targetFormat === 'jpeg' || targetFormat === 'bmp';
+  const isOpaqueTarget = targetFormat === 'jpeg' || targetFormat === 'bmp' || targetFormat === 'pdf';
   if (isOpaqueTarget || (options.backgroundColor && options.backgroundColor !== 'transparent')) {
     ctx.fillStyle = options.backgroundColor || '#ffffff';
     ctx.fillRect(0, 0, targetWidth, targetHeight);
@@ -61,62 +110,59 @@ async function processConversion(payload: ConvertRequestPayload): Promise<void> 
 
   postProgress(id, 70, `Encoding to ${targetFormat.toUpperCase()}`);
 
-  const previewBlob = await canvas.convertToBlob({ type: 'image/png' });
-  const previewBuffer = await previewBlob.arrayBuffer();
+  const needsPngPreview = PNG_PREVIEW_FORMATS.has(targetFormat as ImageOutputFormat);
+  let previewBuffer: ArrayBuffer | undefined;
+  if (needsPngPreview) {
+    const previewBlob = await canvas.convertToBlob({ type: 'image/png' });
+    previewBuffer = await previewBlob.arrayBuffer();
+  }
 
-  const { buffer: resultBuffer, mimeType } = await convertCanvasToTarget(
+  const encoded = await convertCanvasToTarget(
     canvas,
     ctx,
     targetFormat as ImageOutputFormat,
     options,
-    fileName,
-    previewBuffer,
+    originalByteLength,
     targetWidth,
-    targetHeight
+    targetHeight,
   );
 
   postProgress(id, 100, 'Conversion completed');
 
-  const successMessage: WorkerOutboundMessage = {
-    type: 'CONVERT_SUCCESS',
-    payload: {
+  const transfer: Transferable[] = [encoded.buffer];
+  if (previewBuffer) transfer.push(previewBuffer);
+
+  postSuccess(
+    {
       id,
-      buffer: resultBuffer,
+      buffer: encoded.buffer,
       previewBuffer,
       targetFormat,
-      mimeType,
+      quality: encoded.quality,
+      qualityAdjusted: encoded.qualityAdjusted,
+      mimeType: encoded.mimeType,
       width: targetWidth,
       height: targetHeight,
-      size: resultBuffer.byteLength,
+      size: encoded.buffer.byteLength,
     },
-  };
-
-  postMessage(successMessage, { transfer: [resultBuffer, previewBuffer] });
-}
-
-function postProgress(id: string, progress: number, stage: string): void {
-  const msg: WorkerOutboundMessage = {
-    type: 'CONVERT_PROGRESS',
-    payload: { id, progress, stage },
-  };
-  self.postMessage(msg);
+    transfer,
+  );
 }
 
 self.onmessage = async (event: MessageEvent<WorkerInboundMessage>): Promise<void> => {
   const message = event.data;
-  if (message.type === 'CONVERT_REQUEST') {
-    try {
-      await processConversion(message.payload);
-    } catch (err: unknown) {
-      const errorMessageText = err instanceof Error ? err.message : 'Unknown worker conversion error';
-      const errorMessage: WorkerOutboundMessage = {
-        type: 'CONVERT_ERROR',
-        payload: {
-          id: message.payload.id,
-          error: errorMessageText,
-        },
-      };
-      self.postMessage(errorMessage);
-    }
+  if (message.type !== 'CONVERT_REQUEST') return;
+  try {
+    await processConversion(message.payload);
+  } catch (err: unknown) {
+    const errorMessageText = err instanceof Error ? err.message : 'Unknown worker conversion error';
+    const errorMessage: WorkerOutboundMessage = {
+      type: 'CONVERT_ERROR',
+      payload: {
+        id: message.payload.id,
+        error: errorMessageText,
+      },
+    };
+    self.postMessage(errorMessage);
   }
 };

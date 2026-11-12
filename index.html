@@ -23,9 +23,10 @@
         }
       })();
     </script>
-    <title>Universal Convertor - 100% Free Client-Side Image, Audio, Video and Document Converter</title>
-    <meta name="description" content="100% Free, private, client-side universal converter. Convert images, audio, video, and documents directly in your browser with zero server uploads and complete privacy." />
-    <meta name="keywords" content="universal convertor, free file converter, client side converter, batch image converter, audio to wav converter, video frame grabber, markdown to html, json to csv, zero cloud upload, private converter" />
+    <title>Universal Convertor - Free Client-Side Image, Document, PDF and Date Converter</title>
+    <meta name="description" content="Free private converter for images, documents, PDF, and calendars. PNG, JPG, WebP, AVIF, HEIC, SVG, CSV, JSON, and Solar Hijri dates stay on your device. Nothing is uploaded." />
+    <meta name="keywords" content="universal convertor, free image converter, client-side converter, png to webp, jpg to png, avif converter, heic converter, json to csv, csv to json, images to pdf, merge pdf, date converter, jalali converter, hijri calendar, offline file converter, zero cloud upload" />
+    <link rel="canonical" href="https://convertor.apidevelopers.ir/" />
     <meta name="robots" content="index, follow" />
     <meta name="application-name" content="Universal Convertor" />
     <meta name="apple-mobile-web-app-title" content="Universal Convertor" />
@@ -38,32 +39,104 @@
     <link rel="icon" type="image/webp" sizes="32x32" href="/images/logo/32x32.webp" />
     <link rel="icon" type="image/webp" sizes="16x16" href="/images/logo/16x16.webp" />
     <link rel="apple-touch-icon" sizes="128x128" href="/images/logo/128x128.webp" />
-    <meta property="og:title" content="Universal Convertor - 100% Free Client-Side Converter" />
-    <meta property="og:description" content="Convert images, audio, video, and documents completely in your browser memory for free. Ultra-fast, secure, zero cloud uploads." />
+    <meta property="og:title" content="Universal Convertor - Free Client-Side Image, Document and Date Converter" />
+    <meta property="og:description" content="Convert images, documents, and calendars in your browser. Free, private, and nothing is uploaded." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/images/logo/512x512.webp" />
+    <meta property="og:url" content="https://convertor.apidevelopers.ir/" />
+    <meta property="og:site_name" content="Universal Convertor" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://convertor.apidevelopers.ir/images/logo/512x512.webp" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Universal Convertor - 100% Free Converter" />
-    <meta name="twitter:description" content="100% Free, private, client-side batch converter for images, audio, video, and documents with zero cloud uploads." />
-    <meta name="twitter:image" content="/images/logo/512x512.webp" />
+    <meta name="twitter:title" content="Universal Convertor - Free Client-Side Converter" />
+    <meta name="twitter:description" content="Free private browser converter for images, documents, PDF, and Solar Hijri, Gregorian, and Hijri dates." />
+    <meta name="twitter:image" content="https://convertor.apidevelopers.ir/images/logo/512x512.webp" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Universal Convertor",
-        "operatingSystem": "All",
-        "applicationCategory": "MultimediaApplication",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "description": "100% Free, high-speed, client-side converter for images, audio, video, and documents with zero server uploads."
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Universal Convertor",
+            "url": "https://convertor.apidevelopers.ir/",
+            "image": "https://convertor.apidevelopers.ir/images/logo/512x512.webp",
+            "inLanguage": "en",
+            "operatingSystem": "Any",
+            "applicationCategory": "MultimediaApplication",
+            "browserRequirements": "Requires a modern browser with Web Workers and OffscreenCanvas",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "description": "Free client-side converter for images, documents, PDF, and calendars. Files are processed in the browser and are never uploaded.",
+            "featureList": [
+              "Client-side image conversion for PNG, JPEG, WebP, AVIF, HEIC, SVG, BMP, ICO, TIFF, PSD, and GIF",
+              "Document conversion for JSON, CSV, TSV, Markdown, HTML, XML, and plain text",
+              "In-browser ZIP packaging and multi-page PDF merge",
+              "Solar Hijri, Gregorian, and Lunar Hijri date conversion"
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is Universal Convertor really 100% free with no conversion limits?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Universal Convertor is free with no file-size limits, daily caps, or subscriptions. Decoding, resizing, and encoding run in the browser, so there is no upload and no server storage bill."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Are my photos or documents uploaded to any external server?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Files stay in browser memory on your device. They are not sent to a server, cloud bucket, or third-party API."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which image and document formats are supported?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Images: PNG, JPG, JPEG, JFIF, WebP, AVIF, HEIC/HEIF where the browser can decode them, SVG, BMP, ICO, TIFF, PSD, and GIF. Documents: Markdown, HTML, plain text, XML, CSV, TSV, and JSON. You can also merge images into a PDF or download a ZIP."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I convert dates between Solar Hijri, Gregorian, and Lunar Hijri?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. The date converter at /date synchronizes Solar Hijri, Gregorian, and Lunar Hijri calendars locally in the browser."
+                }
+              }
+            ]
+          }
+        ]
       }
     </script>
   </head>
   <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased selection:bg-cyan-500/20 selection:text-cyan-600 dark:selection:text-cyan-300 min-h-screen transition-colors duration-200">
-    <div id="root"></div>
+    <div id="root">
+      <main>
+        <h1>Free client-side image, document, PDF, and date converter</h1>
+        <p>Universal Convertor processes PNG, JPEG, WebP, AVIF, HEIC, SVG, BMP, ICO, TIFF, PSD, GIF, JSON, CSV, TSV, Markdown, HTML, XML, and plain text entirely in your browser. Nothing is uploaded. A separate page converts Solar Hijri, Gregorian, and Lunar Hijri dates.</p>
+        <h2>Frequently asked questions</h2>
+        <section>
+          <h3>Is Universal Convertor really 100% free with no conversion limits?</h3>
+          <p>Yes. Universal Convertor is free with no file-size limits, daily caps, or subscriptions. Decoding, resizing, and encoding run in the browser, so there is no upload and no server storage bill.</p>
+        </section>
+        <section>
+          <h3>Are my photos or documents uploaded to any external server?</h3>
+          <p>No. Files stay in browser memory on your device. They are not sent to a server, cloud bucket, or third-party API.</p>
+        </section>
+        <section>
+          <h3>Which image and document formats are supported?</h3>
+          <p>Images: PNG, JPG, JPEG, JFIF, WebP, AVIF, HEIC/HEIF where the browser can decode them, SVG, BMP, ICO, TIFF, PSD, and GIF. Documents: Markdown, HTML, plain text, XML, CSV, TSV, and JSON. You can also merge images into a PDF or download a ZIP.</p>
+        </section>
+        <section>
+          <h3>Can I convert dates between Solar Hijri, Gregorian, and Lunar Hijri?</h3>
+          <p>Yes. The date converter at /date synchronizes Solar Hijri, Gregorian, and Lunar Hijri calendars locally in the browser.</p>
+        </section>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

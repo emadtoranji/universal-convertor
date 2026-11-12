@@ -1,14 +1,20 @@
 # Universal Convertor
 
-> Universal Convertor is a free, private browser-based converter for images, documents and date. Files are processed locally and are never uploaded.
+> Universal Convertor is a free, private browser converter for images, documents, PDF, and dates. Files and dates are processed locally and are never uploaded.
 
-The application converts PNG, JPEG, WebP, AVIF, HEIC, SVG, BMP, ICO, GIF, TIFF, PSD, JSON, CSV, TSV, Markdown, HTML, XML, and plain text. Image processing uses browser APIs and Web Workers. ZIP archives and merged PDFs are generated on the user's device.
+The image and document converter accepts PNG, JPEG, WebP, AVIF, HEIC, SVG, BMP, ICO, GIF, TIFF, PSD, JSON, CSV, TSV, Markdown, HTML, XML, and plain text. It can write WebP, AVIF, PNG, JPEG, ICO, BMP, TIFF, PDF, and ZIP. Image work uses browser codecs and Web Workers. Video and audio are not supported.
 
-The converter validates file content, sanitizes SVG input, and keeps file data in browser memory. No account is required.
+The date converter at /date synchronizes Solar Hijri (Jalali), Gregorian, and Lunar Hijri on the device.
+
+## Direct answers
+
+- Is it free? Yes. There is no account, file-size cap, or subscription.
+- Are files uploaded? No. Conversion stays in browser memory.
+- Can the same file get larger? Lossless targets such as BMP and TIFF are larger by nature. Lossy JPEG, WebP, and AVIF encodings keep the smallest result that still respects the quality floor, and an unchanged file is returned as-is.
+- Does it work offline? Yes, after the page has loaded.
 
 ## Resources
 
-- [Universal Convertor website](https://convertor.apidevelopers.ir/): Open the browser-based converter.
-- [Source repository](https://github.com/emadtoranji/universal-convertor): Browse the source code and project documentation.
-- [Project README](https://github.com/emadtoranji/universal-convertor/blob/main/README.md): Read setup and application details.
-- [License](https://github.com/emadtoranji/universal-convertor/blob/main/LICENSE): Review reuse and redistribution terms.
+- [Universal Convertor](https://convertor.apidevelopers.ir/): Convert images and documents in the browser.
+- [Date converter](https://convertor.apidevelopers.ir/date): Convert Solar Hijri, Gregorian, and Lunar Hijri dates.
+- [Source repository](https://github.com/emadtoranji/universal-convertor): Browse the source code.

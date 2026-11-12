@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <script>
+      (function() {
+        try {
+          var match = document.cookie.match(/(?:^|;\s*)theme=([^;]*)/);
+          var theme = match ? decodeURIComponent(match[1]).trim().toLowerCase() : null;
+          if (theme !== 'dark' && theme !== 'light') {
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+            document.cookie = 'theme=' + encodeURIComponent(theme) + '; path=/; max-age=31536000; SameSite=Lax';
+          }
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+    <title>Date Converter - Solar Hijri, Gregorian, and Lunar Hijri</title>
+    <meta name="description" content="Convert Solar Hijri, Gregorian, and Lunar Hijri dates in your browser. Free, private, and nothing is uploaded." />
+    <meta name="keywords" content="jalali date converter, solar hijri converter, gregorian to jalali, hijri calendar converter, umm al-qura, client-side date converter" />
+    <link rel="canonical" href="https://convertor.apidevelopers.ir/date" />
+    <meta name="robots" content="index, follow" />
+    <meta name="application-name" content="Universal Convertor" />
+    <meta name="apple-mobile-web-app-title" content="Universal Convertor" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#06b6d4" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="describedby" href="/llms.txt" />
+    <link rel="icon" type="image/webp" sizes="32x32" href="/images/logo/32x32.webp" />
+    <link rel="icon" type="image/webp" sizes="16x16" href="/images/logo/16x16.webp" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/images/logo/128x128.webp" />
+    <meta property="og:title" content="Date Converter - Solar Hijri, Gregorian, and Lunar Hijri" />
+    <meta property="og:description" content="Synchronize Solar Hijri, Gregorian, and Lunar Hijri dates locally in the browser. Nothing is uploaded." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://convertor.apidevelopers.ir/date" />
+    <meta property="og:site_name" content="Universal Convertor" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://convertor.apidevelopers.ir/images/logo/512x512.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Date Converter - Solar Hijri, Gregorian, and Lunar Hijri" />
+    <meta name="twitter:description" content="Free private browser converter for Solar Hijri, Gregorian, and Lunar Hijri dates." />
+    <meta name="twitter:image" content="https://convertor.apidevelopers.ir/images/logo/512x512.webp" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Universal Date Converter",
+            "url": "https://convertor.apidevelopers.ir/date",
+            "image": "https://convertor.apidevelopers.ir/images/logo/512x512.webp",
+            "inLanguage": "en",
+            "operatingSystem": "Any",
+            "applicationCategory": "UtilitiesApplication",
+            "isPartOf": { "@type": "WebApplication", "name": "Universal Convertor", "url": "https://convertor.apidevelopers.ir/" },
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "description": "Free client-side converter for Solar Hijri, Gregorian, and Lunar Hijri dates. Calculations stay in the browser."
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is the date conversion performed entirely in my browser?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. The date converter uses local calendar algorithms and browser Intl APIs. Dates are not sent to a server."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How accurate are the Solar Hijri and Lunar Hijri conversions?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Solar Hijri uses the 33-year leap cycle. Lunar Hijri follows the Umm al-Qura astronomical standard, calculated on the device."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How does the converter calculate leap years?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Leap years are calculated for Solar Hijri, Gregorian, and Lunar Hijri at the same time. A badge marks a leap year on the active calendar."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 antialiased selection:bg-cyan-500/20 selection:text-cyan-600 dark:selection:text-cyan-300 min-h-screen transition-colors duration-200">
+    <div id="root">
+      <main>
+        <h1>Solar Hijri, Gregorian, and Lunar Hijri date converter</h1>
+        <p>Universal Convertor synchronizes Solar Hijri (Jalali), Gregorian, and Lunar Hijri dates in the browser. Change any field and the other calendars update locally. Nothing is uploaded.</p>
+        <h2>Frequently asked questions</h2>
+        <section>
+          <h3>Is the date conversion performed entirely in my browser?</h3>
+          <p>Yes. The date converter uses local calendar algorithms and browser Intl APIs. Dates are not sent to a server.</p>
+        </section>
+        <section>
+          <h3>How accurate are the Solar Hijri and Lunar Hijri conversions?</h3>
+          <p>Solar Hijri uses the 33-year leap cycle. Lunar Hijri follows the Umm al-Qura astronomical standard, calculated on the device.</p>
+        </section>
+        <section>
+          <h3>How does the converter calculate leap years?</h3>
+          <p>Leap years are calculated for Solar Hijri, Gregorian, and Lunar Hijri at the same time. A badge marks a leap year on the active calendar.</p>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

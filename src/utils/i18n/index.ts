@@ -8,7 +8,6 @@ import features from './locales/en/features.json' with { type: 'json' };
 import matrix from './locales/en/matrix.json' with { type: 'json' };
 import faq from './locales/en/faq.json' with { type: 'json' };
 import terms from './locales/en/terms.json' with { type: 'json' };
-import date from './locales/en/date.json' with { type: 'json' };
 
 export const enDictionary = {
   meta,
@@ -21,7 +20,6 @@ export const enDictionary = {
   matrix,
   faq,
   terms,
-  date,
 } as const;
 
 export const defaultLocale = 'en' as const;
@@ -99,7 +97,6 @@ export interface TypedTranslator {
   matrix: typeof matrix;
   faq: typeof faq;
   terms: typeof terms;
-  date: typeof date;
 }
 
 export const t: TypedTranslator = Object.assign(translate, enDictionary);

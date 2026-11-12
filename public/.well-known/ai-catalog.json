@@ -1,9 +1,25 @@
 {
-    "specVersion": "1.0",
-    "host": {
-        "displayName": "Universal Convertor",
-        "identifier": "did:web:convertor.apidevelopers.ir",
-        "documentationUrl": "https://convertor.apidevelopers.ir/"
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Universal Convertor",
+    "identifier": "did:web:convertor.apidevelopers.ir",
+    "documentationUrl": "https://convertor.apidevelopers.ir/"
+  },
+  "entries": [
+    {
+      "name": "Image and document converter",
+      "url": "https://convertor.apidevelopers.ir/",
+      "description": "Converts images and structured documents entirely in the browser. Files are not uploaded.",
+      "privacy": "Processing stays on the device. There is no account and no server-side file storage.",
+      "inputs": ["png", "jpeg", "webp", "avif", "heic", "svg", "bmp", "ico", "gif", "tiff", "psd", "json", "csv", "tsv", "md", "html", "txt", "xml"],
+      "outputs": ["webp", "avif", "png", "jpeg", "ico", "bmp", "tiff", "pdf", "zip", "json", "csv", "tsv", "md", "html", "txt", "xml"]
     },
-    "entries": []
+    {
+      "name": "Date converter",
+      "url": "https://convertor.apidevelopers.ir/date",
+      "description": "Synchronizes Solar Hijri, Gregorian, and Lunar Hijri dates in the browser.",
+      "privacy": "Date calculations stay on the device and are not sent to a server.",
+      "calendars": ["solar-hijri", "gregorian", "lunar-hijri"]
+    }
+  ]
 }

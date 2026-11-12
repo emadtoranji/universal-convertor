@@ -1,7 +1,8 @@
 {
   "title": "Drag & drop files here, or",
   "browse": "browse files",
-  "dragActive": "Drop files here to start converting",
+    "dragActive": "Drop files here to start converting",
+    "windowDrop": "Drop files anywhere to upload",
   "subtitle": "Batch convert images and structured data locally in browser memory. Paste with",
   "pasteKey": "Ctrl+V",
   "pasteAria": "Paste files from clipboard with Ctrl+V",

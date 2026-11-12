@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import App from './App';
-import DatePage from './pages/DatePage';
+
+const DatePage = lazy(() =>
+    import('./pages/DatePage').then((module) => ({ default: module.DatePage })),
+);
 
 function normalizePath(pathname: string): string {
     const trimmed = pathname.trim();
@@ -30,7 +33,18 @@ export function RootRouter(): React.ReactElement {
     }, []);
 
     if (currentPath === '/date') {
-        return <DatePage />;
+        return (
+            <Suspense
+                fallback={
+                    <div
+                        className='min-h-screen bg-zinc-50 dark:bg-zinc-950'
+                        aria-hidden='true'
+                    />
+                }
+            >
+                <DatePage />
+            </Suspense>
+        );
     }
 
     return <App />;

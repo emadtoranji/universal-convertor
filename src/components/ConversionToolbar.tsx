@@ -282,7 +282,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                                     }
                                 >
                                     <FileArchive className='h-4 w-4 text-cyan-600 dark:text-cyan-400' />
-                                    <span className='xs:inline hidden'>
+                                    <span className='hidden sm:inline'>
                                         {t.toolbar.actions.downloadZip}
                                     </span>
                                 </button>
@@ -298,7 +298,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                                         }
                                     >
                                         <FileText className='h-4 w-4 text-pink-600 dark:text-pink-400' />
-                                        <span className='xs:inline hidden'>
+                                        <span className='hidden sm:inline'>
                                             {t.toolbar.actions.mergePdf}
                                         </span>
                                     </button>
@@ -329,7 +329,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                             <select
                                 value={globalOptions.targetFormat}
                                 onChange={handleFormatChange}
-                                className='w-full cursor-pointer rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-900 focus:ring-2 focus:ring-cyan-500/50 focus:outline-none sm:text-sm dark:border-zinc-700/80 dark:bg-zinc-950 dark:text-zinc-100'
+                                className='w-full cursor-pointer rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-900 focus:ring-2 focus:ring-cyan-500/50 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none sm:text-sm dark:border-zinc-700/80 dark:bg-zinc-950 dark:text-zinc-100'
                             >
                                 {OUTPUT_FORMAT_GROUPS.map((grp) => (
                                     <optgroup
@@ -444,7 +444,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                                     }
                                 >
                                     <FileArchive className='h-4 w-4 text-cyan-600 dark:text-cyan-400' />
-                                    <span className='xs:inline hidden'>
+                                    <span className='hidden sm:inline'>
                                         {t.toolbar.actions.downloadZip}
                                     </span>
                                 </button>
@@ -460,7 +460,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                                         }
                                     >
                                         <FileText className='h-4 w-4 text-pink-600 dark:text-pink-400' />
-                                        <span className='xs:inline hidden'>
+                                        <span className='hidden sm:inline'>
                                             {t.toolbar.actions.mergePdf}
                                         </span>
                                     </button>
@@ -646,7 +646,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                                                         ''
                                                     }
                                                     onChange={handleWidthChange}
-                                                    className='w-full rounded-lg border border-zinc-300 bg-zinc-50 px-2 py-1 text-xs text-zinc-900 focus:border-cyan-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100'
+                                                    className='w-full rounded-lg border border-zinc-300 bg-zinc-50 px-2 py-1 text-xs text-zinc-900 focus:border-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100'
                                                 />
                                                 <span className='text-zinc-400'>
                                                     ×
@@ -664,7 +664,7 @@ const ConversionToolbarComponent: React.FC<ConversionToolbarProps> = ({
                                                     onChange={
                                                         handleHeightChange
                                                     }
-                                                    className='w-full rounded-lg border border-zinc-300 bg-zinc-50 px-2 py-1 text-xs text-zinc-900 focus:border-cyan-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100'
+                                                    className='w-full rounded-lg border border-zinc-300 bg-zinc-50 px-2 py-1 text-xs text-zinc-900 focus:border-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100'
                                                 />
                                                 <button
                                                     type='button'

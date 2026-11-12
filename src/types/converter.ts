@@ -178,6 +178,7 @@ export interface ConvertRequestPayload {
   originalWidth: number;
   originalHeight: number;
   fileName: string;
+  originalByteLength: number;
 }
 
 export type WorkerInboundMessage =

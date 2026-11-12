@@ -49,7 +49,14 @@ const workerEdgeHandler = {
       return Response.redirect(redirectUrl.toString(), 301);
     }
 
-    const response = await env.ASSETS.fetch(request);
+    let assetRequest = request;
+    if (url.pathname === '/date' || url.pathname === '/date/') {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = '/date.html';
+      assetRequest = new Request(assetUrl.toString(), request);
+    }
+
+    const response = await env.ASSETS.fetch(assetRequest);
     const headers = new Headers(response.headers);
 
     if (STATIC_EXTENSIONS.has(ext) && ext !== 'txt' && ext !== 'xml') {

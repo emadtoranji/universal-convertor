@@ -32,7 +32,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({
                             <span className='truncate bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 bg-clip-text text-sm font-bold tracking-tight text-transparent sm:text-lg dark:from-white dark:via-zinc-200 dark:to-zinc-400'>
                                 {t.header.brand.name}
                             </span>
-                            <span className='xs:block hidden truncate text-[10px] text-zinc-600 sm:text-xs dark:text-zinc-400'>
+                            <span className='hidden truncate text-[10px] text-zinc-600 sm:block sm:text-xs dark:text-zinc-400'>
                                 {t.header.brand.tagline}
                             </span>
                         </div>

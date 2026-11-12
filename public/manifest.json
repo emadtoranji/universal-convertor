@@ -1,7 +1,7 @@
 {
     "name": "Universal Convertor",
     "short_name": "Universal Convertor",
-    "description": "100% Free Client-Side Image, Audio, Video, Document and Date Converter",
+    "description": "Free client-side converter for images, documents, PDF, and Solar Hijri, Gregorian, and Lunar Hijri dates.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#09090b",
