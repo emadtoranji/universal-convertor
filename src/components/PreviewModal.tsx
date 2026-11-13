@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
 import X from 'lucide-react/icons/x';
 import Download from 'lucide-react/icons/download';
+import Share2 from 'lucide-react/icons/share-2';
 import Columns from 'lucide-react/icons/columns-2';
 import SplitSquareVertical from 'lucide-react/icons/square-split-vertical';
 import ArrowRight from 'lucide-react/icons/arrow-right';
@@ -14,18 +15,25 @@ interface PreviewModalProps {
   item: QueueItem | null;
   onClose: () => void;
   onDownload: (item: QueueItem) => void;
+  onShare: (item: QueueItem) => Promise<boolean>;
 }
 
 const PreviewModalComponent: React.FC<PreviewModalProps> = ({
   item,
   onClose,
   onDownload,
+  onShare,
 }): React.ReactElement | null => {
   const [sliderPosition, setSliderPosition] = useState<number>(50);
   const [comparisonMode, setComparisonMode] = useState<'slider' | 'side-by-side'>('slider');
   const [convertedImgError, setConvertedImgError] = useState<boolean>(false);
+  const [shareUnsupported, setShareUnsupported] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    setShareUnsupported(false);
+  }, [item?.id]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent): void => {
@@ -144,16 +152,32 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
             )}
 
             {item.result && (
-              <button
-                type="button"
-                onClick={() => onDownload(item)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-semibold text-xs transition-colors cursor-pointer"
-                title={t.preview.actions.downloadTitle}
-                aria-label={t.preview.actions.downloadAria}
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t.preview.actions.download}</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void onShare(item).then((shared) => {
+                      setShareUnsupported(!shared);
+                    });
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-zinc-950 font-semibold text-xs transition-colors cursor-pointer"
+                  title={t.preview.actions.shareTitle}
+                  aria-label={t.preview.actions.shareAria}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{t.preview.actions.share}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDownload(item)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-semibold text-xs transition-colors cursor-pointer"
+                  title={t.preview.actions.downloadTitle}
+                  aria-label={t.preview.actions.downloadAria}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{t.preview.actions.download}</span>
+                </button>
+              </>
             )}
 
             <button
@@ -288,9 +312,16 @@ const PreviewModalComponent: React.FC<PreviewModalProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400 text-[11px]">
-            <ShieldCheck className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-            <span>{t.preview.footer.clientSideGuarantee}</span>
+          <div className="flex flex-col items-end gap-1">
+            {shareUnsupported && (
+              <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium text-right">
+                {t.preview.actions.shareUnsupported}
+              </p>
+            )}
+            <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400 text-[11px]">
+              <ShieldCheck className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+              <span>{t.preview.footer.clientSideGuarantee}</span>
+            </div>
           </div>
         </div>
       </div>

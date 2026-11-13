@@ -38,6 +38,10 @@
     "download": "Download",
     "downloadTitle": "Download converted file",
     "downloadAria": "Download converted file to device",
+    "share": "Share",
+    "shareTitle": "Share converted file",
+    "shareAria": "Share converted file without downloading",
+    "shareUnsupported": "Sharing isn't available in this browser. You can still download the file.",
     "close": "Close",
     "closeAria": "Close preview modal"
   }

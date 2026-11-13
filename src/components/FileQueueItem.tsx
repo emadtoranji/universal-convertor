@@ -1,5 +1,6 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import Download from 'lucide-react/icons/download';
+import Share2 from 'lucide-react/icons/share-2';
 import Trash2 from 'lucide-react/icons/trash';
 import Play from 'lucide-react/icons/play';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
@@ -34,6 +35,7 @@ interface FileQueueItemProps {
   onRemove: (id: string) => void;
   onConvertSingle: (id: string) => void;
   onDownloadSingle: (item: QueueItem) => void;
+  onShareSingle: (item: QueueItem) => Promise<boolean>;
   onPreview: (item: QueueItem) => void;
   onTargetFormatChange: (id: string, format: OutputFormat) => void;
   onOptionsChange?: (id: string, options: ConversionOptions) => void;
@@ -45,6 +47,7 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
   onRemove,
   onConvertSingle,
   onDownloadSingle,
+  onShareSingle,
   onPreview,
   onTargetFormatChange,
   onOptionsChange,
@@ -52,6 +55,11 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
 }): React.ReactElement => {
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
   const [showMoreControls, setShowMoreControls] = useState<boolean>(false);
+  const [shareUnsupported, setShareUnsupported] = useState<boolean>(false);
+
+  useEffect(() => {
+    setShareUnsupported(false);
+  }, [item.id, item.status]);
 
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -232,6 +240,19 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
                   aria-label={t.queue.actions.previewAria}
                 >
                   <Eye className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void onShareSingle(item).then((shared) => {
+                      setShareUnsupported(!shared);
+                    });
+                  }}
+                  className="p-2 rounded-lg bg-teal-50 dark:bg-teal-500/10 hover:bg-teal-100 dark:hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/30 transition-colors cursor-pointer"
+                  title={t.queue.actions.shareTitle}
+                  aria-label={t.queue.actions.shareAria}
+                >
+                  <Share2 className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
@@ -507,9 +528,16 @@ const FileQueueItemComponent: React.FC<FileQueueItemProps> = ({
       )}
 
       {item.status === 'completed' && (
-        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>{t.queue.messages.completed}</span>
+        <div className="mt-2 flex flex-col gap-1">
+          <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{t.queue.messages.completed}</span>
+          </div>
+          {shareUnsupported && (
+            <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+              {t.queue.actions.shareUnsupported}
+            </p>
+          )}
         </div>
       )}
 

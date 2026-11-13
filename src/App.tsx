@@ -770,13 +770,22 @@ export default function App(): ReactElement {
         setIsProcessing(false);
     }, [convertSingleItem, isProcessing]);
 
-    const handleDownloadSingle = useCallback(
-        (item: QueueItem): void => {
-            if (!item.result) return;
+    const getConvertedFileName = useCallback(
+        (item: QueueItem): string | null => {
+            if (!item.result) return null;
             const ext = getFormatExtension(item.result.format);
             const baseName =
                 item.name.substring(0, item.name.lastIndexOf('.')) || item.name;
-            const downloadFileName = `${baseName}.${ext}`;
+            return `${baseName}.${ext}`;
+        },
+        [getFormatExtension],
+    );
+
+    const handleDownloadSingle = useCallback(
+        (item: QueueItem): void => {
+            if (!item.result) return;
+            const downloadFileName = getConvertedFileName(item);
+            if (!downloadFileName) return;
 
             const anchor = document.createElement('a');
             anchor.href = item.result.url;
@@ -785,7 +794,44 @@ export default function App(): ReactElement {
             anchor.click();
             document.body.removeChild(anchor);
         },
-        [getFormatExtension],
+        [getConvertedFileName],
+    );
+
+    const handleShareSingle = useCallback(
+        async (item: QueueItem): Promise<boolean> => {
+            if (!item.result || typeof navigator.share !== 'function') {
+                return false;
+            }
+
+            const fileName = getConvertedFileName(item);
+            if (!fileName) return false;
+
+            const file = new File([item.result.blob], fileName, {
+                type: item.result.mimeType || 'application/octet-stream',
+            });
+            const payload: ShareData = { files: [file], title: fileName };
+
+            if (
+                typeof navigator.canShare === 'function' &&
+                !navigator.canShare(payload)
+            ) {
+                return false;
+            }
+
+            try {
+                await navigator.share(payload);
+                return true;
+            } catch (error) {
+                if (
+                    error instanceof DOMException &&
+                    error.name === 'AbortError'
+                ) {
+                    return true;
+                }
+                return false;
+            }
+        },
+        [getConvertedFileName],
     );
 
     const handleDownloadZip = useCallback(async (): Promise<void> => {
@@ -1071,6 +1117,9 @@ export default function App(): ReactElement {
                                                     onDownloadSingle={
                                                         handleDownloadSingle
                                                     }
+                                                    onShareSingle={
+                                                        handleShareSingle
+                                                    }
                                                     onPreview={
                                                         handleOpenPreview
                                                     }
@@ -1234,6 +1283,7 @@ export default function App(): ReactElement {
                         item={previewItem}
                         onClose={handleClosePreview}
                         onDownload={handleDownloadSingle}
+                        onShare={handleShareSingle}
                     />
                 </Suspense>
             )}
